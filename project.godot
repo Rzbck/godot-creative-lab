@@ -1,0 +1,17 @@
+; Engine configuration file.
+; Generated for DataC0re Creative Lab.
+; Godot renderer and exact engine version will be confirmed before first scene.
+
+config_version=5
+
+[application]
+
+config/name="DataC0re Creative Lab"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"

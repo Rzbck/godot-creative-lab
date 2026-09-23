@@ -1,0 +1,25 @@
+# Godot generated data
+.godot/
+
+# Builds / exports
+build/
+dist/
+export/
+
+# Logs / temporary files
+*.log
+*.tmp
+*.temp
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local-only experiments / captures
+captures/
+local/
