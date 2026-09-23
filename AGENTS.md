@@ -140,3 +140,18 @@ Update HANDOFF.md after material changes:
 Do not store conversation transcripts.
 
 Keep durable decisions, evidence, commit references and next actions.
+
+## Godot project configuration
+
+`project.godot` is tracked and important, but the Godot editor may legitimately rewrite it.
+
+Before treating a dirty worktree as a blocker:
+
+1. run `scripts/preflight.ps1`;
+2. if only `project.godot` changed, inspect its exact diff;
+3. distinguish editor normalization from intentional Project Settings changes;
+4. never automatically restore, stage, or accept arbitrary `project.godot` changes.
+
+Prefer the Godot editor / Project Settings UI for ordinary engine configuration.
+
+Use `.gitattributes` as the repository source of truth for line-ending policy.

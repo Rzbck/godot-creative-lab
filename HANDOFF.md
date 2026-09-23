@@ -84,3 +84,16 @@ EXPERIMENTAL:
 BLOCKER:
 - installed Godot executable/version not yet located.
 
+
+## project.godot editor policy
+
+Godot 4.7.1 normalized `project.godot` on first editor launch.
+
+Validated normalization:
+- standard Godot configuration-file header;
+- `config/features=PackedStringArray("4.7")`;
+- existing display settings preserved.
+
+Future sessions must use `scripts/preflight.ps1`.
+
+A `project.godot`-only dirty state is `REVIEW_REQUIRED`, not an automatic blocker.

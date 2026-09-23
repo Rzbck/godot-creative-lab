@@ -1,12 +1,17 @@
 ; Engine configuration file.
-; Generated for DataC0re Creative Lab.
-; Godot renderer and exact engine version will be confirmed before first scene.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
 
 [application]
 
 config/name="DataC0re Creative Lab"
+config/features=PackedStringArray("4.7")
 
 [display]
 
