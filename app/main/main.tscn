@@ -1,0 +1,116 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://app/main/main.gd" id="1_main"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.047, 0.055, 0.071, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Shell" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+
+[node name="TopBar" type="HBoxContainer" parent="Margin/Shell"]
+layout_mode = 2
+
+[node name="Brand" type="VBoxContainer" parent="Margin/Shell/TopBar"]
+layout_mode = 2
+
+[node name="BrandTitle" type="Label" parent="Margin/Shell/TopBar/Brand"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "DataC0re Creative Lab"
+
+[node name="BrandSubtitle" type="Label" parent="Margin/Shell/TopBar/Brand"]
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "Realtime creative-coding workspace"
+
+[node name="Spacer" type="Control" parent="Margin/Shell/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GalleryButton" type="Button" parent="Margin/Shell/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Gallery"
+
+[node name="SettingsButton" type="Button" parent="Margin/Shell/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Settings"
+
+[node name="AboutButton" type="Button" parent="Margin/Shell/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "About"
+
+[node name="Separator" type="HSeparator" parent="Margin/Shell"]
+layout_mode = 2
+
+[node name="ContentPanel" type="PanelContainer" parent="Margin/Shell"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContentMargin" type="MarginContainer" parent="Margin/Shell/ContentPanel"]
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="Margin/Shell/ContentPanel/ContentMargin"]
+layout_mode = 2
+
+[node name="Kicker" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "APPLICATION SHELL"
+
+[node name="PageTitle" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "Gallery"
+
+[node name="PageBody" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Creative Lab shell"
+autowrap_mode = 2
+
+[node name="ContentSpacer" type="Control" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StatusRow" type="HBoxContainer" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+layout_mode = 2
+
+[node name="StatusDot" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content/StatusRow"]
+layout_mode = 2
+text = "●"
+
+[node name="StatusLabel" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content/StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "Shell ready"
