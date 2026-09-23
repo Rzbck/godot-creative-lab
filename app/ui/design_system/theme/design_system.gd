@@ -18,6 +18,7 @@ const COLOR_ACCENT := Color(0.941, 0.651, 0.357, 1.0)
 const COLOR_ACCENT_SOFT := Color(0.941, 0.651, 0.357, 0.14)
 const COLOR_ACCENT_HOVER := Color(1.0, 0.714, 0.431, 1.0)
 const COLOR_DANGER := Color(0.886, 0.376, 0.376, 1.0)
+const COLOR_DANGER_SOFT := Color(0.886, 0.376, 0.376, 0.15)
 
 const FONT_MICRO := 10
 const FONT_CAPTION := 11
@@ -119,12 +120,34 @@ static func _define_buttons(theme: Theme) -> void:
     theme.set_stylebox("hover", "ToolButton", _box(COLOR_SURFACE_HOVER, COLOR_BORDER, RADIUS_SMALL, 1, 7.0, 3.0))
     theme.set_stylebox("pressed", "ToolButton", _box(COLOR_ACCENT_SOFT, COLOR_ACCENT, RADIUS_SMALL, 1, 7.0, 3.0))
 
+    theme.set_type_variation("WindowButton", "Button")
+    theme.set_font_size("font_size", "WindowButton", FONT_CAPTION)
+    theme.set_color("font_color", "WindowButton", COLOR_TEXT_DIM)
+    theme.set_color("font_hover_color", "WindowButton", COLOR_TEXT)
+    theme.set_color("font_pressed_color", "WindowButton", COLOR_ACCENT)
+    theme.set_color("font_focus_color", "WindowButton", COLOR_TEXT)
+    theme.set_stylebox("normal", "WindowButton", _box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), RADIUS_SMALL, 0, 4.0, 2.0))
+    theme.set_stylebox("hover", "WindowButton", _box(COLOR_SURFACE_HOVER, COLOR_BORDER_SOFT, RADIUS_SMALL, 1, 4.0, 2.0))
+    theme.set_stylebox("pressed", "WindowButton", _box(COLOR_ACCENT_SOFT, COLOR_ACCENT, RADIUS_SMALL, 1, 4.0, 2.0))
+    theme.set_stylebox("focus", "WindowButton", _box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), RADIUS_SMALL, 0, 4.0, 2.0))
+
+    theme.set_type_variation("WindowCloseButton", "Button")
+    theme.set_font_size("font_size", "WindowCloseButton", FONT_CAPTION)
+    theme.set_color("font_color", "WindowCloseButton", COLOR_TEXT_DIM)
+    theme.set_color("font_hover_color", "WindowCloseButton", COLOR_TEXT)
+    theme.set_color("font_pressed_color", "WindowCloseButton", COLOR_TEXT)
+    theme.set_color("font_focus_color", "WindowCloseButton", COLOR_TEXT)
+    theme.set_stylebox("normal", "WindowCloseButton", _box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), RADIUS_SMALL, 0, 4.0, 2.0))
+    theme.set_stylebox("hover", "WindowCloseButton", _box(COLOR_DANGER_SOFT, COLOR_DANGER, RADIUS_SMALL, 1, 4.0, 2.0))
+    theme.set_stylebox("pressed", "WindowCloseButton", _box(COLOR_DANGER, COLOR_DANGER, RADIUS_SMALL, 1, 4.0, 2.0))
+    theme.set_stylebox("focus", "WindowCloseButton", _box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), RADIUS_SMALL, 0, 4.0, 2.0))
+
 
 static func _define_panels(theme: Theme) -> void:
     theme.set_stylebox("panel", "PanelContainer", _box(COLOR_SURFACE, COLOR_BORDER_SOFT, RADIUS_SMALL, 1, 0.0, 0.0))
 
     theme.set_type_variation("TopBarPanel", "PanelContainer")
-    theme.set_stylebox("panel", "TopBarPanel", _box(COLOR_SURFACE, COLOR_BORDER_SOFT, RADIUS_SMALL, 1, 8.0, 5.0))
+    theme.set_stylebox("panel", "TopBarPanel", _box(COLOR_SURFACE, COLOR_BORDER_SOFT, RADIUS_SMALL, 1, 8.0, 4.0))
 
     theme.set_type_variation("RailPanel", "PanelContainer")
     theme.set_stylebox("panel", "RailPanel", _box(COLOR_SURFACE, COLOR_BORDER_SOFT, RADIUS_SMALL, 1, 4.0, 4.0))

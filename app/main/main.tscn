@@ -37,7 +37,8 @@ theme_type_variation = &"ShellMargin"
 layout_mode = 2
 
 [node name="TopBar" type="PanelContainer" parent="Margin/Shell"]
-custom_minimum_size = Vector2(0, 34)
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 theme_type_variation = &"TopBarPanel"
 
@@ -46,31 +47,68 @@ layout_mode = 2
 
 [node name="Brand" type="Label" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
+mouse_filter = 2
 theme_type_variation = &"BrandLabel"
 text = "DC//LAB"
 
 [node name="BrandDivider" type="VSeparator" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="PagePath" type="Label" parent="Margin/Shell/TopBar/Row"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 2
 theme_type_variation = &"PathLabel"
 text = "res://gallery"
 
 [node name="TopSpacer" type="Control" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
 [node name="Engine" type="Label" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
+mouse_filter = 2
 theme_type_variation = &"MicroLabel"
 text = "GODOT 4.7.1"
 
 [node name="Mode" type="Label" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
+mouse_filter = 2
 theme_type_variation = &"AccentLabel"
 text = "[LOCAL]"
+
+[node name="WindowDivider" type="VSeparator" parent="Margin/Shell/TopBar/Row"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MinimizeButton" type="Button" parent="Margin/Shell/TopBar/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 20)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"WindowButton"
+tooltip_text = "Minimize"
+text = "–"
+
+[node name="MaximizeButton" type="Button" parent="Margin/Shell/TopBar/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 20)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"WindowButton"
+tooltip_text = "Maximize"
+text = "□"
+
+[node name="CloseButton" type="Button" parent="Margin/Shell/TopBar/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 20)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"WindowCloseButton"
+tooltip_text = "Close"
+text = "×"
 
 [node name="Body" type="HBoxContainer" parent="Margin/Shell"]
 layout_mode = 2
