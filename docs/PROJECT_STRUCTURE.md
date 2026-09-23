@@ -25,8 +25,11 @@
         │   ├── setting_row/
         │   ├── dialogs/
         │   └── notifications/
-        ├── theme/
-        └── assets/
+        └── design_system/
+            ├── tokens/
+            ├── theme/
+            │   └── generated/
+            ├── components/
             ├── icons/
             └── fonts/
 
@@ -71,5 +74,7 @@ The artistic title remains metadata.
 Sketch-specific content stays inside its sketch.
 
 Application UI resources stay under `app/ui/`.
+
+The application design system lives under `app/ui/design_system/` and is the single source of reusable UI styling decisions.
 
 Only real reuse belongs under `shared/`.
