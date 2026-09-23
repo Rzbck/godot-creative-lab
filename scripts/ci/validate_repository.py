@@ -28,6 +28,11 @@ FORBIDDEN_TRACKED_PREFIXES = (
 MAX_TRACKED_FILE_BYTES = 90 * 1024 * 1024
 
 ALLOWED_PROJECT_NAME = re.compile(r"^[a-z0-9_]+(?:\.[a-z0-9_]+)*$")
+ALLOWED_CONVENTIONAL_FILENAMES = {
+    "README.md",
+    "LICENSE",
+    "LICENSE.md",
+}
 
 
 def fail(message: str) -> None:
@@ -114,8 +119,12 @@ def validate_project_owned_names() -> None:
                 if component.startswith("."):
                     continue
 
+                # Conventional documentation filenames keep their standard casing.
+                if path.is_file() and component == path.name and component in ALLOWED_CONVENTIONAL_FILENAMES:
+                    continue
+
                 stem = component
-                if path.is_file():
+                if path.is_file() and component == path.name:
                     stem = path.stem
 
                 if stem and not ALLOWED_PROJECT_NAME.fullmatch(stem.lower()):
