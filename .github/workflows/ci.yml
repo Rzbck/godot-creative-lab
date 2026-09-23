@@ -66,7 +66,28 @@ jobs:
           esac
 
       - name: Import project headlessly
-        run: godot --headless --path . --import
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          godot --headless --path . --import 2>&1 | tee /tmp/godot-import.log
+
+          if grep -Eq '^\s*(SCRIPT ERROR:|ERROR:)' /tmp/godot-import.log; then
+            echo "Godot reported an import/script error." >&2
+            exit 1
+          fi
+
+      - name: Smoke-test main scene
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          godot --headless --path . --quit-after 3 2>&1 | tee /tmp/godot-smoke.log
+
+          if grep -Eq '^\s*(SCRIPT ERROR:|ERROR:)' /tmp/godot-smoke.log; then
+            echo "Godot reported a runtime/script error." >&2
+            exit 1
+          fi
 
       - name: Verify Godot did not modify tracked files
         shell: bash
@@ -80,4 +101,4 @@ jobs:
             exit 1
           fi
 
-          echo "Repository remains clean after Godot import."
+          echo "Repository remains clean after Godot import and runtime smoke test."
