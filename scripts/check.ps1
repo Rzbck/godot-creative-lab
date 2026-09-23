@@ -36,9 +36,30 @@
 
     Write-Host "`n=== GODOT ===" -ForegroundColor Cyan
 
-    $Version = (godot --version).Trim()
+    $GodotAutomation = $null
 
-    Write-Host "Version : $Version"
+    if ($IsWindows) {
+        $PinnedConsole = "C:\Godot\Godot_v4.7.1-stable_win64_console.exe"
+
+        if (Test-Path -LiteralPath $PinnedConsole) {
+            $GodotAutomation = $PinnedConsole
+        }
+    }
+
+    if (-not $GodotAutomation) {
+        $GodotCommand = Get-Command godot -ErrorAction SilentlyContinue
+
+        if (-not $GodotCommand) {
+            throw "STOP : Godot introuvable."
+        }
+
+        $GodotAutomation = $GodotCommand.Source
+    }
+
+    $Version = (& $GodotAutomation --version).Trim()
+
+    Write-Host "Automation executable : $GodotAutomation"
+    Write-Host "Version               : $Version"
 
     if ($Version -notmatch "^4\.7\.1\.stable") {
         throw "STOP : version Godot inattendue : $Version"
@@ -46,7 +67,7 @@
 
     Write-Host "`n=== GODOT HEADLESS IMPORT ===" -ForegroundColor Cyan
 
-    godot `
+    & $GodotAutomation `
         --headless `
         --path . `
         --import
@@ -56,7 +77,7 @@
     $AfterGodot = @(git status --porcelain)
 
     if ($AfterGodot.Count -ne 0) {
-        Write-Host "Godot a modifie des fichiers versionnes :" -ForegroundColor Red
+        Write-Host "Godot a modifie le repository :" -ForegroundColor Red
         $AfterGodot
         git --no-pager diff
         throw "STOP : Godot headless n'est pas repository-clean."
