@@ -3,14 +3,15 @@ extends "res://app/main/main_base.gd"
 var _render_window: Window = null
 var _render_window_texture: TextureRect = null
 var _presentation_transition: bool = false
+var _render_screen: int = 0
 
 
 func _create_render_window() -> void:
     if is_instance_valid(_render_window):
         return
 
-    # This output must be a real native window. It stays independent from the
-    # Creative Lab window so entering/leaving presentation never reflows the UI.
+    # Dedicated native output. The Creative Lab window is never resized or
+    # switched to fullscreen, so presentation cannot reflow the main UI.
     get_viewport().gui_embed_subwindows = false
 
     _render_window = Window.new()
@@ -18,8 +19,10 @@ func _create_render_window() -> void:
     _render_window.title = "DataC0re Creative Lab / Output"
     _render_window.visible = false
     _render_window.force_native = true
+    _render_window.mode = Window.MODE_WINDOWED
     _render_window.borderless = true
     _render_window.unresizable = true
+    _render_window.always_on_top = true
     _render_window.transient = false
     _render_window.exclusive = false
     _render_window.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
@@ -46,6 +49,15 @@ func _create_render_window() -> void:
     _render_window.size_changed.connect(_on_render_window_size_changed)
 
 
+func _input(event: InputEvent) -> void:
+    # The native output window owns all presentation input. Without this guard,
+    # the same Esc/F11 event can also be seen by main_base.gd.
+    if _fullscreen_active:
+        return
+
+    super(event)
+
+
 func _enter_render_fullscreen() -> void:
     if not is_instance_valid(_active_sketch) or _fullscreen_active or _presentation_transition:
         return
@@ -56,14 +68,14 @@ func _enter_render_fullscreen() -> void:
 
     _presentation_transition = true
     _fullscreen_active = true
+    _render_screen = get_window().current_screen
     _render_window_texture.texture = sketch_viewport.get_texture()
 
-    # Put the native output on the same monitor as Creative Lab before making
-    # it fullscreen. MODE_FULLSCREEN is intentional: it is the Godot mode with
-    # full multi-window support, whereas exclusive fullscreen conflicts with a
-    # second application window on the same screen.
-    _render_window.current_screen = get_window().current_screen
-    _render_window.mode = Window.MODE_WINDOWED
+    # Windows/Godot multi-window fullscreen has been unreliable here. For a VJ
+    # presentation output we do not need to change the main app window at all:
+    # make a native borderless top-level window cover the complete monitor.
+    # This includes the taskbar area and is visually identical to fullscreen.
+    _apply_render_screen_rect()
     _render_window.show()
     _last_preview_size = Vector2i.ZERO
     call_deferred("_finish_enter_render_fullscreen")
@@ -76,41 +88,33 @@ func _finish_enter_render_fullscreen() -> void:
         _presentation_transition = false
         return
 
-    var window_id: int = _render_window.get_window_id()
-    if window_id == DisplayServer.INVALID_WINDOW_ID:
-        _fullscreen_active = false
-        _render_window.hide()
-        _presentation_transition = false
-        return
+    # Reapply after show(): on Windows, the window manager can alter the first
+    # placement while creating the native HWND.
+    _apply_render_screen_rect()
 
-    var target_screen: int = get_window().current_screen
-    DisplayServer.window_set_current_screen(target_screen, window_id)
-    DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN, window_id)
-
-    await get_tree().process_frame
     await get_tree().process_frame
 
     if not _fullscreen_active:
         _presentation_transition = false
         return
 
-    # Defensive Windows fallback: if the window manager did not accept the
-    # fullscreen request, cover the physical monitor exactly with a borderless
-    # native top-level window instead of silently leaving a smaller window.
-    if DisplayServer.window_get_mode(window_id) != DisplayServer.WINDOW_MODE_FULLSCREEN:
-        DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED, window_id)
-        DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true, window_id)
-        DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_ALWAYS_ON_TOP, true, window_id)
-        DisplayServer.window_set_position(DisplayServer.screen_get_position(target_screen), window_id)
-        DisplayServer.window_set_size(DisplayServer.screen_get_size(target_screen), window_id)
-
-        await get_tree().process_frame
-
-    DisplayServer.window_move_to_foreground(window_id)
     _last_preview_size = Vector2i.ZERO
     _sync_preview_resolution(true)
     _render_window.grab_focus()
     _presentation_transition = false
+
+
+func _apply_render_screen_rect() -> void:
+    if not is_instance_valid(_render_window):
+        return
+
+    _render_window.mode = Window.MODE_WINDOWED
+    _render_window.current_screen = _render_screen
+    _render_window.borderless = true
+    _render_window.unresizable = true
+    _render_window.always_on_top = true
+    _render_window.position = DisplayServer.screen_get_position(_render_screen)
+    _render_window.size = DisplayServer.screen_get_size(_render_screen)
 
 
 func _exit_render_fullscreen() -> void:
@@ -119,13 +123,12 @@ func _exit_render_fullscreen() -> void:
 
     _presentation_transition = true
 
+    # Hiding the native output is enough. We deliberately do not call
+    # DisplayServer with its window ID during teardown: hide() can invalidate
+    # that platform ID immediately on Windows.
     if is_instance_valid(_render_window):
-        # Important on Windows: reset the Window while its native handle still
-        # exists. Hiding it first invalidates that handle, which caused the
-        # DisplayServer "!windows.has(p_window)" errors seen on Esc.
-        _render_window.always_on_top = false
-        _render_window.mode = Window.MODE_WINDOWED
         _render_window.hide()
+        _render_window.always_on_top = false
 
     call_deferred("_finish_exit_render_fullscreen")
 
@@ -139,8 +142,6 @@ func _finish_exit_render_fullscreen() -> void:
     await get_tree().process_frame
     await get_tree().process_frame
 
-    # The Creative Lab window was never resized or switched to fullscreen, so
-    # the normal project UI is still exactly where it was before presentation.
     _sync_preview_resolution(true)
     get_window().grab_focus()
     _presentation_transition = false
