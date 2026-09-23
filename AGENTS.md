@@ -140,3 +140,40 @@ Update HANDOFF.md after material changes:
 Do not store conversation transcripts.
 
 Keep durable decisions, evidence, commit references and next actions.
+
+## Godot project configuration
+
+`project.godot` is tracked and important, but the Godot editor may legitimately rewrite it.
+
+Before treating a dirty worktree as a blocker:
+
+1. run `scripts/preflight.ps1`;
+2. if only `project.godot` changed, inspect its exact diff;
+3. distinguish editor normalization from intentional Project Settings changes;
+4. never automatically restore, stage, or accept arbitrary `project.godot` changes.
+
+Prefer the Godot editor / Project Settings UI for ordinary engine configuration.
+
+Use `.gitattributes` as the repository source of truth for line-ending policy.
+
+## Automated validation
+
+Prefer repeatable repository scripts and CI over repeatedly asking the user to perform equivalent manual checks.
+
+Local standard check:
+
+    scripts/check.ps1
+
+GitHub CI:
+
+    .github/workflows/ci.yml
+
+For PowerShell 7 automation that invokes native commands such as Git or Godot, enable:
+
+    $PSNativeCommandUseErrorActionPreference = $true
+
+A failing native process must not be silently treated as success.
+
+Godot CI must remain pinned to the validated project engine version until an explicit engine upgrade is validated.
+
+Do not add expensive build/export matrices before the project actually needs them.

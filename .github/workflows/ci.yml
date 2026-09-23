@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-policy:
+    name: Repository policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Validate repository
+        run: python scripts/ci/validate_repository.py
+
+  godot-headless:
+    name: Godot 4.7.1 headless
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Godot 4.7.1
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: "4.7.1"
+          use-dotnet: false
+          include-templates: false
+
+      - name: Verify Godot version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(godot --version)"
+          echo "Godot: ${VERSION}"
+
+          case "${VERSION}" in
+            4.7.1.stable*)
+              ;;
+            *)
+              echo "Unexpected Godot version: ${VERSION}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Import project headlessly
+        run: godot --headless --path . --import
+
+      - name: Verify Godot did not modify tracked files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Godot changed the repository:"
+            git status --short
+            git diff
+            exit 1
+          fi
+
+          echo "Repository remains clean after Godot import."
