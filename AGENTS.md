@@ -155,3 +155,25 @@ Before treating a dirty worktree as a blocker:
 Prefer the Godot editor / Project Settings UI for ordinary engine configuration.
 
 Use `.gitattributes` as the repository source of truth for line-ending policy.
+
+## Automated validation
+
+Prefer repeatable repository scripts and CI over repeatedly asking the user to perform equivalent manual checks.
+
+Local standard check:
+
+    scripts/check.ps1
+
+GitHub CI:
+
+    .github/workflows/ci.yml
+
+For PowerShell 7 automation that invokes native commands such as Git or Godot, enable:
+
+    $PSNativeCommandUseErrorActionPreference = $true
+
+A failing native process must not be silently treated as success.
+
+Godot CI must remain pinned to the validated project engine version until an explicit engine upgrade is validated.
+
+Do not add expensive build/export matrices before the project actually needs them.

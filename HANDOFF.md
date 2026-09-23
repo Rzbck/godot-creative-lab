@@ -141,3 +141,27 @@ Current intentional state:
 NEXT:
 
 User chooses the next implementation target before any scene is created.
+
+## Automation foundation
+
+Repository automation is being introduced before application implementation.
+
+Local validation entry point:
+
+`scripts/check.ps1`
+
+GitHub workflow:
+
+`.github/workflows/ci.yml`
+
+Current CI targets:
+
+- repository policy;
+- Godot 4.7.1 headless import;
+- tracked-file cleanliness after Godot import.
+
+Dependabot is configured for GitHub Actions updates.
+
+No export/build/release pipeline exists yet.
+
+Those stages will be added when the project has actual runnable scenes/export presets.
