@@ -68,6 +68,13 @@ jobs:
       - name: Import project headlessly
         run: godot --headless --path . --import
 
+      - name: Inspect generated Godot UID sidecars
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Generated UID sidecars:"
+          find . -type f -name '*.gd.uid' -print -exec sh -c 'printf "  "; cat "$1"' _ {} \;
+
       - name: Verify Godot did not modify tracked files
         shell: bash
         run: |
