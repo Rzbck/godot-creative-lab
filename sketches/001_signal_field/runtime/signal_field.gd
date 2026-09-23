@@ -168,13 +168,3 @@ func _draw() -> void:
         var color: Color = POINT.lerp(POINT_FAINT, clampf(1.0 - pulse, 0.0, 1.0))
         color.a = lerpf(0.45, 0.95, pulse)
         draw_circle(points[i], radius, color)
-
-    draw_string(
-        ThemeDB.fallback_font,
-        Vector2(20, size.y - 20),
-        "001_SIGNAL_FIELD  |  MOVE POINTER / HOLD LEFT CLICK  |  points=%d" % point_count,
-        HORIZONTAL_ALIGNMENT_LEFT,
-        -1,
-        14,
-        Color(0.62, 0.68, 0.80, 0.70)
-    )

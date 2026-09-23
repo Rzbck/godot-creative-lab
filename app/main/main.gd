@@ -40,13 +40,13 @@ const RESIZE_GRAB_PX: float = 6.0
 @onready var sketch_viewport: SubViewport = %SketchViewport
 @onready var parameter_list: VBoxContainer = %ParameterList
 @onready var page_spacer: Control = %PageSpacer
-@onready var fullscreen_overlay: Control = %FullscreenOverlay
-@onready var fullscreen_texture: TextureRect = %FullscreenTexture
 
 var _catalog: Array[Dictionary] = []
 var _active_definition: Dictionary = {}
 var _active_sketch: Node = null
 var _fullscreen_active: bool = false
+var _render_window: Window = null
+var _render_window_texture: TextureRect = null
 var _last_preview_size: Vector2i = Vector2i.ZERO
 
 var _last_window_mode: int = -1
@@ -65,6 +65,11 @@ func _ready() -> void:
     root_window.content_scale_factor = 1.0
     root_window.min_size = MIN_WINDOW_SIZE
 
+    # Keep presentation fullscreen in its own native window. The editor window
+    # must never change mode or geometry when entering/exiting render fullscreen.
+    get_viewport().gui_embed_subwindows = false
+    _create_render_window()
+
     DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
     DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
     top_bar.mouse_default_cursor_shape = Control.CURSOR_MOVE
@@ -79,14 +84,12 @@ func _ready() -> void:
     project_back_button.custom_minimum_size = Vector2(118, 24)
     project_back_button.tooltip_text = "Back to Gallery / Esc"
     gallery_button.tooltip_text = "Gallery / all projects / Esc"
-    fullscreen_button.tooltip_text = "Fill Creative Lab with render / F11 / Esc to return"
+    fullscreen_button.tooltip_text = "Render fullscreen / F11 / Esc to return"
 
     minimize_button.pressed.connect(_minimize_window)
     maximize_button.pressed.connect(_toggle_maximize_window)
     close_button.pressed.connect(_close_window)
     top_bar.gui_input.connect(_on_top_bar_gui_input)
-
-    fullscreen_texture.texture = sketch_viewport.get_texture()
 
     _remember_windowed_rect()
     _sync_window_controls()
@@ -132,10 +135,10 @@ func _input(event: InputEvent) -> void:
                 get_viewport().set_input_as_handled()
                 return
 
+    # The fullscreen presentation window has its own input signal and forwards
+    # events to the sketch. Never let fullscreen presentation clicks resize the
+    # editor window underneath it.
     if _fullscreen_active:
-        if is_instance_valid(_active_sketch):
-            sketch_viewport.push_input(event, true)
-        get_viewport().set_input_as_handled()
         return
 
     if not event is InputEventMouseButton:
@@ -154,6 +157,41 @@ func _input(event: InputEvent) -> void:
 
     DisplayServer.window_start_resize(edge)
     get_viewport().set_input_as_handled()
+
+
+func _create_render_window() -> void:
+    if is_instance_valid(_render_window):
+        return
+
+    _render_window = Window.new()
+    _render_window.name = "RenderFullscreenWindow"
+    _render_window.title = "DataC0re Creative Lab / Render"
+    _render_window.visible = false
+    _render_window.borderless = true
+    _render_window.unresizable = true
+    _render_window.transient = false
+    _render_window.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+    _render_window.content_scale_factor = 1.0
+    add_child(_render_window)
+
+    var render_background: ColorRect = ColorRect.new()
+    render_background.name = "Background"
+    render_background.color = Color.BLACK
+    render_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    render_background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    _render_window.add_child(render_background)
+
+    _render_window_texture = TextureRect.new()
+    _render_window_texture.name = "RenderTexture"
+    _render_window_texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _render_window_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    _render_window_texture.stretch_mode = TextureRect.STRETCH_SCALE
+    _render_window_texture.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    _render_window.add_child(_render_window_texture)
+
+    _render_window.close_requested.connect(_exit_render_fullscreen)
+    _render_window.window_input.connect(_on_render_window_input)
+    _render_window.size_changed.connect(_on_render_window_size_changed)
 
 
 func _load_catalog() -> void:
@@ -429,20 +467,29 @@ func _enter_render_fullscreen() -> void:
     if not is_instance_valid(_active_sketch) or _fullscreen_active:
         return
 
+    _create_render_window()
+    if not is_instance_valid(_render_window) or not is_instance_valid(_render_window_texture):
+        return
+
     _fullscreen_active = true
-    fullscreen_texture.texture = sketch_viewport.get_texture()
-    fullscreen_overlay.visible = true
-    fullscreen_overlay.grab_focus()
+    _render_window_texture.texture = sketch_viewport.get_texture()
+    _render_window.current_screen = get_window().current_screen
+    _render_window.mode = Window.MODE_FULLSCREEN
+    _render_window.show()
+    _render_window.grab_focus()
     _last_preview_size = Vector2i.ZERO
     call_deferred("_finish_enter_render_fullscreen")
 
 
 func _finish_enter_render_fullscreen() -> void:
     await get_tree().process_frame
-    if not _fullscreen_active:
+    await get_tree().process_frame
+
+    if not _fullscreen_active or not is_instance_valid(_render_window):
         return
+
     _sync_preview_resolution(true)
-    fullscreen_overlay.grab_focus()
+    _render_window.grab_focus()
 
 
 func _exit_render_fullscreen() -> void:
@@ -450,7 +497,10 @@ func _exit_render_fullscreen() -> void:
         return
 
     _fullscreen_active = false
-    fullscreen_overlay.visible = false
+
+    if is_instance_valid(_render_window):
+        _render_window.hide()
+
     _last_preview_size = Vector2i.ZERO
     call_deferred("_finish_exit_render_fullscreen")
 
@@ -462,11 +512,40 @@ func _finish_exit_render_fullscreen() -> void:
     get_window().grab_focus()
 
 
+func _on_render_window_input(event: InputEvent) -> void:
+    if not _fullscreen_active:
+        return
+
+    if event is InputEventKey:
+        var key_event: InputEventKey = event as InputEventKey
+        if key_event.pressed and not key_event.echo:
+            if key_event.keycode == KEY_ESCAPE or key_event.keycode == KEY_F11:
+                _exit_render_fullscreen()
+                if is_instance_valid(_render_window):
+                    _render_window.set_input_as_handled()
+                return
+
+    if is_instance_valid(_active_sketch):
+        sketch_viewport.push_input(event, true)
+
+
+func _on_render_window_size_changed() -> void:
+    if not _fullscreen_active:
+        return
+    _last_preview_size = Vector2i.ZERO
+    call_deferred("_sync_preview_resolution", true)
+
+
 func _sync_preview_resolution(force: bool = false) -> void:
     if not is_instance_valid(sketch_viewport):
         return
 
-    var target_size: Vector2 = fullscreen_overlay.size if _fullscreen_active else sketch_viewport_container.size
+    var target_size: Vector2
+    if _fullscreen_active and is_instance_valid(_render_window) and _render_window.visible:
+        target_size = Vector2(_render_window.size)
+    else:
+        target_size = sketch_viewport_container.size
+
     var target: Vector2i = Vector2i(
         maxi(1, roundi(target_size.x)),
         maxi(1, roundi(target_size.y))
@@ -581,6 +660,8 @@ func _resize_edge_for_position(position: Vector2) -> int:
 
 
 func _close_window() -> void:
+    if is_instance_valid(_render_window):
+        _render_window.hide()
     get_tree().quit()
 
 
