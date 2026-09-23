@@ -48,6 +48,10 @@ var _catalog: Array[Dictionary] = []
 var _active_definition: Dictionary = {}
 var _active_sketch: Node = null
 var _fullscreen_active: bool = false
+var _fullscreen_transition: bool = false
+var _fullscreen_previous_mode: int = DisplayServer.WINDOW_MODE_WINDOWED
+var _fullscreen_previous_position: Vector2i = Vector2i.ZERO
+var _fullscreen_previous_size: Vector2i = Vector2i(1280, 720)
 var _last_preview_size: Vector2i = Vector2i.ZERO
 
 var _last_window_mode: int = -1
@@ -76,6 +80,12 @@ func _ready() -> void:
     project_back_button.pressed.connect(_show_gallery)
     fullscreen_button.pressed.connect(_enter_render_fullscreen)
 
+    project_back_button.text = "< ALL PROJECTS"
+    project_back_button.custom_minimum_size = Vector2(118, 24)
+    project_back_button.tooltip_text = "Back to Gallery / Esc"
+    gallery_button.tooltip_text = "Gallery / all projects / Esc"
+    fullscreen_button.tooltip_text = "Render fullscreen / F11 / Esc to return"
+
     minimize_button.pressed.connect(_minimize_window)
     maximize_button.pressed.connect(_toggle_maximize_window)
     close_button.pressed.connect(_close_window)
@@ -94,7 +104,7 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
     var mode: int = DisplayServer.window_get_mode()
 
-    if mode == DisplayServer.WINDOW_MODE_WINDOWED and not _restoring_window:
+    if mode == DisplayServer.WINDOW_MODE_WINDOWED and not _restoring_window and not _fullscreen_transition:
         _remember_windowed_rect()
 
     if mode != _last_window_mode:
@@ -106,14 +116,28 @@ func _process(_delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-    if _fullscreen_active:
-        if event is InputEventKey:
-            var key_event: InputEventKey = event as InputEventKey
-            if key_event.pressed and not key_event.echo and key_event.keycode == KEY_ESCAPE:
-                _exit_render_fullscreen()
+    if event is InputEventKey:
+        var key_event: InputEventKey = event as InputEventKey
+        if key_event.pressed and not key_event.echo:
+            if key_event.keycode == KEY_ESCAPE:
+                if _fullscreen_active:
+                    _exit_render_fullscreen()
+                    get_viewport().set_input_as_handled()
+                    return
+                if project_view.visible and is_instance_valid(_active_sketch):
+                    _show_gallery()
+                    get_viewport().set_input_as_handled()
+                    return
+
+            if key_event.keycode == KEY_F11 and is_instance_valid(_active_sketch):
+                if _fullscreen_active:
+                    _exit_render_fullscreen()
+                else:
+                    _enter_render_fullscreen()
                 get_viewport().set_input_as_handled()
                 return
 
+    if _fullscreen_active:
         if is_instance_valid(_active_sketch):
             sketch_viewport.push_input(event, true)
             get_viewport().set_input_as_handled()
@@ -237,7 +261,7 @@ func _open_sketch(definition: Dictionary) -> void:
     page_path.text = "res://gallery/%s" % str(definition.get("id", "unknown"))
     page_tag.text = "[LIVE]"
     page_body.text = description_text
-    status_label.text = "ACTIVE / %s" % str(definition.get("id", "unknown")).to_upper()
+    status_label.text = "ACTIVE / %s / ESC=GALLERY / F11=FULLSCREEN" % str(definition.get("id", "unknown")).to_upper()
 
     project_index.text = index_text
     project_title.text = title_text
@@ -366,8 +390,8 @@ func _show_gallery() -> void:
     page_title.text = "GALLERY"
     page_path.text = "res://gallery"
     page_tag.text = "[%03d]" % _catalog.size()
-    page_body.text = "SELECT A PATCH. IT LOADS IMMEDIATELY AND UNLOADS AUTOMATICALLY WHEN YOU LEAVE."
-    status_label.text = "GALLERY / %d PATCHES" % _catalog.size()
+    page_body.text = "SELECT A PATCH. IT LOADS IMMEDIATELY. ESC RETURNS HERE FROM ANY OPEN PROJECT."
+    status_label.text = "GALLERY / %d PATCHES / CLICK TO OPEN" % _catalog.size()
 
 
 func _show_settings() -> void:
@@ -407,19 +431,59 @@ func _set_nav_state(active_button: Button) -> void:
 
 
 func _enter_render_fullscreen() -> void:
-    if not is_instance_valid(_active_sketch):
+    if not is_instance_valid(_active_sketch) or _fullscreen_active or _fullscreen_transition:
         return
+
+    _fullscreen_transition = true
+    _fullscreen_previous_mode = DisplayServer.window_get_mode()
+
+    if _fullscreen_previous_mode == DisplayServer.WINDOW_MODE_WINDOWED:
+        _fullscreen_previous_position = DisplayServer.window_get_position()
+        _fullscreen_previous_size = DisplayServer.window_get_size()
 
     _fullscreen_active = true
     fullscreen_overlay.visible = true
+    fullscreen_texture.texture = sketch_viewport.get_texture()
+    DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+    call_deferred("_finish_enter_render_fullscreen")
+
+
+func _finish_enter_render_fullscreen() -> void:
+    await get_tree().process_frame
+    await get_tree().process_frame
+    _last_preview_size = Vector2i.ZERO
+    _sync_preview_resolution(true)
     fullscreen_overlay.grab_focus()
-    call_deferred("_sync_preview_resolution", true)
+    _fullscreen_transition = false
 
 
 func _exit_render_fullscreen() -> void:
+    if not _fullscreen_active or _fullscreen_transition:
+        return
+
+    _fullscreen_transition = true
+    DisplayServer.window_set_mode(_fullscreen_previous_mode)
+    call_deferred("_finish_exit_render_fullscreen")
+
+
+func _finish_exit_render_fullscreen() -> void:
+    await get_tree().process_frame
+
+    if _fullscreen_previous_mode == DisplayServer.WINDOW_MODE_WINDOWED:
+        DisplayServer.window_set_position(_fullscreen_previous_position)
+        DisplayServer.window_set_size(_fullscreen_previous_size)
+
+    await get_tree().process_frame
+    await get_tree().process_frame
+
     _fullscreen_active = false
     fullscreen_overlay.visible = false
-    call_deferred("_sync_preview_resolution", true)
+    _fullscreen_transition = false
+    _last_preview_size = Vector2i.ZERO
+
+    await get_tree().process_frame
+    _sync_preview_resolution(true)
+    _sync_window_controls()
 
 
 func _sync_preview_resolution(force: bool = false) -> void:
