@@ -192,7 +192,7 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"TagLabel"
-text = "[EMPTY]"
+text = "[001]"
 
 [node name="HeaderSeparator" type="HSeparator" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
 layout_mode = 2
@@ -210,12 +210,119 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"BodyMutedLabel"
-text = "NO CREATIVE PATCH LOADED. THE HOST IS READY FOR THE FIRST REALTIME SYSTEM."
+text = "001 SIGNAL FIELD IS READY. RUN THE PATCH TO START THE FIRST REALTIME SYSTEM."
 autowrap_mode = 2
 
-[node name="WorkspaceSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
+[node name="GalleryHost" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="PatchPanel" type="PanelContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost"]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+theme_type_variation = &"WorkspacePanel"
+
+[node name="PatchMargin" type="MarginContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel"]
+layout_mode = 2
+theme_type_variation = &"WorkspaceMargin"
+
+[node name="PatchInfo" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin"]
+layout_mode = 2
+
+[node name="PatchIndex" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+layout_mode = 2
+theme_type_variation = &"AccentLabel"
+text = "001"
+
+[node name="PatchTitle" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+layout_mode = 2
+theme_type_variation = &"PageTitleLabel"
+text = "SIGNAL FIELD"
+
+[node name="PatchMeta" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "NODE2D / REALTIME / ADAPTIVE"
+
+[node name="PatchDescription" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+layout_mode = 2
+theme_type_variation = &"BodyMutedLabel"
+text = "MOVING SIGNAL NODES WITH DISTANCE-BASED CONNECTIONS AND ORGANIC DRIFT."
+autowrap_mode = 2
+
+[node name="PatchSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PatchState" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TagLabel"
+text = "[STOPPED]"
+
+[node name="RunPatchButton" type="Button" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+theme_type_variation = &"ToolButton"
+text = "RUN 001"
+
+[node name="StopPatchButton" type="Button" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+disabled = true
+theme_type_variation = &"ToolButton"
+text = "STOP"
+
+[node name="PreviewPanel" type="PanelContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"WorkspacePanel"
+
+[node name="PreviewColumn" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel"]
+layout_mode = 2
+
+[node name="PreviewHeader" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn"]
+layout_mode = 2
+
+[node name="PreviewLabel" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn/PreviewHeader"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "PREVIEW / LIVE RENDER"
+
+[node name="PreviewSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn/PreviewHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewResolution" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn/PreviewHeader"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "AUTO"
+
+[node name="PreviewSeparator" type="HSeparator" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn"]
+layout_mode = 2
+
+[node name="SketchViewportContainer" type="SubViewportContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+stretch = true
+
+[node name="SketchViewport" type="SubViewport" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn/SketchViewportContainer"]
+unique_name_in_owner = true
+size = Vector2i(640, 360)
+disable_3d = true
+render_target_update_mode = 4
+
+[node name="PageSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+visible = false
 
 [node name="Hint" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
 layout_mode = 2
@@ -239,7 +346,7 @@ text = "●"
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MicroLabel"
-text = "READY / AWAITING FIRST PATCH"
+text = "GALLERY / 001 READY"
 
 [node name="StatusSpacer" type="Control" parent="Margin/Shell/StatusBar/StatusRow"]
 layout_mode = 2
@@ -266,6 +373,7 @@ theme_type_variation = &"MicroLabel"
 text = "/"
 
 [node name="FpsState" type="Label" parent="Margin/Shell/StatusBar/StatusRow"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MicroLabel"
 text = "FPS --"
