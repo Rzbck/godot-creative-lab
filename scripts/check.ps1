@@ -65,12 +65,34 @@
         throw "STOP : version Godot inattendue : $Version"
     }
 
-    Write-Host "`n=== GODOT HEADLESS IMPORT ===" -ForegroundColor Cyan
+    function Invoke-GodotChecked {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string[]]$Arguments,
 
-    & $GodotAutomation `
-        --headless `
-        --path . `
-        --import
+            [Parameter(Mandatory = $true)]
+            [string]$Label
+        )
+
+        Write-Host "`n=== $Label ===" -ForegroundColor Cyan
+
+        $Output = @(& $GodotAutomation @Arguments 2>&1)
+        $Output | ForEach-Object { Write-Host $_ }
+
+        $Text = $Output -join "`n"
+
+        if ($Text -match "(?m)^\s*(SCRIPT ERROR:|ERROR:)") {
+            throw "STOP : Godot a signale une erreur pendant '$Label'."
+        }
+    }
+
+    Invoke-GodotChecked `
+        -Label "GODOT HEADLESS IMPORT" `
+        -Arguments @("--headless", "--path", ".", "--import")
+
+    Invoke-GodotChecked `
+        -Label "GODOT RUNTIME SMOKE" `
+        -Arguments @("--headless", "--path", ".", "--quit-after", "3")
 
     Write-Host "`n=== POST-GODOT GIT CHECK ===" -ForegroundColor Cyan
 
@@ -83,7 +105,7 @@
         throw "STOP : Godot headless n'est pas repository-clean."
     }
 
-    Write-Host "Godot headless : PASS" -ForegroundColor Green
+    Write-Host "Godot import + runtime smoke : PASS" -ForegroundColor Green
 
     Write-Host "`n===== ALL LOCAL CHECKS PASS =====" -ForegroundColor Green
 }
