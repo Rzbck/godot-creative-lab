@@ -120,15 +120,12 @@ func _exit_render_fullscreen() -> void:
     _presentation_transition = true
 
     if is_instance_valid(_render_window):
-        var window_id: int = _render_window.get_window_id()
-
-        # Hide first so Windows never flashes a restored output window over the
-        # Creative Lab UI during the fullscreen -> windowed transition.
+        # Important on Windows: reset the Window while its native handle still
+        # exists. Hiding it first invalidates that handle, which caused the
+        # DisplayServer "!windows.has(p_window)" errors seen on Esc.
+        _render_window.always_on_top = false
+        _render_window.mode = Window.MODE_WINDOWED
         _render_window.hide()
-
-        if window_id != DisplayServer.INVALID_WINDOW_ID:
-            DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED, window_id)
-            DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_ALWAYS_ON_TOP, false, window_id)
 
     call_deferred("_finish_exit_render_fullscreen")
 
