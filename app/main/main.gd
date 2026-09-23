@@ -39,8 +39,9 @@ func _enter_render_fullscreen() -> void:
     # Keep the same native HWND and the same WINDOWED mode. The app is already
     # borderless, so covering the physical monitor gives us presentation output
     # without triggering the layout corruption seen after Windows fullscreen.
+    # Do not set unresizable here: on Windows that can also block our own exact
+    # programmatic restore on Esc.
     root_window.always_on_top = true
-    root_window.unresizable = true
     root_window.position = DisplayServer.screen_get_position(_presentation_screen)
     root_window.size = DisplayServer.screen_get_size(_presentation_screen)
     root_window.grab_focus()
@@ -73,33 +74,64 @@ func _exit_render_fullscreen() -> void:
 
     var root_window: Window = get_window()
 
-    # Keep the render overlay visible while restoring the old rectangle. This
-    # prevents the normal UI from ever being shown at monitor size. Containers
-    # get two frames to relayout at the restored dimensions before we reveal it.
-    root_window.position = _presentation_previous_position
+    # Keep the render overlay visible during the whole restore. Most important:
+    # make the window resizable BEFORE restoring its rectangle. Previously the
+    # fullscreen-sized borderless window could keep its monitor dimensions on
+    # Windows, leaving the project UI laid out as if it were still fullscreen.
+    root_window.unresizable = false
     root_window.size = _presentation_previous_size
-    root_window.always_on_top = _presentation_previous_always_on_top
-    root_window.unresizable = _presentation_previous_unresizable
+    root_window.position = _presentation_previous_position
 
     call_deferred("_finish_exit_render_fullscreen")
 
 
 func _finish_exit_render_fullscreen() -> void:
-    await get_tree().process_frame
+    var root_window: Window = get_window()
+
+    # Window resize/position messages are asynchronous on Windows. Reapply the
+    # saved rectangle until Godot reports the exact pre-presentation geometry,
+    # while the fullscreen render still hides the intermediate relayout.
+    for _attempt: int in range(8):
+        await get_tree().process_frame
+
+        if root_window.size == _presentation_previous_size \
+        and root_window.position == _presentation_previous_position:
+            break
+
+        root_window.unresizable = false
+        root_window.size = _presentation_previous_size
+        root_window.position = _presentation_previous_position
+
+    # Reassert the normal project shell explicitly. Fullscreen is only entered
+    # from an open project, so this is the exact view that must be visible when
+    # Esc returns to Creative Lab.
+    margin.visible = true
+    top_bar.visible = true
+    rail.visible = true
+    status_bar.visible = true
+    gallery_view.visible = false
+    project_view.visible = true
+    page_spacer.visible = false
+
+    # Let the normal Containers recalculate against the restored client size
+    # before uncovering them.
+    margin.queue_sort()
+    project_view.queue_sort()
     await get_tree().process_frame
     await get_tree().process_frame
 
-    # Only reveal the application after the window and all Containers are back
-    # at their original dimensions.
     _fullscreen_active = false
     fullscreen_overlay.visible = false
     _last_preview_size = Vector2i.ZERO
     _sync_preview_resolution(true)
 
+    root_window.always_on_top = _presentation_previous_always_on_top
+    root_window.unresizable = _presentation_previous_unresizable
+
     _restoring_window = false
     _remember_windowed_rect()
     _sync_window_controls()
-    get_window().grab_focus()
+    root_window.grab_focus()
     _presentation_transition = false
 
 
