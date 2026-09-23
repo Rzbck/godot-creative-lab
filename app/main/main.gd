@@ -26,7 +26,6 @@ const RESIZE_GRAB_PX := 6.0
 @onready var run_patch_button: Button = %RunPatchButton
 @onready var stop_patch_button: Button = %StopPatchButton
 @onready var patch_state: Label = %PatchState
-@onready var sketch_viewport_container: SubViewportContainer = %SketchViewportContainer
 @onready var sketch_viewport: SubViewport = %SketchViewport
 
 var _last_window_mode := -1
@@ -35,7 +34,6 @@ var _restore_size := Vector2i(1280, 720)
 var _has_restore_rect := false
 var _restoring_window := false
 var _active_sketch: Node = null
-var _last_preview_size := Vector2i.ZERO
 
 
 func _ready() -> void:
@@ -66,7 +64,6 @@ func _ready() -> void:
     _remember_windowed_rect()
     _sync_window_controls()
     _show_gallery()
-    call_deferred("_sync_preview_resolution")
 
 
 func _process(_delta: float) -> void:
@@ -79,7 +76,6 @@ func _process(_delta: float) -> void:
         _sync_window_controls()
 
     fps_state.text = "FPS %d" % Engine.get_frames_per_second()
-    _sync_preview_resolution()
 
 
 func _input(event: InputEvent) -> void:
@@ -114,7 +110,6 @@ func _show_gallery() -> void:
     gallery_host.visible = true
     page_spacer.visible = false
     _set_sketch_processing(true)
-    call_deferred("_sync_preview_resolution")
 
 
 func _show_settings() -> void:
@@ -183,7 +178,6 @@ func _run_signal_field() -> void:
     status_label.text = "RUN / 001_SIGNAL_FIELD"
 
     _set_sketch_processing(gallery_host.visible)
-    call_deferred("_sync_preview_resolution")
 
 
 func _stop_signal_field() -> void:
@@ -204,25 +198,6 @@ func _set_sketch_processing(enabled: bool) -> void:
         return
 
     _active_sketch.process_mode = Node.PROCESS_MODE_INHERIT if enabled else Node.PROCESS_MODE_DISABLED
-
-
-func _sync_preview_resolution() -> void:
-    if not is_instance_valid(sketch_viewport_container) or not is_instance_valid(sketch_viewport):
-        return
-
-    var target := Vector2i(
-        maxi(1, roundi(sketch_viewport_container.size.x)),
-        maxi(1, roundi(sketch_viewport_container.size.y))
-    )
-
-    if target == _last_preview_size:
-        return
-
-    sketch_viewport.size = target
-    _last_preview_size = target
-
-    if _active_sketch is CanvasItem:
-        (_active_sketch as CanvasItem).queue_redraw()
 
 
 func _on_top_bar_gui_input(event: InputEvent) -> void:
