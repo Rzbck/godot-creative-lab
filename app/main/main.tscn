@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://app/main/main.gd" id="1_main"]
+[ext_resource type="Texture2D" path="res://app/ui/design_system/icons/gallery.svg" id="2_gallery"]
+[ext_resource type="Texture2D" path="res://app/ui/design_system/icons/settings.svg" id="3_settings"]
+[ext_resource type="Texture2D" path="res://app/ui/design_system/icons/about.svg" id="4_about"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -12,6 +15,7 @@ grow_vertical = 2
 script = ExtResource("1_main")
 
 [node name="Background" type="ColorRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,7 +23,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.047, 0.055, 0.071, 1)
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -28,89 +31,203 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"ShellMargin"
 
 [node name="Shell" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
 
-[node name="TopBar" type="HBoxContainer" parent="Margin/Shell"]
+[node name="TopBar" type="PanelContainer" parent="Margin/Shell"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_type_variation = &"TopBarPanel"
+
+[node name="Row" type="HBoxContainer" parent="Margin/Shell/TopBar"]
 layout_mode = 2
 
-[node name="Brand" type="VBoxContainer" parent="Margin/Shell/TopBar"]
+[node name="Brand" type="Label" parent="Margin/Shell/TopBar/Row"]
+layout_mode = 2
+theme_type_variation = &"BrandLabel"
+text = "DC//LAB"
+
+[node name="BrandDivider" type="VSeparator" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
 
-[node name="BrandTitle" type="Label" parent="Margin/Shell/TopBar/Brand"]
+[node name="PagePath" type="Label" parent="Margin/Shell/TopBar/Row"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"TitleLabel"
-text = "DataC0re Creative Lab"
+theme_type_variation = &"PathLabel"
+text = "res://gallery"
 
-[node name="BrandSubtitle" type="Label" parent="Margin/Shell/TopBar/Brand"]
-layout_mode = 2
-theme_type_variation = &"CaptionLabel"
-text = "Realtime creative-coding workspace"
-
-[node name="Spacer" type="Control" parent="Margin/Shell/TopBar"]
+[node name="TopSpacer" type="Control" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="GalleryButton" type="Button" parent="Margin/Shell/TopBar"]
-unique_name_in_owner = true
+[node name="Engine" type="Label" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
-text = "Gallery"
+theme_type_variation = &"MicroLabel"
+text = "GODOT 4.7.1"
 
-[node name="SettingsButton" type="Button" parent="Margin/Shell/TopBar"]
-unique_name_in_owner = true
+[node name="Mode" type="Label" parent="Margin/Shell/TopBar/Row"]
 layout_mode = 2
-text = "Settings"
+theme_type_variation = &"AccentLabel"
+text = "[LOCAL]"
 
-[node name="AboutButton" type="Button" parent="Margin/Shell/TopBar"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "About"
-
-[node name="Separator" type="HSeparator" parent="Margin/Shell"]
-layout_mode = 2
-
-[node name="ContentPanel" type="PanelContainer" parent="Margin/Shell"]
+[node name="Body" type="HBoxContainer" parent="Margin/Shell"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ContentMargin" type="MarginContainer" parent="Margin/Shell/ContentPanel"]
+[node name="Rail" type="PanelContainer" parent="Margin/Shell/Body"]
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+theme_type_variation = &"RailPanel"
+
+[node name="Nav" type="VBoxContainer" parent="Margin/Shell/Body/Rail"]
+layout_mode = 2
+alignment = 1
+
+[node name="GalleryButton" type="Button" parent="Margin/Shell/Body/Rail/Nav"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+theme_type_variation = &"NavButton"
+toggle_mode = true
+tooltip_text = "Gallery"
+icon = ExtResource("2_gallery")
+expand_icon = true
+icon_max_width = 16
+
+[node name="SettingsButton" type="Button" parent="Margin/Shell/Body/Rail/Nav"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+theme_type_variation = &"NavButton"
+toggle_mode = true
+tooltip_text = "Settings"
+icon = ExtResource("3_settings")
+expand_icon = true
+icon_max_width = 16
+
+[node name="AboutButton" type="Button" parent="Margin/Shell/Body/Rail/Nav"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+theme_type_variation = &"NavButton"
+toggle_mode = true
+tooltip_text = "About"
+icon = ExtResource("4_about")
+expand_icon = true
+icon_max_width = 16
+
+[node name="Workspace" type="PanelContainer" parent="Margin/Shell/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"WorkspacePanel"
+
+[node name="WorkspaceMargin" type="MarginContainer" parent="Margin/Shell/Body/Workspace"]
+layout_mode = 2
+theme_type_variation = &"WorkspaceMargin"
+
+[node name="Content" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin"]
 layout_mode = 2
 
-[node name="Content" type="VBoxContainer" parent="Margin/Shell/ContentPanel/ContentMargin"]
+[node name="Header" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
 layout_mode = 2
 
-[node name="Kicker" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
-layout_mode = 2
-theme_type_variation = &"CaptionLabel"
-text = "APPLICATION SHELL"
-
-[node name="PageTitle" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+[node name="SectionIndex" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"TitleLabel"
-text = "Gallery"
+theme_type_variation = &"AccentLabel"
+text = "// 01"
 
-[node name="PageBody" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+[node name="PageTitle" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "Creative Lab shell"
+theme_type_variation = &"PageTitleLabel"
+text = "GALLERY"
+
+[node name="HeaderSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PageTag" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TagLabel"
+text = "[EMPTY]"
+
+[node name="HeaderSeparator" type="HSeparator" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
+layout_mode = 2
+
+[node name="PromptRow" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
+layout_mode = 2
+
+[node name="Prompt" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/PromptRow"]
+layout_mode = 2
+theme_type_variation = &"AccentLabel"
+text = ">"
+
+[node name="PageBody" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/PromptRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyMutedLabel"
+text = "NO CREATIVE PATCH LOADED. THE HOST IS READY FOR THE FIRST REALTIME SYSTEM."
 autowrap_mode = 2
 
-[node name="ContentSpacer" type="Control" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+[node name="WorkspaceSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="StatusRow" type="HBoxContainer" parent="Margin/Shell/ContentPanel/ContentMargin/Content"]
+[node name="Hint" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "SELECT MODULE / LOAD PATCH / ROUTE OUTPUT"
+
+[node name="StatusBar" type="PanelContainer" parent="Margin/Shell"]
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+theme_type_variation = &"StatusPanel"
+
+[node name="StatusRow" type="HBoxContainer" parent="Margin/Shell/StatusBar"]
 layout_mode = 2
 
-[node name="StatusDot" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content/StatusRow"]
+[node name="ReadyDot" type="Label" parent="Margin/Shell/StatusBar/StatusRow"]
 layout_mode = 2
+theme_type_variation = &"AccentLabel"
 text = "●"
 
-[node name="StatusLabel" type="Label" parent="Margin/Shell/ContentPanel/ContentMargin/Content/StatusRow"]
+[node name="StatusLabel" type="Label" parent="Margin/Shell/StatusBar/StatusRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"CaptionLabel"
-text = "Shell ready"
+theme_type_variation = &"MicroLabel"
+text = "READY / AWAITING FIRST PATCH"
+
+[node name="StatusSpacer" type="Control" parent="Margin/Shell/StatusBar/StatusRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EngineState" type="Label" parent="Margin/Shell/StatusBar/StatusRow"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "ENGINE 4.7.1"
+
+[node name="SepA" type="Label" parent="Margin/Shell/StatusBar/StatusRow"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "/"
+
+[node name="OutputState" type="Label" parent="Margin/Shell/StatusBar/StatusRow"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "OUT LOCAL"
+
+[node name="SepB" type="Label" parent="Margin/Shell/StatusBar/StatusRow"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "/"
+
+[node name="FpsState" type="Label" parent="Margin/Shell/StatusBar/StatusRow"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "FPS --"
