@@ -97,3 +97,47 @@ Validated normalization:
 Future sessions must use `scripts/preflight.ps1`.
 
 A `project.godot`-only dirty state is `REVIEW_REQUIRED`, not an automatic blocker.
+
+## Architecture foundation
+
+Active branch:
+
+`chore/architecture-foundation-20260923`
+
+Architecture-only phase.
+
+Accepted decisions:
+
+- application code under `app/`;
+- creative works under `sketches/`;
+- feature-local resource ownership;
+- genuinely reusable resources only under `shared/`;
+- central clean creative render boundary;
+- Window / Spout / NDI treated as output adapters;
+- minimal Autoload/global state policy;
+- future persistent settings stored under `user://`.
+
+Architecture references:
+
+- `docs/ARCHITECTURE.md`
+- `docs/PROJECT_STRUCTURE.md`
+- `docs/UI_ARCHITECTURE.md`
+- `docs/SKETCH_CONTRACT.md`
+- `docs/OUTPUT_ARCHITECTURE.md`
+- `docs/SETTINGS_ARCHITECTURE.md`
+- `docs/decisions/`
+
+Current intentional state:
+
+- no `.tscn`;
+- no Gallery implementation;
+- no Settings implementation;
+- no sketch implementation;
+- no Spout;
+- no NDI;
+- no Autoload;
+- no icon assets.
+
+NEXT:
+
+User chooses the next implementation target before any scene is created.

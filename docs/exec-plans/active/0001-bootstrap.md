@@ -1,32 +1,40 @@
-# Exec Plan 0001 — Bootstrap Creative Lab
+# Exec Plan 0001 — Architecture foundation
 
 Status: ACTIVE
 
 ## Goal
 
-Create the smallest clean Godot project that can become a gallery of isolated creative-coding sketches.
+Establish a scalable Godot repository architecture before creating application scenes or creative works.
 
-## Phase 1
+## Included
 
-- locate Godot;
-- confirm version;
-- open project;
-- create Main scene;
-- create Gallery scene;
-- create Sketch 001.
+- application ownership;
+- sketch ownership;
+- runtime/output boundaries;
+- settings boundary;
+- UI organization;
+- directory layout;
+- architecture decisions.
 
-## Phase 2
+## Explicitly excluded
 
-Introduce the central render-target architecture.
+Do not yet:
 
-## Phase 3
-
-Prototype Spout output behind an adapter.
-
-## Phase 4
-
-Prototype NDI output behind an adapter.
+- create `.tscn`;
+- create the first sketch;
+- implement Gallery;
+- implement Settings UI;
+- configure Autoload;
+- install Spout;
+- install NDI;
+- select icons;
+- create a generic sketch framework.
 
 ## Exit criteria
 
-The gallery can open Sketch 001, return to the gallery, and run with Spout/NDI completely absent.
+- architecture docs versioned;
+- directory scaffold versioned;
+- zero `.tscn`;
+- clean worktree.
+
+The user chooses the next implementation target.
