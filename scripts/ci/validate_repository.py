@@ -34,6 +34,14 @@ ALLOWED_CONVENTIONAL_FILENAMES = {
     "LICENSE.md",
 }
 
+# Sketch identity belongs to the workstation/gallery UI, never to the rendered
+# visual surface. This catches the common accidental burn-in form "002 / TITLE"
+# inside runtime GDScript while still allowing typography that is the artwork.
+BURNED_IN_SKETCH_TITLE = re.compile(
+    r"draw_string\([^\n]*[\"']\d{3}\s*/\s*[A-Za-z]",
+    re.MULTILINE,
+)
+
 
 def fail(message: str) -> None:
     print(f"ERROR: {message}", file=sys.stderr)
@@ -145,6 +153,23 @@ def validate_project_config() -> None:
         fail("Godot 4.7 project feature declaration missing")
 
 
+def validate_no_burned_in_sketch_titles(files: list[str]) -> None:
+    for relative in files:
+        normalized = relative.replace("\\", "/")
+        if not normalized.startswith("sketches/"):
+            continue
+        if "/runtime/" not in normalized or not normalized.endswith(".gd"):
+            continue
+
+        path = ROOT / relative
+        text = path.read_text(encoding="utf-8")
+        if BURNED_IN_SKETCH_TITLE.search(text):
+            fail(
+                "sketch title/index must not be burned into rendered output: "
+                f"{normalized}"
+            )
+
+
 def main() -> None:
     print("Creative Lab repository policy")
 
@@ -156,6 +181,7 @@ def main() -> None:
     validate_file_sizes(files)
     validate_project_owned_names()
     validate_project_config()
+    validate_no_burned_in_sketch_titles(files)
 
     print(f"Tracked files checked: {len(files)}")
     print("Repository policy: PASS")
