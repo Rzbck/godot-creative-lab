@@ -1,0 +1,9 @@
+{
+  "id": "006_breath_score",
+  "index": "006",
+  "title": "BREATH SCORE",
+  "scene": "res://sketches/006_breath_score/runtime/breath_score.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "RHYTHM", "INTERACTIVE"],
+  "description": "A typographic breathing score: press inhales into one line, holding accumulates tension, and release exhales through a damped editorial composition."
+}

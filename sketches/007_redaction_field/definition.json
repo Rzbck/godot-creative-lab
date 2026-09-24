@@ -1,0 +1,9 @@
+{
+  "id": "007_redaction_field",
+  "index": "007",
+  "title": "REDACTION FIELD",
+  "scene": "res://sketches/007_redaction_field/runtime/redaction_field.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "REDACTION", "INTERACTIVE"],
+  "description": "An editorial censorship system: drag right to reveal, drag left to redact, hold to preserve a decision, then watch the document slowly renegotiate what remains visible."
+}
