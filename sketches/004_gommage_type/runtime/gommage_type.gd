@@ -19,6 +19,9 @@ const LINES: Array[String] = ["ERASE", "REBUILD"]
 
 var _marks: Array[Dictionary] = []
 var _mark_accumulator: float = 0.0
+var _last_mark_position: Vector2 = Vector2.ZERO
+var _mark_history_ready: bool = false
+var _smoothed_velocity: Vector2 = Vector2.ZERO
 
 
 func get_parameter_schema() -> Array[Dictionary]:
@@ -92,10 +95,18 @@ func _update_source_simulation(delta: float) -> void:
         )
         mark_energy = 0.42 * pointer_force
 
+    var raw_velocity: Vector2 = Vector2.ZERO
+    if _mark_history_ready:
+        raw_velocity = (mark_position - _last_mark_position) / maxf(interval, 0.001)
+    _last_mark_position = mark_position
+    _mark_history_ready = true
+    _smoothed_velocity = _smoothed_velocity.lerp(raw_velocity, 0.42)
+
     _marks.append({
         "position": mark_position,
         "energy": mark_energy,
         "birth": sketch_time,
+        "velocity": _smoothed_velocity.limit_length(900.0),
     })
 
     while _marks.size() > trail_length:
@@ -106,6 +117,9 @@ func _get_custom_live_sync_state() -> Dictionary:
     return {
         "marks": _marks.duplicate(true),
         "mark_accumulator": _mark_accumulator,
+        "last_mark_position": _last_mark_position,
+        "mark_history_ready": _mark_history_ready,
+        "smoothed_velocity": _smoothed_velocity,
     }
 
 
@@ -117,11 +131,19 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
             if item is Dictionary:
                 _marks.append((item as Dictionary).duplicate(true))
     _mark_accumulator = float(state.get("mark_accumulator", _mark_accumulator))
+    var last_position_variant: Variant = state.get("last_mark_position", _last_mark_position)
+    if last_position_variant is Vector2:
+        _last_mark_position = last_position_variant as Vector2
+    _mark_history_ready = bool(state.get("mark_history_ready", _mark_history_ready))
+    var velocity_variant: Variant = state.get("smoothed_velocity", _smoothed_velocity)
+    if velocity_variant is Vector2:
+        _smoothed_velocity = velocity_variant as Vector2
 
 
 func _get_custom_live_debug_state() -> Dictionary:
     return {
         "mark_count": _marks.size(),
+        "gesture_speed": _smoothed_velocity.length(),
     }
 
 
@@ -215,7 +237,25 @@ func _dissolve_influence(point: Vector2) -> float:
         if not position_variant is Vector2:
             continue
         var position: Vector2 = position_variant as Vector2
-        var distance: float = point.distance_to(position)
+        var delta: Vector2 = point - position
+
+        var velocity: Vector2 = Vector2.ZERO
+        var velocity_variant: Variant = mark.get("velocity", Vector2.ZERO)
+        if velocity_variant is Vector2:
+            velocity = velocity_variant as Vector2
+
+        var distance: float = delta.length()
+        if velocity.length() > 30.0:
+            var direction: Vector2 = velocity.normalized()
+            var tangent: Vector2 = Vector2(-direction.y, direction.x)
+            var parallel: float = delta.dot(direction)
+            var perpendicular: float = delta.dot(tangent)
+            var speed_stretch: float = clampf(velocity.length() / 700.0, 0.0, 1.0)
+            distance = Vector2(
+                parallel * lerpf(0.78, 0.46, speed_stretch),
+                perpendicular * lerpf(1.0, 1.34, speed_stretch)
+            ).length()
+
         if distance >= dissolve_radius:
             continue
         var radial: float = 1.0 - distance / dissolve_radius
@@ -231,6 +271,10 @@ func _draw_dust(
     accent: Color,
     secondary: Color
 ) -> void:
+    var drift_direction: Vector2 = Vector2.ZERO
+    if _smoothed_velocity.length() > 0.001:
+        drift_direction = _smoothed_velocity.normalized()
+
     for particle_index: int in range(dust_amount):
         var seed: float = float(glyph_index * 37 + particle_index * 13)
         var angle: float = hash01(seed + 1.7) * TAU
@@ -240,6 +284,7 @@ func _draw_dust(
             cos(angle + sketch_time * (0.25 + hash01(seed + 2.2) * 0.55)),
             sin(angle * 1.17 + sketch_time * (0.18 + hash01(seed + 3.4) * 0.45))
         )
+        motion += drift_direction * (0.25 + hash01(seed + 12.6) * 0.65)
         var position: Vector2 = center + Vector2(cos(angle), sin(angle)) * radial + motion * drift * erase
         var radius: float = 0.8 + hash01(seed + 9.8) * 3.2
         var color: Color = accent.lerp(secondary, hash01(seed + 6.6))
@@ -255,13 +300,30 @@ func _draw_eraser_marks(accent: Color) -> void:
         var position: Vector2 = position_variant as Vector2
         var energy: float = clampf(float(mark.get("energy", 0.0)), 0.0, 1.0)
         var ring_color: Color = accent
-        ring_color.a = 0.02 + edge_glow * energy * 0.035
+        ring_color.a = 0.015 + edge_glow * energy * 0.03
         draw_arc(position, dissolve_radius * (0.38 + energy * 0.48), 0.0, TAU, 96, ring_color, 1.0, true)
+
+        var velocity_variant: Variant = mark.get("velocity", Vector2.ZERO)
+        if velocity_variant is Vector2:
+            var velocity: Vector2 = velocity_variant as Vector2
+            if velocity.length() > 20.0:
+                var tail: Vector2 = velocity.limit_length(420.0) * 0.07
+                var trail_color: Color = ring_color
+                trail_color.a *= 1.8
+                draw_line(position - tail, position, trail_color, 1.2, true)
 
 
 func _draw_background(accent: Color) -> void:
-    for index: int in range(10):
-        var x: float = 70.0 + float(index) * 126.0
+    # The vertical rhythm is intentionally sparse and stable so the erasure can
+    # become expressive without destroying the poster hierarchy.
+    for index: int in range(7):
+        var x: float = 136.0 + float(index) * 168.0
         var color: Color = accent
-        color.a = 0.012 + float(index % 3) * 0.004
+        color.a = 0.01 + float(index % 3) * 0.004
         draw_line(Vector2(x, 118.0), Vector2(x, 610.0), color, 1.0)
+
+    for row: int in range(5):
+        var y: float = 154.0 + float(row) * 102.0
+        var horizontal: Color = PAPER
+        horizontal.a = 0.008 + float(row % 2) * 0.004
+        draw_line(Vector2(92.0, y), Vector2(1188.0, y), horizontal, 1.0)
