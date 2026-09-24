@@ -1,161 +1,107 @@
 # DC//LAB Cross-Domain Knowledge Layer
 
-This folder is the project's bridge between the existing `creative-coding/` and `design/` libraries.
+This folder bridges the project's `creative-coding/` and `design/` libraries.
 
-The goal is not to collect more styles. The goal is to make the research library **generative itself**: extract transferable principles from several domains, translate them into compatible representations, combine them through reusable operators, then deliberately mutate the result until it becomes an original DC//LAB system.
+Its purpose is not to impose a house technique. It exists to help us move between domains, compare possible representations, combine principles, and mutate them into an original DC//LAB system.
 
-A source is therefore not a look to imitate. It is raw material for a transformation grammar.
+A source is not a look to imitate. A technique is not a style to repeat.
 
 ## Read order
 
-1. `CROSS_DOMAIN_ATLAS.md` — maps reusable bridges between typography, graphic design, shaders, simulation, geometry, interaction and realtime systems.
-2. `IDEA_ENGINE.md` — method for multiplying, mutating and filtering combinations into original concepts.
-3. `LIVING_SYSTEMS.md` — autonomy, coupling, internal state, multiple time scales, emergence and interaction-as-perturbation.
-4. `SOURCE_CATALOG.md` — references selected specifically because they demonstrate movement between disciplines.
-5. `sources.json` — machine-readable index for later tooling, search or automated concept generation.
+1. `TECHNIQUE_PALETTE.md` — compare the available representation/mechanism families before choosing an implementation.
+2. `CROSS_DOMAIN_ATLAS.md` — reusable bridges between typography, graphic design, shaders, simulation, geometry, interaction and realtime systems.
+3. `IDEA_ENGINE.md` — method for multiplying, mutating and filtering combinations into original concepts.
+4. `LIVING_SYSTEMS.md` — optional research brick for autonomy, coupling, internal state, multiple time scales and interaction-as-perturbation when the concept needs it.
+5. `SOURCE_CATALOG.md` — references selected because they demonstrate movement between disciplines.
+6. `sources.json` — machine-readable index.
 
 Use these together with:
 
 - `../creative-coding/CONCEPT_ATLAS.md`
 - `../creative-coding/SOURCE_CATALOG.md`
 - `../design/TYPOGRAPHY_ATLAS.md`
-- `../design/STRUCTURAL_TYPOGRAPHY.md`
+- `../design/STRUCTURAL_TYPOGRAPHY.md` when internal glyph anatomy is relevant
 - `../design/GRAPHIC_DESIGN_ATLAS.md`
 - `../design/REALTIME_DESIGN_BRIDGE.md`
 - `../design/DESIGN_REVIEW_CHECKLIST.md`
 
-## Core vocabulary
+## Technique-selection rule
 
-Every cross-domain concept can be decomposed into a small set of roles.
+For substantial work, do not jump from concept directly to the most recently used technique.
+
+Before implementation, compare at least three plausible chains, for example:
+
+```text
+same artistic intention
+A -> direct / variable typography + layout state machine
+B -> raster mask + feedback buffer + shader
+C -> particles / agents + vector field + reconstruction
+```
+
+Choose the mechanism that makes the artistic idea more specific.
+
+Contours, SDFs, feedback, particles, shaders, grids, meshes, graph systems, raster masks, simulations, variable fonts and whole-glyph typography are all separate options. None is the default.
+
+## Core vocabulary
 
 ### Carrier
 
-The thing that carries the identity of the work.
-
-Examples: glyph, word, grid, line, image, particle set, field, mesh, color system, data stream, spatial surface.
+The thing carrying the work's identity: glyph, word, grid, line, image, particles, field, mesh, color system, data stream, spatial surface, etc.
 
 ### Representation
 
-The form in which the carrier becomes manipulable.
+The computational form of the carrier: direct type, raster mask, vector path, sampled points, SDF/MSDF, scalar/vector field, graph, particles, texture history, mesh, parameter vector, etc.
 
-Examples: raster mask, vector path, sampled points, signed distance field, scalar field, vector field, graph, particle cloud, texture buffer, mesh, parameter vector.
-
-Representation depth matters. A concept about internal glyph anatomy should not stop at a rigid glyph instance; move to contours, sampled points or SDF/MSDF when necessary.
+Representation depth should match the claim. A concept about word hierarchy may need only direct typography; a concept about a counterform collapsing may need contours/SDF; a concept about memory may be better served by a feedback buffer.
 
 ### Operator
 
-A transformation applied to a representation.
-
-Examples: sample, quantize, threshold, warp, fold, repeat, advect, diffuse, erode, dilate, sort, pack, interpolate, accumulate, feedback, displace, remap, segment, mirror, phase-shift.
+Sample, quantize, threshold, warp, fold, repeat, advect, diffuse, erode, dilate, sort, pack, interpolate, accumulate, feedback, displace, remap, segment, mirror, phase-shift, change topology, and so on.
 
 ### Driver
 
-The signal that changes the system.
+Time, pointer, velocity, acceleration, touch count, audio, glyph metrics, text content, field state, simulation state, camera or external data.
 
-Examples: time, pointer position, touch velocity, multiple touches, audio envelope, glyph metrics, text content, simulation state, noise, camera, external data.
-
-A driver should not automatically be direct control. It may inject energy, change a boundary condition, alter coupling or seed an event.
+A driver is input to a system; it does not have to directly move the artwork.
 
 ### Temporal model
 
-How state behaves through time.
-
-Examples: stateless, oscillator, eased transition, spring, hysteresis, accumulation, decay, feedback, simulation, autonomous agent system, fatigue/repair, regime change.
+Stateless, loop, oscillator, spring, hysteresis, delay, accumulation, decay, feedback, autonomous agents, stochastic events, phase transition, repair, mutation, regime switching, etc.
 
 ### Design constraint
 
-The rules that stop the result becoming arbitrary.
+Grid, baseline rhythm, margin/crop rule, type family, palette logic, scale hierarchy, density limits, asymmetry, editorial sequence, etc.
 
-Examples: modular grid, baseline rhythm, fixed margins, two-color palette, one type family, limited scale ratio, controlled crop, hierarchy bands, density limits, asymmetry rule.
+## Diversity rule for a series
 
-### Output
+Several works should differ in more than wording and color.
 
-The final rendering language.
+- no more than two should share the same primary representation;
+- no more than two should share the same primary temporal model;
+- interaction consequences should materially differ;
+- palette/composition differences alone do not count as conceptual diversity;
+- structural typography is one option, not a mandatory DC//LAB signature;
+- autonomous behavior is useful when conceptually justified, not a compulsory effect layer.
 
-Examples: 2D shader field, kinetic poster, particle typography, procedural mesh, live identity, interactive installation surface, realtime type system.
-
-## Default cross-domain recipe
-
-For substantial new work, choose deliberately:
-
-```text
-1 carrier
-+ 1 representation change
-+ 2 operators from different domains
-+ 1 autonomous process
-+ 1 interaction perturbation
-+ 1 temporal model with memory/coupling when appropriate
-+ 1 professional design constraint
-```
-
-Then run the result through the mutation process in `IDEA_ENGINE.md` and the living-system checks in `LIVING_SYSTEMS.md`.
-
-Example structure, not a prescribed visual:
-
-```text
-glyph outlines
--> sampled contour population
--> neighbour spring coupling
--> counter area becomes local pressure
--> autonomous pressure oscillation changes contours
--> touch injects fatigue rather than directly setting position
--> damaged regions repair with hysteresis
--> composition remains governed by a fixed editorial hierarchy
-```
-
-The value is in the chain of transformations and feedback relationships, not any single effect.
-
-## Originality rule
-
-A DC//LAB concept should not be traceable to one reference's surface appearance.
-
-Prefer combinations where:
-
-- multiple independent references contribute different principles;
-- at least one bridge crosses a genuinely different discipline;
-- the implementation changes representation, behavior or temporal logic rather than only color/style;
-- the system has meaningful autonomous behavior before interaction;
-- interaction changes internal state rather than merely moving a cursor effect;
-- consequences can propagate, persist, repair or alter later behavior;
-- the final composition still has a deliberate graphic-design identity.
-
-If the description can be reduced to "make source X but with our colors", the research process has failed.
+If five pieces could be produced by one renderer with changed text, colors and cursor mapping, the series has failed.
 
 ## Artwork / interface boundary
 
-The logical PROGRAM canvas is the artwork.
+The logical PROGRAM canvas is the artwork. Do not burn sketch title, index, tags, debug metadata or explanatory UI captions into it. Text is valid when it is actually part of the artwork.
 
-Do not burn project/interface metadata into it:
+## Originality rule
 
-- sketch title;
-- sketch number;
-- tags/category;
-- technical labels;
-- explanatory captions that belong to the editor/Gallery.
+Prefer combinations where independent references contribute different principles and where representation, behavior or temporal logic changes meaningfully.
 
-Text is welcome when it is the actual artistic carrier.
+Reject directions that are mainly:
 
-A visible frame or poster-within-a-canvas is not the default. Use it only when framing itself is part of the concept.
-
-## Living-system gate
-
-Before implementation, answer:
-
-```text
-What happens for 30 seconds with no input?
-What internal variables evolve?
-What is coupled to what?
-What is the fast time scale?
-What is the slow time scale?
-What does a gesture perturb?
-What remains after release?
-What can repair, fatigue, migrate, synchronize or change regime?
-```
-
-If those answers are mostly empty, the idea is probably still an interactive effect rather than a mature realtime system.
+- one tutorial effect plus our colors;
+- the same representation repeated across every sketch;
+- interaction reduced to a radial cursor mask;
+- typography added because it looks fashionable rather than because its structure matters;
+- simulation with no relationship to composition;
+- a pile of unrelated effects without one system tying them together.
 
 ## Implementation boundary
 
-This library is research memory. It stores our own abstractions, links, tags and methods.
-
-Do not automatically vendor external code, fonts, imagery, screenshots, articles or project files. Before exact code/asset reuse, inspect the license and provenance of the specific upstream material. Prefer reimplementation from understood principles.
+This library stores our abstractions, links, tags and methods. Do not vendor external code/fonts/imagery/articles without explicit license review. Prefer reimplementation from understood principles.
