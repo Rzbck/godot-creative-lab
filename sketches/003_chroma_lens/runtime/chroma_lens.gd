@@ -137,9 +137,6 @@ func _draw() -> void:
             draw_string(font, target, glyph, HORIZONTAL_ALIGNMENT_CENTER, step_x * 0.78, font_size, core)
 
     _draw_lens_overlay(lens_center, red_color, cyan_color)
-    draw_string(font, Vector2(78.0, 82.0), "003 / CHROMA LENS", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 20, ACCENT)
-    draw_string(font, Vector2(78.0, 656.0), "LOCAL MAGNIFICATION / RGB DISPLACEMENT / POINTER OPTICS", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 15, Color(0.78, 0.8, 0.9, 0.46))
-
     end_design_draw()
 
 
