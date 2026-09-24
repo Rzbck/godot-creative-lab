@@ -6,6 +6,14 @@ The goal is simple: when we design a new sketch, we should not start from vague 
 
 Last research pass: **2026-09-24**.
 
+## Companion design library
+
+Creative technique is only half of the work. Typography, hierarchy, margins, grid, color, poster composition, motion grammar and visual-system thinking live in the companion library:
+
+`knowledge/design/README.md`
+
+For new sketches, use both libraries together: **creative-coding technique + professional design system**.
+
 ## How to use this library
 
 1. Start with `CONCEPT_ATLAS.md` and choose a technical/aesthetic family.
@@ -14,7 +22,8 @@ Last research pass: **2026-09-24**.
 4. Treat community galleries as inspiration, not as code to copy blindly.
 5. Before reusing code, verify the upstream license for the exact file/repository/version.
 6. Translate the idea into DC//LAB's runtime contract: preview, PROGRAM/LIVE OUT, touch/mouse input, persistent parameters and deterministic sync.
-7. Add any useful new source to both `SOURCE_CATALOG.md` and `sources.json`.
+7. Cross-check the visual system against `../design/TYPOGRAPHY_ATLAS.md` and `../design/GRAPHIC_DESIGN_ATLAS.md`.
+8. Add any useful new source to both `SOURCE_CATALOG.md` and `sources.json`.
 
 ## Source tiers
 
