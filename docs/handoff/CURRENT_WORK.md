@@ -27,24 +27,16 @@ Last refreshed: 2026-09-24.
 - `002_liquid_type` — typography; gesture velocity affects spacing, phase, tangency, smear and chromatic direction.
 - `003_chroma_lens` — typography; safe margins + stable hierarchy + quantized optical states.
 - `004_gommage_type` — typography; directional erosion/dust/gesture memory and reconstruction.
-- `005_pressure_lattice` — internal path retained, but visible artwork is now **REGISTER TYPE**. The original Pressure Lattice concept was rejected and must not be restored.
+- `005_pressure_lattice` — internal path retained, visible artwork **REGISTER TYPE**. Original Pressure Lattice visual concept is rejected and must not be restored.
+- `006_breath_score` — **BREATH SCORE**. Press = inhale, hold = accumulated tension, release = damped exhale; interaction selects the touched typographic line and changes spacing/temporal rhythm rather than applying a generic pointer filter.
+- `007_redaction_field` — **REDACTION FIELD**. Drag right reveals, drag left redacts, long hold preserves the editorial decision, idle slowly renegotiates visibility around the statement `EVERY EDIT / CHANGES / THE STORY`.
+- `008_palimpsest` — **PALIMPSEST**. Slow scratching exposes an older textual layer, fast gestures tear into a deeper layer, holding preserves traces, idle rewrites the present over the archive.
+- `009_chorus_drift` — **CHORUS DRIFT**. Repeated `I AM HERE` voices form a crowd; touch isolates one row, holding gives it presence, horizontal drag displaces it with echoes, release reabsorbs it into the chorus.
+- `010_fault_register` — **FAULT REGISTER**. A strict editorial grid carries `ORDER / IS A TEMPORARY / AGREEMENT`; press anchors a fault, drag shears grid+type, hold deepens the break, release leaves slowly decaying registration scars.
 
-### 005 REGISTER TYPE design contract
+Gallery taxonomy should remain small and semantic: primary `TYPOGRAPHY`, one meaningful family tag (`ELASTIC`, `OPTICAL`, `EROSION`, `PRINT`, `RHYTHM`, `REDACTION`, `MEMORY`, `CHORUS`, `FRACTURE`), plus `INTERACTIVE`.
 
-- stable typographic poster at rest;
-- explicit safe area and six-column editorial structure;
-- asymmetric `FORM / PRESS / TRACE` hierarchy;
-- limited print palette;
-- typography is the primary carrier;
-- press selects the actual touched row and locally compresses it;
-- drag velocity controls registration direction/energy;
-- release returns via damped recovery;
-- shader supplies paper/grain/grid/halftone registration support rather than becoming the artwork itself;
-- custom row energy/anchor/direction remain synchronized between PREVIEW and PROGRAM.
-
-Gallery taxonomy for 002–005 is intentionally small and semantic: primary `TYPOGRAPHY`, one meaningful family tag (`ELASTIC`, `OPTICAL`, `EROSION`, `PRINT`), plus `INTERACTIVE`. Avoid category noise such as `TYPE`, `RGB`, `SHADER`, `LIVE`.
-
-## Knowledge system
+## Creative direction / knowledge system
 
 Before substantial creative work use:
 
@@ -52,20 +44,29 @@ Before substantial creative work use:
 - `knowledge/design/`
 - `knowledge/cross-domain/`
 
-Specifically apply `DESIGN_REVIEW_CHECKLIST.md`, `CROSS_DOMAIN_ATLAS.md` and `IDEA_ENGINE.md`: frozen-frame composition first, real representation bridge, explicit identity invariants, deliberate mutation, causal interaction, designed recovery/idle state, then implementation.
+Specifically apply `DESIGN_REVIEW_CHECKLIST.md`, `CROSS_DOMAIN_ATLAS.md` and `IDEA_ENGINE.md`: frozen-frame composition first, genuine representation bridge, explicit identity invariants, deliberate mutation, causal interaction, designed recovery/idle state, then implementation.
+
+The user explicitly considers the current creative vocabulary still too light compared with studio-grade interactive/generative work. The immediate purpose of sketches 006–010 is to create enough varied material for a **post-test creative audit**. After the host test, do not merely tune parameters: analyze the recurring visual/conceptual limitations, identify missing research bricks (interaction dramaturgy, semantic systems, spatial choreography, type systems, richer simulation/material models, multi-stage state machines, narrative/time structures, etc.), then expand `knowledge/` accordingly before the next major art direction.
 
 ## Validation state / next test
 
-The replacement 005 and taxonomy cleanup have passed CI on their implementation head; resolve the newest exact HEAD after documentation commits before reporting final repository validation.
+Implementation commit `6fc8e85` added sketches 006–010. CI run `36031022484` / #193 completed successfully:
+
+- repository policy passed;
+- Godot 4.7.1 setup/import passed;
+- main-scene smoke test passed;
+- tracked-file cleanliness passed.
+
+Resolve the newest exact HEAD after documentation commits before reporting final repository validation.
 
 Next host test:
 
-1. inspect Gallery taxonomy and thumbnail;
-2. open REGISTER TYPE in PREVIEW;
-3. test press, slow drag, fast drag, release and edges on each of the three typographic rows;
-4. test `TYPE SCALE`, `TRACKING`, `PRESSURE`, `REGISTRATION`, `RECOVERY`, `PRINT GRAIN`, `GRID`, `INK PALETTE`;
-5. `TAKE LIVE` and repeat on the physical PROGRAM touchscreen;
-6. after the test, inspect `telemetry/runtime` before requesting manual logs.
+1. inspect Gallery cards/taxonomy for 006–010;
+2. test each sketch in PREVIEW through its full press / hold / drag / release / idle grammar;
+3. test edges and extreme parameter values;
+4. `TAKE LIVE` and repeat on the physical PROGRAM touchscreen;
+5. after the test, inspect `telemetry/runtime` before requesting manual logs;
+6. perform the planned creative-library gap analysis from the actual visual results.
 
 ## Non-regressions
 
