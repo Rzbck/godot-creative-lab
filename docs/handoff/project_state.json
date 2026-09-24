@@ -5,7 +5,7 @@
   "active_branch": "feat/creative-sketches-002-004-20260924",
   "draft_pr": 7,
   "pr_base": "feat/gallery-project-workflow-20260923",
-  "head_policy": "Resolve current remote branch HEAD from GitHub at session start; do not treat this file as the authoritative latest SHA.",
+  "head_policy": "Resolve current remote branch HEAD from GitHub at session start and again after all material code/documentation commits before reporting validation.",
   "engine": {
     "name": "Godot",
     "version": "4.7.1.stable.official.a13da4feb",
@@ -50,6 +50,13 @@
       "do_not_restore_as_default": true
     }
   ],
+  "creative_exploration": {
+    "preferred_mode": "collision-first",
+    "pipeline": ["blind_random_technical_draw", "coupled_raw_prototype", "observe", "interpret", "art_direct", "mutate"],
+    "raw_seeds_documented_in": "docs/handoff/CURRENT_WORK.md",
+    "do_not_assign_final_message_before_prototype": true,
+    "random_stacking_without_state_coupling_is_rejected": true
+  },
   "shared_creative_infrastructure": {
     "glyph_contour_tools": "sketches/_shared/glyph_contour_tools.gd",
     "glyph_contours_are_optional": true,
@@ -63,19 +70,22 @@
     "publication": "asynchronous_queued_sanitized",
     "last_observed_remote_runtime_head": "729c3a2c5133",
     "last_observed_gallery_preview_count": 10,
-    "last_observed_error_entry_found": false
+    "last_observed_error_entry_found": false,
+    "telemetry_first_after_host_test": true
   },
   "knowledge": {
     "creative_coding": "knowledge/creative-coding/",
     "design": "knowledge/design/",
     "cross_domain": "knowledge/cross-domain/",
     "technique_palette": "knowledge/cross-domain/TECHNIQUE_PALETTE.md",
+    "random_collision_engine": "knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md",
+    "collision_source_catalog": "knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md",
     "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
     "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
     "living_systems": "knowledge/cross-domain/LIVING_SYSTEMS.md",
     "structural_typography": "knowledge/design/STRUCTURAL_TYPOGRAPHY.md",
     "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md",
-    "creative_work_rule": "Artistic intent chooses representation. Compare at least three plausible technical chains before implementation; do not let the most recently added technique become a default house style.",
+    "creative_work_rule": "For the current exploration phase, blind technical collisions may precede artistic meaning. Require coupled state exchange, observe raw behavior first, then art-direct successful accidents. No technique is a default house style.",
     "series_diversity_rules": {
       "max_same_primary_representation": 2,
       "max_same_primary_temporal_model": 2,
@@ -88,7 +98,23 @@
     "local_script": "scripts/check.ps1",
     "required_for_runtime_code": ["repository_policy", "godot_4_7_1_headless_import", "main_scene_smoke_test", "tracked_file_cleanliness"],
     "rollback_commit": "3a437fe2621c00c11c808b909cb6a30a5936e80a",
-    "current_host_state": "ROLLBACK_AWAITING_HOST_RETEST"
+    "current_host_state": "ROLLBACK_HOST_CONFIRMED",
+    "final_head_ci_must_be_checked_after_documentation_commits": true
+  },
+  "ai_completion_protocol": {
+    "mandatory": true,
+    "source": "AGENTS.md",
+    "canonical_operations": "docs/handoff/OPERATIONS.md",
+    "update_current_work_when_durable_state_changes": true,
+    "update_handoff_when_future_session_state_changes": true,
+    "update_project_state_when_machine_state_changes": true,
+    "update_next_ai_prompt_when_startup_or_next_changes": true,
+    "resolve_final_remote_head_after_all_commits": true,
+    "wait_for_exact_final_head_ci": true,
+    "report_exact_short_head_and_ci": true,
+    "auto_supply_ci_waiting_powershell_when_host_test_relevant": true,
+    "powershell_must_not_launch_godot_before_ci_success": true,
+    "telemetry_first_after_host_test": true
   },
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
@@ -101,6 +127,6 @@
     "keep_gallery_taxonomy_small_and_semantic": true,
     "no_sketch_metadata_inside_artwork_canvas": true,
     "do_not_make_glyph_contours_default": true,
-    "compare_multiple_technical_representations_before_substantial_new_work": true
+    "canonical_host_test_uses_exact_head_ci_wait": true
   }
 }
