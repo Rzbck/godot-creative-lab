@@ -44,7 +44,11 @@
   },
   "knowledge": {
     "creative_coding": "knowledge/creative-coding/",
-    "design": "knowledge/design/"
+    "design": "knowledge/design/",
+    "cross_domain": "knowledge/cross-domain/",
+    "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
+    "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
+    "creative_work_rule": "For substantial new work, combine several independent sources across multiple domains, use at least one genuine representation bridge, mutate the first coherent concept, then define identity rules before implementation."
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
