@@ -27,38 +27,38 @@ Last refreshed: 2026-09-24.
 - `002_liquid_type` — typography; gesture velocity affects spacing, phase, tangency, smear and chromatic direction.
 - `003_chroma_lens` — typography; safe margins + stable hierarchy + quantized optical states.
 - `004_gommage_type` — typography; directional erosion/dust/gesture memory and reconstruction.
-- `005_pressure_lattice` — internal path retained, visible artwork **REGISTER TYPE**. Original Pressure Lattice visual concept is rejected and must not be restored.
-- `006_breath_score` — **BREATH SCORE**, now autonomous. The composition breathes without input; real glyph contours expand, ripple and respond locally to touch pressure/gesture direction.
-- `007_redaction_field` — **REDACTION FIELD**, now autonomous/per-character. An institutional scan continuously renegotiates visibility; contour geometry collapses toward its own centerline so letters become their own censorship material. Touch locally reveals/redacts and dwell creates memory.
-- `008_palimpsest` — **PALIMPSEST**, now autonomous. Sediment and old textual strata surface without input; slow/fast gestures excavate different depths. Current/old/deep glyph layers use contour deformation and persistence.
-- `009_chorus_drift` — **CHORUS DRIFT**, now a coupled oscillator population rather than a static crowd waiting for touch. Rows synchronize/desynchronize and some voices emerge autonomously; interaction perturbs one voice and pushes neighbours. High-energy voices deform at contour level.
-- `010_fault_register` — **FAULT REGISTER**, now autonomous and structural. Low-energy faults seed themselves; user faults leave scars. Fault displacement is evaluated per contour point, so one glyph can fracture internally across a fault plane rather than translate as one block.
+- `005_pressure_lattice` — internal path retained, visible artwork **REGISTER TYPE**. Original Pressure Lattice concept is rejected and must not be restored.
+- `006_breath_score` — **BREATH SCORE**, restored to the pre-contour-overuse implementation.
+- `007_redaction_field` — **REDACTION FIELD**, restored to the pre-contour-overuse implementation; project caption/number are suppressed by a thin wrapper.
+- `008_palimpsest` — **PALIMPSEST**, restored to the pre-contour-overuse implementation; archive caption/frame chrome is suppressed by a thin wrapper.
+- `009_chorus_drift` — **CHORUS DRIFT**, restored to the pre-contour-overuse implementation; explanatory frame/caption is suppressed by a thin wrapper.
+- `010_fault_register` — **FAULT REGISTER**, restored to the pre-contour-overuse implementation; the editorial grid remains but project label/number are removed by a thin wrapper.
 
-Gallery taxonomy remains small/semantic. Project metadata belongs to Gallery/editor UI, never inside the artwork.
+## Rejected creative pass
 
-## New shared creative infrastructure
+The host test of the `6c20a094` structural/autonomous pass was rejected.
 
-`sketches/_shared/glyph_contour_tools.gd` provides cached Godot-native glyph outline extraction/sampling through `TextServer.font_get_glyph_contours()`.
+Why it failed:
 
-`design_sketch_base.gd` now exposes helpers to:
+- glyph contours were applied as a near-universal answer instead of one technique among many;
+- several glyph-contour renderings appeared vertically inverted / visually broken;
+- the five works converged technically and aesthetically instead of becoming more diverse;
+- the correction overfit one piece of feedback (`work inside letter structure`) and ignored the much larger available palette of shaders, fields, feedback, particles, SDFs, simulations, geometry, typography metrics, variable fonts, graphs, raster systems, etc.;
+- the result became worse than the previous host-tested pass.
 
-- get glyph contours in the shared 1280×720 design coordinates;
-- map/deform sampled contour points;
-- draw vector contours;
-- compute outline bounds.
+Commit `3a437fe2621c00c11c808b909cb6a30a5936e80a` rolls the five runtimes back without restoring the unwanted presentation captions.
 
-This is the first shared brick for real structural typography. When an artwork claims to bend/fracture/open a letter internally, prefer contour/SDF/anatomy-depth representations over whole-glyph transforms.
+Do not resurrect the rejected contour-everywhere versions.
 
-## Creative-quality rules established from host feedback
+## Creative rules established from host feedback
 
-Treat these as durable rules:
-
-1. **The full PROGRAM canvas is the artwork.** Do not burn sketch title, number, category, debug/project metadata or fake curatorial captions into it. A visible inset frame is only justified when framing is the actual concept.
-2. **The work should normally live before touch.** Default/idle behavior must evolve meaningfully without clicks or slider rescue.
-3. **Interaction perturbs a system; it should not merely toggle an effect.** Prefer injection of energy/state, damage, selection, coupling changes or boundary changes whose consequences can propagate/persist/repair.
-4. **Typographic representation must match the artistic claim.** Structural deformation requires contour/SDF/anatomy access, not just moving a glyph origin.
-5. **Parameters bias behavior rather than rescuing visuals.** Prefer autonomy, cohesion, fatigue, repair, memory, pressure, permeability, mutation, structural tension, etc.
-6. **Use multiple time scales when appropriate.** Fast response + medium redistribution + slow memory/repair produce deeper behavior than one looping oscillator.
+1. **PROGRAM canvas is artwork-only.** Sketch title, index, tags, debug/project metadata and explanatory pseudo-curatorial labels stay in the Gallery/editor UI.
+2. **No single technique becomes house style by accident.** Vector contours, SDF, shaders, particles, feedback, simulation, direct type, mesh/geometry, fields, raster/masks, graphs and variable-font systems are all separate options.
+3. **Concept chooses representation.** For substantial new work, compare at least three plausible technical representations before implementation.
+4. **Structural typography is optional.** Only use contour/anatomy-level techniques when the artistic idea genuinely depends on internal glyph structure.
+5. **Series diversity is structural.** Five works must not be five variants of one renderer with changed text/color/input mapping.
+6. **Interaction and autonomy still need deeper research**, but do not solve that by blindly adding contour deformation or generic ambient oscillation.
+7. **Parameters should express artistic/systemic choices**, not rescue a weak default composition.
 
 ## Knowledge system
 
@@ -68,42 +68,58 @@ Before substantial creative work use:
 - `knowledge/design/`
 - `knowledge/cross-domain/`
 
-New mandatory bricks for relevant work:
+Most important current files:
 
-- `knowledge/design/STRUCTURAL_TYPOGRAPHY.md`
-- `knowledge/cross-domain/LIVING_SYSTEMS.md`
+- `knowledge/cross-domain/TECHNIQUE_PALETTE.md` — mandatory selection/diversity guide;
+- `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`;
+- `knowledge/cross-domain/IDEA_ENGINE.md`;
+- `knowledge/cross-domain/LIVING_SYSTEMS.md` — useful as one behavior research brick, not a mandate that every artwork must be autonomous;
+- `knowledge/design/TYPOGRAPHY_ATLAS.md`;
+- `knowledge/design/STRUCTURAL_TYPOGRAPHY.md` — optional technique-specific reference, not the default typography strategy;
+- `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`.
 
-Also apply:
+### Mandatory technique-selection protocol
 
-- `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`
-- `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`
-- `knowledge/cross-domain/IDEA_ENGINE.md`
+For a substantial new sketch, write at least three candidate implementation chains before choosing one.
 
-The checklist now contains a 30-second no-input acceptance test and a one-gesture-then-hands-off test.
+Example:
 
-## Validation / telemetry state
+```text
+same intention
+A -> direct/variable typography + layout state machine
+B -> raster mask + temporal feedback + shader
+C -> particles/agents + field + reconstruction
+```
 
-Structural/autonomous implementation commit: `6c20a0948a512809ad16014c7fef67e0ffaf4ae9`.
-CI #196 (`36032793642`) passed repository policy, Godot 4.7.1 headless import, main-scene smoke and tracked-file cleanliness.
+Choose by artistic fit, not by recency/convenience.
 
-The online telemetry visible during the user's previous visual review was stale: it reported runtime Git head `0e9a002...` and five previews, so it did **not** contain evidence for the latest 006–010 test. Do not pretend otherwise. After the next host run, inspect `telemetry/runtime` again before requesting logs.
+For a multi-sketch series:
 
-The structural/autonomous pass is `REPO_VALIDATED` but remains `HOST_NOT_VALIDATED` until the user runs this exact version.
+- no more than two works should share the same primary representation;
+- no more than two should share the same primary temporal model;
+- interaction consequence must materially differ;
+- palette/composition changes alone do not count as technical/conceptual diversity.
 
-## Next host test
+## Telemetry state
 
-Do **not** start by tuning sliders.
+The latest host run published runtime head `729c3a2...` with all 10 previews loaded and no error entry found in the rolling telemetry. The user's complaint is therefore primarily a visual/creative failure, not evidence of a runtime crash.
 
-1. sync/run the newest exact HEAD;
-2. inspect 006–010 with hands off for ~30 seconds each;
-3. verify no title/index/project metadata is drawn into artwork and composition uses the full canvas;
-4. observe whether autonomous behavior has character rather than trivial ambient motion;
-5. make one slow gesture, stop touching and watch the consequence;
-6. make one fast/long gesture and compare memory/propagation/recovery;
-7. inspect whether letter contours actually bend/collapse/fracture internally where intended;
-8. test one or two pieces in PROGRAM/touch;
-9. then inspect fresh telemetry plus the user's visual feedback before the next art-direction pass.
+After any further host test, inspect `telemetry/runtime` before requesting manual logs.
+
+## Validation / next step
+
+The runtime rollback itself must pass exact-head CI before being presented as stable.
+
+Do **not** immediately generate another batch of five artworks.
+
+Next creative task is a real gap analysis of the research library and technique palette:
+
+1. classify current sketches 001–010 by primary representation, temporal model, interaction consequence, composition system and visual material;
+2. identify overrepresented mechanisms and missing families;
+3. research studio-grade references for the missing families;
+4. expand the library with concrete implementation bridges;
+5. only then design the next major artwork/series.
 
 ## Non-regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, move the workstation as the normal output mechanism, block the UI with telemetry Git work, resurrect the failed cross-window texture path, add card-covering overlays, fake Spout/NDI, restore Pressure Lattice, or reintroduce artwork metadata captions.
+Do not stop PROGRAM on navigation, create independent linked timelines, move the workstation as the normal output mechanism, block the UI with telemetry Git work, resurrect the failed cross-window texture path, add card-covering overlays, fake Spout/NDI, restore Pressure Lattice, reintroduce artwork metadata captions, or make glyph contours the default creative representation.
