@@ -11,9 +11,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-# Git non-zero exit codes are handled explicitly below. This avoids inheriting
-# $PSNativeCommandUseErrorActionPreference=$true from an interactive PS7 shell.
-$PSNativeCommandUseErrorActionPreference = $false
+# Native Git exit codes are checked explicitly. Keep PowerShell 7 from turning
+# an expected non-zero native status into a terminating exception.
+if (Get-Variable -Name PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue) {
+    $PSNativeCommandUseErrorActionPreference = $false
+}
 
 Set-Location -LiteralPath $RepoRoot
 
@@ -69,7 +71,6 @@ function Get-PublicSessionId {
 }
 
 $SafeKeys = @{
-    # event payload
     previous_mode = $true; previous_position = $true; previous_size = $true
     saved_restore_position = $true; saved_restore_size = $true; saved_has_restore_rect = $true
     restore_mode = $true; restore_position = $true; restore_size = $true
@@ -77,8 +78,6 @@ $SafeKeys = @{
     attempt = $true; matched = $true; mode_ok = $true; rect_ok = $true
     has_restore_rect = $true; from_mode = $true
     godot = $true; os = $true; remote_enabled = $true
-
-    # layout snapshot
     layout = $true; viewport_visible_size = $true
     main = $true; margin = $true; top_bar = $true; rail = $true; status_bar = $true
     gallery_view = $true; project_view = $true; preview_container = $true; fullscreen_overlay = $true
@@ -224,8 +223,8 @@ function Convert-ToSanitizedTelemetry {
 }
 
 try {
-    # Serialize concurrent automatic publishers. The application launches this
-    # script asynchronously on several key events, so overlapping git pushes are possible.
+    # Several application events can publish close together. Serialize them so
+    # they do not race while creating commits on telemetry/runtime.
     for ($Attempt = 0; $Attempt -lt 50 -and $null -eq $LockStream; $Attempt++) {
         try {
             $LockStream = [System.IO.File]::Open(
@@ -255,15 +254,36 @@ try {
         throw "Not inside a Git worktree."
     }
 
-    # Refresh the telemetry-only branch if it already exists. A missing branch is fine.
-    git fetch --quiet $Remote "+$TargetRef`:$RemoteRef" 2>$null
-    $HasParent = $LASTEXITCODE -eq 0
+    # IMPORTANT: probing a branch with `git fetch <missing-ref>` prints a fatal
+    # error on first publication. Probe with ls-remote instead: without
+    # --exit-code, a missing branch is a clean empty result with exit code 0.
+    $PreviousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    $RemoteLines = @(& git ls-remote --heads $Remote $TargetRef 2>$null)
+    $LsRemoteExit = $LASTEXITCODE
+    $ErrorActionPreference = $PreviousErrorActionPreference
+
+    if ($LsRemoteExit -ne 0) {
+        throw "Could not query remote telemetry branch. Check GitHub connectivity/credentials."
+    }
+
+    $HasParent = $RemoteLines.Count -gt 0 -and -not [string]::IsNullOrWhiteSpace(($RemoteLines -join ""))
     $Parent = ""
 
     if ($HasParent) {
-        $Parent = (git rev-parse $RemoteRef).Trim()
+        $PreviousErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        & git fetch --quiet $Remote "+$TargetRef`:$RemoteRef" 2>$null
+        $FetchExit = $LASTEXITCODE
+        $ErrorActionPreference = $PreviousErrorActionPreference
+
+        if ($FetchExit -ne 0) {
+            throw "Could not refresh existing telemetry branch."
+        }
+
+        $Parent = (& git rev-parse $RemoteRef).Trim()
         if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($Parent)) {
-            $HasParent = $false
+            throw "Could not resolve telemetry branch parent."
         }
     }
 
@@ -299,13 +319,21 @@ try {
         throw "git write-tree failed."
     }
 
-    # Never expose the developer's configured Git identity in telemetry commits.
+    # Do not expose the workstation's configured Git identity in telemetry commits.
     $env:GIT_AUTHOR_NAME = "Creative Lab Telemetry"
     $env:GIT_AUTHOR_EMAIL = "telemetry@localhost"
     $env:GIT_COMMITTER_NAME = "Creative Lab Telemetry"
     $env:GIT_COMMITTER_EMAIL = "telemetry@localhost"
 
-    $CommitMessage = "telemetry: $Reason $PublicSessionFile"
+    $SafeReason = ($Reason -replace '[^A-Za-z0-9_\-]', '_')
+    if ([string]::IsNullOrWhiteSpace($SafeReason)) {
+        $SafeReason = "runtime"
+    }
+    if ($SafeReason.Length -gt 64) {
+        $SafeReason = $SafeReason.Substring(0, 64)
+    }
+
+    $CommitMessage = "telemetry: $SafeReason $PublicSessionFile"
     if ($HasParent) {
         $Commit = (git commit-tree $Tree -p $Parent -m $CommitMessage).Trim()
     }
