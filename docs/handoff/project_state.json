@@ -33,15 +33,12 @@
     {"id": "002_liquid_type", "role": "gallery-sketch", "current_refinement": "gesture-velocity-memory", "tags": ["TYPOGRAPHY", "ELASTIC", "INTERACTIVE"]},
     {"id": "003_chroma_lens", "role": "gallery-sketch", "current_refinement": "quantized-editorial-grid-hierarchy", "tags": ["TYPOGRAPHY", "OPTICAL", "INTERACTIVE"]},
     {"id": "004_gommage_type", "role": "gallery-sketch", "current_refinement": "directional-erosion-memory", "tags": ["TYPOGRAPHY", "EROSION", "INTERACTIVE"]},
-    {
-      "id": "005_pressure_lattice",
-      "visible_title": "REGISTER TYPE",
-      "role": "gallery-sketch",
-      "engine": "gdscript_plus_canvas_item_shader",
-      "rejected_previous_concept": "Pressure Lattice",
-      "concept": "editorial-hierarchy_to_typographic-metrics_to_local-compression_to_print-misregistration_to_damped-recovery",
-      "tags": ["TYPOGRAPHY", "PRINT", "INTERACTIVE"]
-    }
+    {"id": "005_pressure_lattice", "visible_title": "REGISTER TYPE", "role": "gallery-sketch", "rejected_previous_concept": "Pressure Lattice", "tags": ["TYPOGRAPHY", "PRINT", "INTERACTIVE"]},
+    {"id": "006_breath_score", "visible_title": "BREATH SCORE", "role": "gallery-sketch", "concept": "press_inhale_to_hold_tension_to_release_exhale", "tags": ["TYPOGRAPHY", "RHYTHM", "INTERACTIVE"]},
+    {"id": "007_redaction_field", "visible_title": "REDACTION FIELD", "role": "gallery-sketch", "concept": "editorial_visibility_as_bidirectional_gesture_and_memory", "tags": ["TYPOGRAPHY", "REDACTION", "INTERACTIVE"]},
+    {"id": "008_palimpsest", "visible_title": "PALIMPSEST", "role": "gallery-sketch", "concept": "gesture_speed_selects_archive_depth_then_present_rewrites_over_memory", "tags": ["TYPOGRAPHY", "MEMORY", "INTERACTIVE"]},
+    {"id": "009_chorus_drift", "visible_title": "CHORUS DRIFT", "role": "gallery-sketch", "concept": "individual_voice_isolated_displaced_then_reabsorbed_by_crowd", "tags": ["TYPOGRAPHY", "CHORUS", "INTERACTIVE"]},
+    {"id": "010_fault_register", "visible_title": "FAULT REGISTER", "role": "gallery-sketch", "concept": "strict_editorial_order_fractures_under_touch_and_retains_scar_memory", "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"]}
   ],
   "telemetry": {
     "remote_branch": "telemetry/runtime",
@@ -57,18 +54,17 @@
     "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md",
     "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
     "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
-    "creative_work_rule": "Define frozen-frame composition and identity invariants, build meaningful representation bridges, mutate the first coherent concept, design causal interaction/recovery, then choose the cheapest Godot representation that preserves the idea."
+    "creative_work_rule": "Define frozen-frame composition and identity invariants, build meaningful representation bridges, mutate the first coherent concept, design causal interaction/recovery, then choose the cheapest Godot representation that preserves the idea.",
+    "next_research_goal": "After host-testing 006-010, identify recurring studio-quality gaps in interaction dramaturgy, semantic/narrative systems, richer type systems, spatial choreography, material/simulation vocabulary and temporal state design, then expand knowledge before the next major art direction."
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
-    "required_for_runtime_code": [
-      "repository_policy",
-      "godot_4_7_1_headless_import",
-      "main_scene_smoke_test",
-      "tracked_file_cleanliness"
-    ],
-    "register_type_host_state": "IMPLEMENTED_NOT_VALIDATED"
+    "required_for_runtime_code": ["repository_policy", "godot_4_7_1_headless_import", "main_scene_smoke_test", "tracked_file_cleanliness"],
+    "creative_006_010_implementation_commit": "6fc8e854dadcc6a67f74babbeefc45ddb92c0205",
+    "creative_006_010_ci_run": 36031022484,
+    "creative_006_010_ci_conclusion": "success",
+    "creative_006_010_host_state": "IMPLEMENTED_NOT_VALIDATED"
   },
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
