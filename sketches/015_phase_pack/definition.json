@@ -1,0 +1,9 @@
+{
+  "id": "015_phase_pack",
+  "index": "015",
+  "title": "PHASE PACK",
+  "scene": "res://sketches/015_phase_pack/runtime/phase_pack.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["PHASE", "PACKING", "INTERACTIVE"],
+  "description": "A packed population of colliding bodies generates a signed-distance field while local neighbour rules flip material phase. Touch changes phase instead of directly dragging form."
+}

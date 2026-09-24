@@ -1,0 +1,9 @@
+{
+  "id": "011_swarm_relay",
+  "index": "011",
+  "title": "SWARM RELAY",
+  "scene": "res://sketches/011_swarm_relay/runtime/swarm_relay.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["AGENTS", "TOPOLOGY", "INTERACTIVE"],
+  "description": "A living relay network of autonomous agents. Local motion rewires neighbourhoods, while touch injects repulsion and breaks/reforms communication paths."
+}

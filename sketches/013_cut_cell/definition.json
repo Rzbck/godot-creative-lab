@@ -1,0 +1,9 @@
+{
+  "id": "013_cut_cell",
+  "index": "013",
+  "title": "CUT CELL",
+  "scene": "res://sketches/013_cut_cell/runtime/cut_cell.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["NETWORK", "VORONOI", "INTERACTIVE"],
+  "description": "A moving cellular territory whose nearest-site regions and communication links constantly renegotiate. Touch cuts graph connections and the field grows around the damage."
+}

@@ -1,0 +1,9 @@
+{
+  "id": "014_ribbon_morph",
+  "index": "014",
+  "title": "RIBBON MORPH",
+  "scene": "res://sketches/014_ribbon_morph/runtime/ribbon_morph.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["MORPHOLOGY", "RASTER", "INTERACTIVE"],
+  "description": "A binary material repeatedly dilates, erodes and reconnects. The raster state is reconstructed as long ribbons, while dwell flips the material regime instead of moving a cursor effect."
+}
