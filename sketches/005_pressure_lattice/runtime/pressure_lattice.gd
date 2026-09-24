@@ -7,7 +7,6 @@ const TRACKING_MULTIPLIERS: Array[float] = [1.0, 0.35, 1.2]
 const SAFE_RECT: Rect2 = Rect2(86.0, 64.0, 1108.0, 592.0)
 const ROW_COUNT: int = 3
 
-const PAPER: Color = Color(0.94, 0.91, 0.84, 1.0)
 const INK: Color = Color(0.035, 0.045, 0.065, 1.0)
 const VERMILION: Color = Color(0.97, 0.16, 0.08, 1.0)
 const CYAN: Color = Color(0.0, 0.55, 0.78, 1.0)
@@ -241,9 +240,9 @@ func _draw_editorial_guides() -> void:
     var micro_font: Font = ThemeDB.fallback_font
     var micro_color: Color = INK
     micro_color.a = 0.46
-    draw_string(micro_font, Vector2(88.0, 104.0), "005 / REGISTER", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 18, micro_color)
+    draw_string(micro_font, Vector2(88.0, 104.0), "INK / PRESS / TRACE", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 18, micro_color)
 
-    var right_label: String = "FORM → PRESSURE → TRACE"
+    var right_label: String = "FORM → FORCE → MEMORY"
     var label_width: float = micro_font.get_string_size(right_label, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 18).x
     draw_string(
         micro_font,
@@ -306,19 +305,18 @@ func _draw_typography() -> void:
 
             var register_vector: Vector2 = direction * registration * local_energy
             register_vector.y *= 0.62
-            var rotation: float = direction.x * local_energy * 0.022
 
             if local_energy > 0.012:
                 var color_a: Color = accent_a
                 color_a.a = clampf(0.18 + local_energy * 0.66, 0.0, 0.84)
                 var color_b: Color = accent_b
                 color_b.a = clampf(0.14 + local_energy * 0.58, 0.0, 0.76)
-                _draw_glyph(font, glyph, core_position - register_vector, font_size, color_b, -rotation * 0.55)
-                _draw_glyph(font, glyph, core_position + register_vector * 0.78, font_size, color_a, rotation)
+                _draw_glyph(font, glyph, core_position - register_vector, font_size, color_b)
+                _draw_glyph(font, glyph, core_position + register_vector * 0.78, font_size, color_a)
 
             var core_color: Color = INK
             core_color.a = 0.96
-            _draw_glyph(font, glyph, core_position, font_size, core_color, rotation * 0.18)
+            _draw_glyph(font, glyph, core_position, font_size, core_color)
 
             cursor_x += glyph_width + row_tracking
 
@@ -328,12 +326,9 @@ func _draw_glyph(
     glyph: String,
     baseline_position: Vector2,
     font_size: int,
-    color: Color,
-    rotation: float
+    color: Color
 ) -> void:
-    draw_set_transform(baseline_position, rotation, Vector2.ONE)
-    draw_string(font, Vector2.ZERO, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, color)
-    draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+    draw_string(font, baseline_position, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, color)
 
 
 func _draw_registration_targets() -> void:
