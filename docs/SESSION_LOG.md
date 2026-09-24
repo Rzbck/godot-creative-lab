@@ -127,3 +127,50 @@ NEXT TEST:
 
 ROLLBACK / CHECKPOINT:
 - active feature branch `feat/creative-sketches-002-004-20260924`; do not merge `main` without user approval.
+
+## 2026-09-24 — knowledge-driven creative pass + 005 Pressure Lattice
+
+HEAD before / after: cross-domain knowledge baseline -> resolve final HEAD after this documentation commit.
+
+HOST_VALIDATED:
+- not yet for this exact creative pass; existing PROGRAM/touch/live-sync foundation remains previously validated.
+
+REPO_VALIDATED:
+- first 005 CI import and smoke test passed;
+- that first run failed only tracked-file cleanliness because Godot generated `pressure_lattice.gd.uid` and `pressure_lattice.gdshader.uid`;
+- both generated UID files were then explicitly tracked; resolve newest CI for final repository validation.
+
+IMPLEMENTED_NOT_VALIDATED:
+- 002 Liquid Type now stores gesture velocity as temporal energy and uses it for tracking, phase, tangential field response, smear and chromatic direction;
+- 003 Chroma Lens now has stable per-cell hierarchy, quantized lens states and a seven-column/baseline editorial grid while preserving safe margins;
+- 004 Gommage Type stores per-mark gesture velocity so erosion, dust and residual traces become directional before reconstruction;
+- 005 Pressure Lattice is a new Godot `canvas_item` shader crossing editorial grid, procedural signal field, gesture-injected vector pressure, decaying memory and a restrained duotone identity;
+- 005 exposes persistent artistic parameters and synchronizes custom memory through the existing PREVIEW/PROGRAM live-sync contract.
+
+REJECTED / EXPERIMENTAL:
+- turning 001 Signal Field into an art piece just for stylistic consistency; it remains useful as a technical contract/regression sketch;
+- making 005 another typographic radial-distortion sketch;
+- using a purely decorative grid with no computational role.
+
+DECISIONS:
+- new work should demonstrate the cross-domain knowledge system in behavior, not only in documentation;
+- 005's grid controls local shader state/frequency; interaction injects energy instead of directly placing the image;
+- existing accepted sketches are refined without erasing their individual identities;
+- 005 is now an approved real Gallery entry; future docs must not say "no 005";
+- do not invent 006 without a new user request.
+
+FILES / SYSTEMS:
+- `sketches/002_liquid_type/runtime/liquid_type.gd`;
+- `sketches/003_chroma_lens/runtime/chroma_lens.gd`;
+- `sketches/004_gommage_type/runtime/gommage_type.gd`;
+- `sketches/005_pressure_lattice/definition.json`;
+- `sketches/005_pressure_lattice/runtime/pressure_lattice.gd`;
+- `sketches/005_pressure_lattice/runtime/pressure_lattice.gdshader`;
+- `sketches/005_pressure_lattice/runtime/pressure_lattice.tscn`;
+- associated Godot UID files and updated handoff state.
+
+NEXT TEST:
+- user syncs/runs the branch, checks Gallery previews for 002–005, then tests 005 in PREVIEW and PROGRAM with mouse/touch; afterward read `telemetry/runtime` before requesting logs.
+
+ROLLBACK / CHECKPOINT:
+- active feature branch + draft PR #7; resolve latest HEAD and CI before host test; do not merge `main` without user approval.
