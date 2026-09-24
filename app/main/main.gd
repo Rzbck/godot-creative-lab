@@ -61,6 +61,7 @@ func _enter_render_fullscreen() -> void:
         "saved_restore_position": _vec2i_array(_presentation_previous_restore_position),
         "saved_restore_size": _vec2i_array(_presentation_previous_restore_size),
         "saved_has_restore_rect": _presentation_previous_has_restore_rect,
+        "layout": _layout_telemetry_snapshot(),
     })
 
     _presentation_transition = true
@@ -70,6 +71,12 @@ func _enter_render_fullscreen() -> void:
     fullscreen_texture.texture = sketch_viewport.get_texture()
     fullscreen_overlay.visible = true
     fullscreen_overlay.grab_focus()
+
+    # The normal workstation UI must not participate in the temporary monitor-size
+    # layout. Keeping it visible behind the overlay made Godot's Containers retain
+    # fullscreen geometry after Esc on Windows. Hide the entire shell before any
+    # window resize, then rebuild it only after the original client rect is back.
+    margin.visible = false
 
     if current_mode != DisplayServer.WINDOW_MODE_WINDOWED:
         DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
@@ -108,12 +115,14 @@ func _finish_enter_render_fullscreen() -> void:
         if matched:
             break
 
+    _force_root_full_rect()
+    fullscreen_overlay.visible = true
     fullscreen_overlay.grab_focus()
     _last_preview_size = Vector2i.ZERO
     _sync_preview_resolution(true)
     root_window.grab_focus()
     _presentation_transition = false
-    _telemetry_event("presentation_enter_complete")
+    _telemetry_event("presentation_enter_complete", {"layout": _layout_telemetry_snapshot()})
 
 
 func _exit_render_fullscreen() -> void:
@@ -125,6 +134,7 @@ func _exit_render_fullscreen() -> void:
         "restore_mode": _window_mode_name(_presentation_previous_mode),
         "restore_position": _vec2i_array(_presentation_previous_position),
         "restore_size": _vec2i_array(_presentation_previous_size),
+        "layout": _layout_telemetry_snapshot(),
     })
     call_deferred("_finish_exit_render_fullscreen")
 
@@ -132,6 +142,10 @@ func _exit_render_fullscreen() -> void:
 func _finish_exit_render_fullscreen() -> void:
     var root_window: Window = get_window()
 
+    # Keep the render overlay visible and the workstation shell hidden until the
+    # native window has fully returned to its pre-presentation state.
+    margin.visible = false
+    fullscreen_overlay.visible = true
     root_window.unresizable = false
     root_window.always_on_top = _presentation_previous_always_on_top
 
@@ -175,6 +189,16 @@ func _finish_exit_render_fullscreen() -> void:
     _restore_size = _presentation_previous_restore_size
     _has_restore_rect = _presentation_previous_has_restore_rect
 
+    _telemetry_event("presentation_exit_native_restored", {"layout": _layout_telemetry_snapshot()})
+
+    # Rebuild the Control hierarchy against the restored client area while it is
+    # still hidden by the fullscreen render. This avoids revealing one frame of
+    # fullscreen-sized container geometry.
+    _force_root_full_rect()
+    _force_workstation_layout()
+    await get_tree().process_frame
+    await get_tree().process_frame
+
     margin.visible = true
     top_bar.visible = true
     rail.visible = true
@@ -182,10 +206,14 @@ func _finish_exit_render_fullscreen() -> void:
     gallery_view.visible = false
     project_view.visible = true
     page_spacer.visible = false
-    margin.queue_sort()
-    project_view.queue_sort()
+
+    _force_root_full_rect()
+    _force_workstation_layout()
     await get_tree().process_frame
     await get_tree().process_frame
+    await get_tree().process_frame
+
+    _telemetry_event("presentation_exit_shell_rebuilt", {"layout": _layout_telemetry_snapshot()})
 
     _fullscreen_active = false
     fullscreen_overlay.visible = false
@@ -200,7 +228,66 @@ func _finish_exit_render_fullscreen() -> void:
     await get_tree().process_frame
     _restoring_window = false
     _presentation_transition = false
-    _telemetry_event("presentation_exit_complete")
+    _telemetry_event("presentation_exit_complete", {"layout": _layout_telemetry_snapshot()})
+
+
+func _force_root_full_rect() -> void:
+    # Reassert the exact full-rect contract from main.tscn. Direct anchor/offset
+    # assignment is intentional here: it does not depend on minimum-size presets.
+    anchor_left = 0.0
+    anchor_top = 0.0
+    anchor_right = 1.0
+    anchor_bottom = 1.0
+    offset_left = 0.0
+    offset_top = 0.0
+    offset_right = 0.0
+    offset_bottom = 0.0
+
+    margin.anchor_left = 0.0
+    margin.anchor_top = 0.0
+    margin.anchor_right = 1.0
+    margin.anchor_bottom = 1.0
+    margin.offset_left = 0.0
+    margin.offset_top = 0.0
+    margin.offset_right = 0.0
+    margin.offset_bottom = 0.0
+
+    fullscreen_overlay.anchor_left = 0.0
+    fullscreen_overlay.anchor_top = 0.0
+    fullscreen_overlay.anchor_right = 1.0
+    fullscreen_overlay.anchor_bottom = 1.0
+    fullscreen_overlay.offset_left = 0.0
+    fullscreen_overlay.offset_top = 0.0
+    fullscreen_overlay.offset_right = 0.0
+    fullscreen_overlay.offset_bottom = 0.0
+
+
+func _force_workstation_layout() -> void:
+    margin.queue_sort()
+    top_bar.queue_sort()
+    rail.queue_sort()
+    status_bar.queue_sort()
+    project_view.queue_sort()
+
+    var shell: Node = margin.get_node_or_null("Shell")
+    if shell is Container:
+        (shell as Container).queue_sort()
+
+    var body: Node = margin.get_node_or_null("Shell/Body")
+    if body is Container:
+        (body as Container).queue_sort()
+
+    var workspace: Node = margin.get_node_or_null("Shell/Body/Workspace")
+    if workspace is Container:
+        (workspace as Container).queue_sort()
+
+    var workspace_margin: Node = margin.get_node_or_null("Shell/Body/Workspace/WorkspaceMargin")
+    if workspace_margin is Container:
+        (workspace_margin as Container).queue_sort()
+
+    var content: Node = margin.get_node_or_null("Shell/Body/Workspace/WorkspaceMargin/Content")
+    if content is Container:
+        (content as Container).queue_sort()
 
 
 func _toggle_maximize_window() -> void:
@@ -238,16 +325,18 @@ func _restore_window() -> void:
 
 
 func _apply_restore_rect() -> void:
+    var root_window: Window = get_window()
     var target_position: Vector2i = _restore_position
     var target_size: Vector2i = _restore_size
     var has_target: bool = _has_restore_rect
 
+    root_window.unresizable = false
     await get_tree().process_frame
 
     for attempt: int in range(WINDOW_APPLY_ATTEMPTS):
         if has_target:
-            DisplayServer.window_set_size(target_size)
-            DisplayServer.window_set_position(target_position)
+            root_window.size = target_size
+            root_window.position = target_position
 
         await get_tree().process_frame
 
@@ -255,8 +344,8 @@ func _apply_restore_rect() -> void:
         var rect_ok: bool = true
         if has_target:
             rect_ok = _window_rect_matches(
-                DisplayServer.window_get_position(),
-                DisplayServer.window_get_size(),
+                root_window.position,
+                root_window.size,
                 target_position,
                 target_size
             )
@@ -275,11 +364,13 @@ func _apply_restore_rect() -> void:
         _restore_size = target_size
         _has_restore_rect = true
 
+    _force_root_full_rect()
+    _force_workstation_layout()
     _sync_window_controls()
     await get_tree().process_frame
     await get_tree().process_frame
     _restoring_window = false
-    _telemetry_event("window_restore_complete")
+    _telemetry_event("window_restore_complete", {"layout": _layout_telemetry_snapshot()})
 
 
 func _remember_windowed_rect() -> void:
@@ -380,6 +471,34 @@ func _vec2i_array(value: Vector2i) -> Array[int]:
     return [value.x, value.y]
 
 
+func _vec2_array(value: Vector2) -> Array[float]:
+    return [value.x, value.y]
+
+
+func _control_telemetry_snapshot(control: Control) -> Dictionary:
+    return {
+        "visible": control.visible,
+        "position": _vec2_array(control.position),
+        "global_position": _vec2_array(control.global_position),
+        "size": _vec2_array(control.size),
+    }
+
+
+func _layout_telemetry_snapshot() -> Dictionary:
+    return {
+        "viewport_visible_size": _vec2_array(get_viewport().get_visible_rect().size),
+        "main": _control_telemetry_snapshot(self),
+        "margin": _control_telemetry_snapshot(margin),
+        "top_bar": _control_telemetry_snapshot(top_bar),
+        "rail": _control_telemetry_snapshot(rail),
+        "status_bar": _control_telemetry_snapshot(status_bar),
+        "gallery_view": _control_telemetry_snapshot(gallery_view),
+        "project_view": _control_telemetry_snapshot(project_view),
+        "preview_container": _control_telemetry_snapshot(sketch_viewport_container),
+        "fullscreen_overlay": _control_telemetry_snapshot(fullscreen_overlay),
+    }
+
+
 func _window_telemetry_snapshot() -> Dictionary:
     var root_window: Window = get_window()
     var screen_index: int = root_window.current_screen
@@ -408,7 +527,7 @@ func _telemetry_event(event_name: String, data: Dictionary = {}) -> void:
 
     _telemetry_sequence += 1
     var record: Dictionary = {
-        "schema": 1,
+        "schema": 2,
         "session": _telemetry_session_id,
         "seq": _telemetry_sequence,
         "elapsed_ms": Time.get_ticks_msec() - _telemetry_started_msec,
@@ -460,7 +579,7 @@ func _ensure_telemetry_started() -> void:
         _telemetry_http.request_completed.connect(_on_telemetry_request_completed)
 
     var start_record: Dictionary = {
-        "schema": 1,
+        "schema": 2,
         "session": _telemetry_session_id,
         "seq": 0,
         "elapsed_ms": 0,
@@ -470,6 +589,7 @@ func _ensure_telemetry_started() -> void:
             "godot": str(Engine.get_version_info().get("string", "")),
             "os": OS.get_name(),
             "remote_enabled": not _telemetry_remote_url.is_empty(),
+            "layout": _layout_telemetry_snapshot(),
         },
     }
     var start_payload: String = JSON.stringify(start_record)
