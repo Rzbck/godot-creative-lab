@@ -1,26 +1,19 @@
 extends "res://app/main/main_runtime_live_output.gd"
 
-# Gallery + persistence workstation layer.
-#
-# Gallery cards own a small render surface showing the actual sketch. The surface
-# is frozen by default (a cheap still preview) and only the card under the pointer
-# is allowed to process and render continuously. This keeps the gallery visual
-# without running every generative patch in the background.
-#
-# Exposed sketch parameters are persisted locally with ConfigFile under user://.
-# They are restored before the parameter inspector is built, so sliders/toggles,
-# preview and LIVE OUT all begin from the same saved state on the next session.
+# Visual gallery + per-sketch persistence.
+# Static thumbnails are real sketch renders. Only the hovered card is allowed to
+# animate, so the gallery stays cheap even when the library grows.
 
 const GALLERY_RUNTIME_REVISION: int = 1
 const GALLERY_PREVIEW_SIZE: Vector2i = Vector2i(384, 216)
-const SETTINGS_PATH: String = "user://creative_lab_sketch_settings.cfg"
-const SETTINGS_SAVE_DELAY: float = 0.35
+const SKETCH_PREFS_PATH: String = "user://creative_lab_sketch_settings.cfg"
+const SKETCH_PREFS_SAVE_DELAY: float = 0.35
 
-var _sketch_settings: ConfigFile = ConfigFile.new()
-var _settings_loaded: bool = false
-var _settings_save_pending: bool = false
-var _settings_save_countdown: float = 0.0
-var _settings_dirty_count: int = 0
+var _sketch_prefs: ConfigFile = ConfigFile.new()
+var _sketch_prefs_loaded: bool = false
+var _sketch_prefs_save_pending: bool = false
+var _sketch_prefs_save_countdown: float = 0.0
+var _sketch_prefs_dirty_count: int = 0
 
 # sketch_id -> { card, viewport, sketch }
 var _gallery_previews: Dictionary = {}
@@ -28,41 +21,41 @@ var _gallery_live_preview_id: String = ""
 
 
 func _ready() -> void:
-    _load_sketch_settings()
+    _load_sketch_prefs()
     super._ready()
 
     _telemetry_event("gallery_persistence_ready", {
         "gallery_runtime_revision": GALLERY_RUNTIME_REVISION,
         "gallery_preview_count": _gallery_previews.size(),
-        "settings_loaded": _settings_loaded,
+        "settings_loaded": _sketch_prefs_loaded,
     })
 
 
 func _process(delta: float) -> void:
     super._process(delta)
 
-    if not _settings_save_pending:
+    if not _sketch_prefs_save_pending:
         return
 
-    _settings_save_countdown -= delta
-    if _settings_save_countdown <= 0.0:
-        _flush_sketch_settings()
+    _sketch_prefs_save_countdown -= delta
+    if _sketch_prefs_save_countdown <= 0.0:
+        _flush_sketch_prefs()
 
 
-func _load_sketch_settings() -> void:
-    _sketch_settings = ConfigFile.new()
-    var load_error: Error = _sketch_settings.load(SETTINGS_PATH)
+func _load_sketch_prefs() -> void:
+    _sketch_prefs = ConfigFile.new()
+    var load_error: Error = _sketch_prefs.load(SKETCH_PREFS_PATH)
     if load_error != OK and load_error != ERR_FILE_NOT_FOUND:
         push_warning("Could not load sketch settings: error %d" % int(load_error))
-    _settings_loaded = load_error == OK or load_error == ERR_FILE_NOT_FOUND
+    _sketch_prefs_loaded = load_error == OK or load_error == ERR_FILE_NOT_FOUND
 
 
-func _settings_section(sketch_id: String) -> String:
+func _sketch_prefs_section(sketch_id: String) -> String:
     return "sketch_%s" % sketch_id
 
 
 func _apply_saved_parameters_to(sketch: Node, sketch_id: String) -> int:
-    if not _settings_loaded or not is_instance_valid(sketch):
+    if not _sketch_prefs_loaded or not is_instance_valid(sketch):
         return 0
     if not sketch.has_method("get_parameter_schema") or not sketch.has_method("set_parameter_value"):
         return 0
@@ -71,28 +64,23 @@ func _apply_saved_parameters_to(sketch: Node, sketch_id: String) -> int:
     if not schema_variant is Array:
         return 0
 
-    var section: String = _settings_section(sketch_id)
+    var section: String = _sketch_prefs_section(sketch_id)
     var restored_count: int = 0
 
     for item: Variant in schema_variant as Array:
         if not item is Dictionary:
             continue
         var parameter_id: String = str((item as Dictionary).get("id", ""))
-        if parameter_id.is_empty() or not _sketch_settings.has_section_key(section, parameter_id):
+        if parameter_id.is_empty() or not _sketch_prefs.has_section_key(section, parameter_id):
             continue
-
-        sketch.call(
-            "set_parameter_value",
-            parameter_id,
-            _sketch_settings.get_value(section, parameter_id)
-        )
+        sketch.call("set_parameter_value", parameter_id, _sketch_prefs.get_value(section, parameter_id))
         restored_count += 1
 
     return restored_count
 
 
 func _persist_active_parameter(parameter_id: String) -> void:
-    if not _settings_loaded or not is_instance_valid(_active_sketch):
+    if not _sketch_prefs_loaded or not is_instance_valid(_active_sketch):
         return
     if not _active_sketch.has_method("get_parameter_value"):
         return
@@ -102,28 +90,30 @@ func _persist_active_parameter(parameter_id: String) -> void:
         return
 
     var actual_value: Variant = _active_sketch.call("get_parameter_value", parameter_id)
-    _sketch_settings.set_value(_settings_section(sketch_id), parameter_id, actual_value)
-    _settings_dirty_count += 1
-    _settings_save_pending = true
-    _settings_save_countdown = SETTINGS_SAVE_DELAY
+    _sketch_prefs.set_value(_sketch_prefs_section(sketch_id), parameter_id, actual_value)
+    _sketch_prefs_dirty_count += 1
+    _sketch_prefs_save_pending = true
+    _sketch_prefs_save_countdown = SKETCH_PREFS_SAVE_DELAY
 
+    # The frozen card reflects the settings the user just created instead of a
+    # generic default frame when they go back to the gallery.
     _sync_gallery_preview_parameter(sketch_id, parameter_id, actual_value)
 
 
-func _flush_sketch_settings() -> void:
-    if not _settings_loaded or not _settings_save_pending:
+func _flush_sketch_prefs() -> void:
+    if not _sketch_prefs_loaded or not _sketch_prefs_save_pending:
         return
 
-    var dirty_count: int = _settings_dirty_count
-    var save_error: Error = _sketch_settings.save(SETTINGS_PATH)
+    var dirty_count: int = _sketch_prefs_dirty_count
+    var save_error: Error = _sketch_prefs.save(SKETCH_PREFS_PATH)
     if save_error != OK:
         push_warning("Could not save sketch settings: error %d" % int(save_error))
-        _settings_save_countdown = SETTINGS_SAVE_DELAY
+        _sketch_prefs_save_countdown = SKETCH_PREFS_SAVE_DELAY
         return
 
-    _settings_save_pending = false
-    _settings_save_countdown = 0.0
-    _settings_dirty_count = 0
+    _sketch_prefs_save_pending = false
+    _sketch_prefs_save_countdown = 0.0
+    _sketch_prefs_dirty_count = 0
 
     _telemetry_event("sketch_settings_saved", {
         "gallery_runtime_revision": GALLERY_RUNTIME_REVISION,
@@ -171,7 +161,7 @@ func _build_gallery_preview_card(definition: Dictionary) -> void:
     var stack: VBoxContainer = VBoxContainer.new()
     stack.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     stack.size_flags_vertical = Control.SIZE_EXPAND_FILL
-    stack.add_theme_constant_override("separation", 7)
+    stack.add_theme_constant_override("separation", 6)
     stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
     content_margin.add_child(stack)
 
@@ -192,11 +182,26 @@ func _build_gallery_preview_card(definition: Dictionary) -> void:
     preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
     stack.add_child(preview)
 
+    var header: HBoxContainer = HBoxContainer.new()
+    header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    stack.add_child(header)
+
     var index_label: Label = Label.new()
     index_label.theme_type_variation = &"MicroLabel"
     index_label.text = index_text
     index_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    stack.add_child(index_label)
+    header.add_child(index_label)
+
+    var header_spacer: Control = Control.new()
+    header_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    header_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    header.add_child(header_spacer)
+
+    var hover_label: Label = Label.new()
+    hover_label.theme_type_variation = &"MicroLabel"
+    hover_label.text = "HOVER / LIVE"
+    hover_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    header.add_child(hover_label)
 
     var title_label: Label = Label.new()
     title_label.theme_type_variation = &"AccentLabel"
@@ -231,8 +236,8 @@ func _build_gallery_preview_card(definition: Dictionary) -> void:
     card.mouse_exited.connect(_on_gallery_card_hover.bind(sketch_id, false))
     gallery_grid.add_child(card)
 
-    # One rendered frame becomes the static thumbnail. No preview simulation is
-    # left running after that frame unless the pointer is over this card.
+    # Keep one real rendered frame as the thumbnail. No continuous processing
+    # remains after this deferred freeze.
     call_deferred("_freeze_gallery_preview", sketch_id)
 
 
@@ -249,10 +254,8 @@ func _on_gallery_card_hover(sketch_id: String, active: bool) -> void:
 func _activate_gallery_preview(sketch_id: String) -> void:
     if _gallery_live_preview_id == sketch_id:
         return
-
     if not _gallery_live_preview_id.is_empty():
         _freeze_gallery_preview(_gallery_live_preview_id)
-
     if not _gallery_previews.has(sketch_id):
         return
 
@@ -346,7 +349,6 @@ func _destroy_gallery_previews() -> void:
 func _build_parameter_inspector(sketch: Node) -> void:
     var sketch_id: String = str(_active_definition.get("id", ""))
     var restored_count: int = _apply_saved_parameters_to(sketch, sketch_id)
-
     super._build_parameter_inspector(sketch)
 
     _telemetry_event("sketch_settings_restored", {
@@ -397,12 +399,12 @@ func _show_about() -> void:
 
 
 func _unload_active_sketch() -> void:
-    _flush_sketch_settings()
+    _flush_sketch_prefs()
     super._unload_active_sketch()
 
 
 func _close_window() -> void:
-    _flush_sketch_settings()
+    _flush_sketch_prefs()
     super._close_window()
 
 
@@ -411,6 +413,6 @@ func _telemetry_event(event_name: String, data: Dictionary = {}) -> void:
     enriched["gallery_runtime_revision"] = GALLERY_RUNTIME_REVISION
     enriched["gallery_preview_count"] = _gallery_previews.size()
     enriched["gallery_preview_live"] = not _gallery_live_preview_id.is_empty()
-    enriched["settings_loaded"] = _settings_loaded
-    enriched["settings_save_pending"] = _settings_save_pending
+    enriched["settings_loaded"] = _sketch_prefs_loaded
+    enriched["settings_save_pending"] = _sketch_prefs_save_pending
     super._telemetry_event(event_name, enriched)
