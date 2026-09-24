@@ -86,13 +86,17 @@ ROLLBACK / CHECKPOINT:
 
 ## 2026-09-24 — cross-domain atlas and concept-generation engine
 
-HEAD before / after: `1705ad6` -> resolve current remote HEAD after documentation commits.
+HEAD before / after: `1705ad6` -> cross-domain documentation sequence validated at `74bc02b`; resolve current remote HEAD because this log update advances the branch again.
 
 HOST_VALIDATED:
 - not applicable; this pass changes research/documentation only.
 
 REPO_VALIDATED:
-- pending final CI check after the documentation sequence.
+- CI run `36024217178` for `74bc02b` completed successfully;
+- `Repository policy` passed;
+- Godot 4.7.1 headless setup/import passed;
+- main-scene smoke test passed;
+- tracked-file cleanliness check passed.
 
 IMPLEMENTED_NOT_VALIDATED:
 - `knowledge/cross-domain/` now contains a translation atlas, idea/mutation engine, specialized source catalog and machine-readable source index;
