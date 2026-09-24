@@ -82,9 +82,6 @@ func _draw() -> void:
 
     var cols: int = grid_density
     var rows: int = maxi(4, roundi(float(grid_density) * 0.56))
-
-    # Use cell centres instead of using the first/last glyph as the grid bounds.
-    # This keeps the complete composition centred for every density value.
     var cell_width: float = TYPE_SAFE_RECT.size.x / float(cols)
     var cell_height: float = TYPE_SAFE_RECT.size.y / float(rows)
     var font_size: int = maxi(
@@ -101,14 +98,21 @@ func _draw() -> void:
     var glyph_index: int = 0
     for row: int in range(rows):
         for col: int in range(cols):
+            # Each cell owns a stable hierarchy role. The lens can perturb that
+            # role, but the composition never becomes an undifferentiated field.
+            var role_index: int = (row * 3 + col * 5) % 7
+            var hierarchy: float = 1.0 if role_index == 0 or role_index == 3 else 0.62
+            if role_index == 6:
+                hierarchy = 0.38
+
             var phase: float = sketch_time * motion_speed + float(row) * 0.47 + float(col) * 0.31
             var cell_center: Vector2 = Vector2(
                 TYPE_SAFE_RECT.position.x + (float(col) + 0.5) * cell_width,
                 TYPE_SAFE_RECT.position.y + (float(row) + 0.5) * cell_height
             )
             var base_position: Vector2 = cell_center + Vector2(
-                sin(phase * 1.7) * minf(5.0, cell_width * 0.07),
-                cos(phase * 1.25) * minf(5.0, cell_height * 0.07)
+                sin(phase * 1.7) * minf(5.0, cell_width * 0.07) * hierarchy,
+                cos(phase * 1.25) * minf(5.0, cell_height * 0.07) * hierarchy
             )
 
             var glyph: String = GLYPH_STREAM.substr(glyph_index % GLYPH_STREAM.length(), 1)
@@ -122,7 +126,7 @@ func _draw() -> void:
             var inside: bool = distance < lens_size
 
             if not inside:
-                var outside_alpha: float = 0.24 + contrast * 0.22
+                var outside_alpha: float = (0.18 + contrast * 0.2) * hierarchy
                 var outside_color: Color = BASE_INK
                 outside_color.a = outside_alpha
                 var safe_base: Vector2 = _clamp_glyph_center(base_position, font, glyph, font_size, 0.0)
@@ -131,20 +135,31 @@ func _draw() -> void:
 
             var lens_amount: float = 1.0 - normalized
             var smooth_amount: float = pow(lens_amount, lerpf(0.55, 2.1, edge_softness))
+
+            # A quantized editorial response replaces the old purely radial
+            # gradient. Cells step through four graphic states, then blend just
+            # enough to keep motion fluid.
+            var state_count: float = 4.0
+            var quantized_amount: float = floor(smooth_amount * state_count + 0.5) / state_count
+            var quantize_mix: float = clampf(0.35 + contrast * 0.22, 0.35, 0.82)
+            var graphic_amount: float = lerpf(smooth_amount, quantized_amount, quantize_mix)
+            graphic_amount *= lerpf(0.72, 1.0, hierarchy)
+
             var radial: Vector2 = Vector2.ZERO
             if distance > 0.001:
                 radial = to_cell / distance
             var tangent: Vector2 = Vector2(-radial.y, radial.x)
 
-            var zoomed: Vector2 = lens_center + to_cell * lerpf(1.0, zoom_factor, smooth_amount)
-            var wobble: Vector2 = tangent * sin(phase * 3.0 + distance * 0.025) * distortion * 18.0 * smooth_amount
+            var zoomed: Vector2 = lens_center + to_cell * lerpf(1.0, zoom_factor, graphic_amount)
+            var wobble: Vector2 = tangent * sin(phase * 3.0 + distance * 0.025) * distortion * 18.0 * graphic_amount
             var target: Vector2 = zoomed + wobble
-            var split: Vector2 = (radial + tangent * 0.35).normalized() * chroma_amount * smooth_amount
+            var split_dir: Vector2 = radial + tangent * (0.18 + hierarchy * 0.28)
+            if split_dir.length() > 0.001:
+                split_dir = split_dir.normalized()
+            var split: Vector2 = split_dir * chroma_amount * graphic_amount
             var pressed_boost: float = 1.35 if pointer_down else 1.0
-            target += radial * distortion * 13.0 * smooth_amount * pressed_boost
+            target += radial * distortion * 13.0 * graphic_amount * pressed_boost
 
-            # The lens may distort a glyph, but it may not break the typography
-            # safe area. Account for the RGB split as well as the glyph itself.
             target = _clamp_glyph_center(
                 target,
                 font,
@@ -154,10 +169,10 @@ func _draw() -> void:
             )
 
             var shadow_red: Color = red_color
-            shadow_red.a = 0.42 + 0.42 * smooth_amount
+            shadow_red.a = (0.30 + 0.52 * graphic_amount) * hierarchy
             var shadow_cyan: Color = cyan_color
-            shadow_cyan.a = 0.42 + 0.42 * smooth_amount
-            var core: Color = Color(0.98, 0.98, 0.96, 0.72 + 0.28 * smooth_amount)
+            shadow_cyan.a = (0.30 + 0.52 * graphic_amount) * hierarchy
+            var core: Color = Color(0.98, 0.98, 0.96, (0.56 + 0.4 * graphic_amount) * lerpf(0.75, 1.0, hierarchy))
 
             _draw_centered_glyph(font, target - split, glyph, font_size, shadow_cyan)
             _draw_centered_glyph(font, target + split, glyph, font_size, shadow_red)
@@ -226,25 +241,28 @@ func _clamp_glyph_center(
 
 
 func _draw_background_grid(lens_center: Vector2) -> void:
-    for x_index: int in range(17):
-        var x: float = 48.0 + float(x_index) * 74.0
-        draw_line(Vector2(x, 70.0), Vector2(x, 650.0), Color(0.7, 0.8, 1.0, 0.022), 1.0)
+    # The background now exposes the same seven-column / baseline logic that
+    # structures the typography instead of drawing an unrelated graph-paper grid.
+    var guide_color: Color = Color(0.7, 0.8, 1.0, 0.028)
+    for x_index: int in range(8):
+        var x: float = TYPE_SAFE_RECT.position.x + TYPE_SAFE_RECT.size.x * float(x_index) / 7.0
+        draw_line(Vector2(x, TYPE_SAFE_RECT.position.y), Vector2(x, TYPE_SAFE_RECT.end.y), guide_color, 1.0)
     for y_index: int in range(9):
-        var y: float = 74.0 + float(y_index) * 72.0
-        draw_line(Vector2(48.0, y), Vector2(1232.0, y), Color(0.7, 0.8, 1.0, 0.022), 1.0)
+        var y: float = TYPE_SAFE_RECT.position.y + TYPE_SAFE_RECT.size.y * float(y_index) / 8.0
+        var row_color: Color = guide_color
+        row_color.a = 0.018 + float(y_index % 2) * 0.012
+        draw_line(Vector2(TYPE_SAFE_RECT.position.x, y), Vector2(TYPE_SAFE_RECT.end.x, y), row_color, 1.0)
 
     var halo: Color = ACCENT
-    halo.a = 0.025
+    halo.a = 0.018 + contrast * 0.007
     draw_circle(lens_center, lens_size * 1.18, halo)
 
 
 func _draw_lens_overlay(lens_center: Vector2, red_color: Color, cyan_color: Color) -> void:
     var border_a: Color = cyan_color
-    border_a.a = 0.28
+    border_a.a = 0.22
     var border_b: Color = red_color
-    border_b.a = 0.22
-    draw_arc(lens_center - Vector2(chroma_amount * 0.22, 0.0), lens_size, 0.0, TAU, 160, border_a, 1.5, true)
-    draw_arc(lens_center + Vector2(chroma_amount * 0.22, 0.0), lens_size, 0.0, TAU, 160, border_b, 1.5, true)
-    draw_arc(lens_center, lens_size, 0.0, TAU, 160, Color(1.0, 1.0, 1.0, 0.16), 1.0, true)
-    draw_line(lens_center - Vector2(14.0, 0.0), lens_center + Vector2(14.0, 0.0), Color(1, 1, 1, 0.18), 1.0)
-    draw_line(lens_center - Vector2(0.0, 14.0), lens_center + Vector2(0.0, 14.0), Color(1, 1, 1, 0.18), 1.0)
+    border_b.a = 0.18
+    draw_arc(lens_center - Vector2(chroma_amount * 0.22, 0.0), lens_size, -PI * 0.72, PI * 0.58, 96, border_a, 1.5, true)
+    draw_arc(lens_center + Vector2(chroma_amount * 0.22, 0.0), lens_size, PI * 0.28, PI * 1.58, 96, border_b, 1.5, true)
+    draw_arc(lens_center, lens_size, 0.0, TAU, 160, Color(1.0, 1.0, 1.0, 0.11), 1.0, true)
