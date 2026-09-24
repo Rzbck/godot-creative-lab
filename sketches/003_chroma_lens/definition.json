@@ -3,7 +3,7 @@
   "index": "003",
   "title": "CHROMA LENS",
   "scene": "res://sketches/003_chroma_lens/runtime/chroma_lens.tscn",
-  "engine": "GDSCRIPT / TYPOGRAPHY",
-  "tags": ["TYPE", "RGB", "LENS", "INTERACTIVE", "LIVE"],
-  "description": "A kinetic typographic field with a pointer-driven chromatic lens, local magnification and RGB displacement."
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "OPTICAL", "INTERACTIVE"],
+  "description": "A typographic field with an interactive optical region, controlled chromatic displacement and grid-aware hierarchy."
 }
