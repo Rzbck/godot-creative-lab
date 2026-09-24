@@ -21,73 +21,77 @@ Do **not** rely on previous-chat memory. Reconstruct the current state from the 
    - `docs/handoff/OPERATIONS.md`
    - `docs/handoff/project_state.json`
    - `docs/ARCHITECTURE.md`
-3. Inspect `app/main/main_runtime.tscn` and follow the actual `extends` chain of the runtime script before changing Gallery/PROGRAM/window/telemetry behavior.
+3. Inspect `app/main/main_runtime.tscn` and follow the actual `extends` chain before changing Gallery/PROGRAM/window/telemetry behavior.
 4. Inspect the exact sketch/runtime files involved in the user's next request.
-5. If the request is creative/design related, read the relevant material under:
+5. For creative/design work, read the relevant material under:
    - `knowledge/creative-coding/`
    - `knowledge/design/`
    - `knowledge/cross-domain/`
-6. For a substantial new artwork/shader, specifically read `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md` and `knowledge/cross-domain/IDEA_ENGINE.md`. Use them to generate and mutate a concept before implementation; do not simply combine a single visual reference with a stock effect.
-7. Resolve current CI status before assuming the branch is healthy.
-8. If the user's message follows a runtime test, read the online sanitized telemetry branch `telemetry/runtime` (`latest.jsonl` and session snapshots as necessary) before asking for copied logs.
+6. For substantial artwork/shader work, specifically use `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`, `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md` and `knowledge/cross-domain/IDEA_ENGINE.md`. Define frozen-frame composition, invariants, interaction causality and recovery before implementation.
+7. Resolve current CI before assuming the branch is healthy.
+8. If the user's message follows a runtime test, read `telemetry/runtime` (`latest.jsonl` and relevant session snapshots) before asking for copied logs.
 
 ## Operating rules
 
-- Work directly through GitHub on the active feature branch when code/docs changes are needed.
+- Work directly through GitHub on the active feature branch.
 - The user should not have to write code manually.
 - Do not merge or modify `main` without explicit user approval.
 - Do not force-push/reset as routine recovery.
 - Do not use blind `git add -A` instructions.
-- After runtime/code changes, verify GitHub CI (repository policy + Godot 4.7.1 headless import/smoke test/cleanliness) before saying the work is finished.
-- When host validation is needed, give one concise copy/paste PowerShell block wrapped in `& { ... }`, using the canonical block in `docs/handoff/OPERATIONS.md`.
-- Respond in concise French. The user writes quickly/phonetically; answer the intent rather than correcting spelling.
+- After runtime/code changes, verify repository policy + Godot 4.7.1 headless import + smoke test + tracked-file cleanliness.
+- For host validation, give one concise copy/paste PowerShell block wrapped in `& { ... }` using `docs/handoff/OPERATIONS.md`.
+- Respond in concise French and answer intent rather than correcting the user's fast/phonetic spelling.
 - Prefer concrete implementation/progress over generic explanation.
 
 ## Product behaviors that must not regress
 
-- The DC//LAB workstation stays open and usable while PROGRAM/LIVE OUT runs on the selected physical display.
-- Returning to Gallery/Settings/opening another project does **not** stop current PROGRAM output.
-- Another PREVIEW can replace PROGRAM using `TAKE LIVE`.
-- Touch/mouse input on the physical PROGRAM display controls the live sketch.
-- Linked PREVIEW and PROGRAM represent the same generative runtime state; do not create two independent timelines.
-- Per-sketch exposed parameters persist across application sessions.
-- Gallery cards display real rendered thumbnails and only the hovered card animates.
-- Gallery groups/search/tag filters are generated from `definition.json` metadata.
-- Final output must not contain debug labels/title chrome unless text is intentionally the artwork.
-- Telemetry publication must remain asynchronous and must not block Godot's main/UI thread.
+- Workstation remains usable while PROGRAM/LIVE OUT runs on the selected physical display.
+- Navigation does not stop PROGRAM.
+- Another PREVIEW replaces PROGRAM only via `TAKE LIVE`.
+- PROGRAM touch/mouse controls the live sketch.
+- Linked PREVIEW and PROGRAM share one generative state/timeline.
+- Per-sketch parameters persist.
+- Gallery uses real rendered thumbnails and hover-only animation.
+- Gallery groups/search/tag filters come from `definition.json`.
+- No debug/title chrome is burned into PROGRAM unless text is intentionally the artwork.
+- Telemetry publication remains asynchronous.
 
 ## Current content / direction
 
 Existing sketches:
-- 001 Signal Field — technical foundation/test patch; preserve mainly as a contract/regression reference.
-- 002 Liquid Type — refined with gesture-velocity memory affecting spacing, phase, field direction, smear and chromatic behavior.
-- 003 Chroma Lens — refined with fixed safe margins, stable cell hierarchy, quantized graphic lens states and seven-column editorial structure.
-- 004 Gommage Type — refined with directional gesture-memory in erosion, dust and residual marks.
-- 005 Pressure Lattice — real Godot `canvas_item` shader crossing editorial grid, procedural field, gesture-injected vector pressure, decaying temporal memory and duotone identity.
+- 001 Signal Field — technical foundation/regression patch.
+- 002 Liquid Type — gesture-memory refinement.
+- 003 Chroma Lens — safe margins + editorial/quantized optical hierarchy.
+- 004 Gommage Type — directional erosion/dust memory and reconstruction.
+- 005 internal id/path `005_pressure_lattice`, but visible artwork is now **REGISTER TYPE**.
 
-`005_pressure_lattice` is approved and implemented. Do not rely on older documentation claiming there is no 005. Do not invent 006 unless the user asks for another creative work.
+Important 005 history: the original **PRESSURE LATTICE** visual concept was rejected by the user as weak. Do not restore it.
 
-There is a versioned external knowledge library in the repo. It has three layers:
+REGISTER TYPE is a designed typographic print system:
 
-- `knowledge/creative-coding/` — technical methods and generative/GPU vocabulary;
-- `knowledge/design/` — typography, composition, grids, color, hierarchy and professional design constraints;
-- `knowledge/cross-domain/` — representation bridges, mutation operators and an idea engine for producing original identities from the first two layers.
+`editorial hierarchy -> typographic metrics -> local compression -> print misregistration -> damped recovery`
 
-For substantial new work, extract principles from several independent references, build genuine representation changes between domains, mutate the first coherent combination, and define persistent identity rules before choosing the Godot implementation.
+It uses a stable `FORM / PRESS / TRACE` poster, explicit safe area, six-column structure, limited print palette, row-local interaction, gesture direction/velocity, spring recovery and a supporting canvas shader for grain/grid/halftone registration.
 
-The current immediate validation task is to host-test the knowledge-driven 002–005 creative pass, especially 005 in PREVIEW and PROGRAM with touch/mouse interaction. If the user reports a test result, inspect `telemetry/runtime` before asking for logs.
+Gallery taxonomy for artistic sketches is intentionally small and semantic: `TYPOGRAPHY`, one meaningful family tag (`ELASTIC`, `OPTICAL`, `EROSION`, `PRINT`) and `INTERACTIVE`. Do not reintroduce noisy tags such as `TYPE`, `RGB`, `SHADER`, `LIVE` merely because they describe implementation details.
 
-Longer-term live-performance direction may include A/B/C decks, crossfade/mixing, timeline/cues and compositing, but these are future directions, not automatic implementation tasks.
+Do not invent 006 unless the user asks for another work.
+
+For future creative work, extract principles from multiple sources, use genuine representation bridges, mutate the first coherent combination and keep professional design constraints. More effects are not automatically better.
+
+Immediate task after a host test: inspect telemetry first, then use the user's visual/tactile feedback to refine REGISTER TYPE or the other sketches.
+
+Longer-term A/B/C decks, crossfade/mixing, timeline/cues, compositing, Spout and NDI remain future explicit tasks.
 
 ## First response behavior
 
 After scanning the repository, briefly state:
 - current branch + short HEAD;
 - PR/CI state;
-- what the current implemented product can do;
-- any stale/conflicting docs you detected;
-- the exact next task you understood from the user's request.
+- implemented product capabilities;
+- stale/conflicting docs if any;
+- exact next task understood from the user's request.
 
-Then work on the request. Do not ask the user to re-explain project history that is already documented.
+Then work on the request. Do not ask the user to re-explain documented history.
 
 ---
