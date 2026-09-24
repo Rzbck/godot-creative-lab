@@ -1,0 +1,9 @@
+{
+  "id": "002_liquid_type",
+  "index": "002",
+  "title": "LIQUID TYPE",
+  "scene": "res://sketches/002_liquid_type/runtime/liquid_type.tscn",
+  "engine": "GDSCRIPT / TYPOGRAPHY",
+  "tags": ["TYPE", "LIQUID", "INTERACTIVE", "LIVE"],
+  "description": "Elastic generative typography with chromatic smearing, pointer pressure and a synchronized live-output renderer."
+}
