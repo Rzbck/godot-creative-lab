@@ -41,7 +41,7 @@ DC//LAB is no longer an architecture-only scaffold. It is a functioning custom G
 - mouse/touch interaction forwarded from the physical output display to the live sketch;
 - preview/PROGRAM runtime-state synchronization while linked;
 - sanitized online telemetry for deep runtime debugging;
-- external creative-coding + design/typography research libraries under `knowledge/`.
+- external creative-coding + design/typography + cross-domain research libraries under `knowledge/`.
 
 ## Current sketches
 
@@ -199,6 +199,22 @@ Current files include:
 
 Use these to cross professional design principles (grid, hierarchy, margins, rhythm, typography, color, composition, poster systems) with realtime creative-coding techniques.
 
+### Cross-domain translation + idea generation
+
+`knowledge/cross-domain/`
+
+This layer exists to turn the two libraries above into a concept engine rather than a reference archive.
+
+Current files:
+
+- `README.md` — vocabulary and usage model;
+- `CROSS_DOMAIN_ATLAS.md` — representation changes and bridges such as type -> geometry/SDF, grid -> coordinate system, interaction -> force field, simulation -> graphic language and feedback -> memory;
+- `IDEA_ENGINE.md` — multiplier decks, mutation passes, originality checks, identity anchors and candidate filter;
+- `SOURCE_CATALOG.md` — sources chosen specifically because they cross disciplines;
+- `sources.json` — machine-readable bridge metadata for future tooling.
+
+For substantial new creative work, use at least one genuine representation change and normally combine three or more domains. Do not implement the first coherent combination unchanged: mutate it deliberately until the concept has its own internal logic and visual identity.
+
 Do not blindly copy third-party source/code/assets; check license/provenance for the exact material.
 
 ## CI / validation
@@ -236,9 +252,10 @@ See `docs/handoff/OPERATIONS.md` for the exact tested PowerShell patterns.
 The immediate product foundation is in a good usable state. Current development direction is:
 
 1. Keep Gallery / PROGRAM / persistence / touch / telemetry stable.
-2. Use the knowledge library when designing the next creative work rather than starting from memory alone.
-3. Continue improving visual quality of existing sketches only when requested.
-4. Longer-term live-performance direction: PROGRAM transport can evolve toward A/B/C decks, crossfade/mix, timeline/cues/compositing — but do not build that without an explicit user task.
-5. Spout and NDI remain future adapters and must not be faked.
+2. Use all three knowledge layers when designing the next creative work: technical vocabulary + professional design discipline + cross-domain mutation.
+3. For the next approved shader/sketch, begin with a concept-generation pass from `knowledge/cross-domain/` before choosing the implementation.
+4. Continue improving visual quality of existing sketches only when requested.
+5. Longer-term live-performance direction: PROGRAM transport can evolve toward A/B/C decks, crossfade/mix, timeline/cues/compositing — but do not build that without an explicit user task.
+6. Spout and NDI remain future adapters and must not be faked.
 
 For a fresh AI session, use the prompt in `docs/handoff/NEXT_AI_PROMPT.md`.
