@@ -205,9 +205,6 @@ func _draw() -> void:
             glyph_global_index += 1
 
     _draw_eraser_marks(accent)
-    draw_string(font, Vector2(78.0, 82.0), "004 / GOMMAGE TYPE", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 20, accent)
-    draw_string(font, Vector2(78.0, 656.0), "ERASE / DUST / MEMORY / RECONSTRUCTION", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 15, Color(0.82, 0.8, 0.86, 0.46))
-
     end_design_draw()
 
 
