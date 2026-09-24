@@ -30,10 +30,18 @@
   },
   "sketches": [
     {"id": "001_signal_field", "role": "technical-foundation"},
-    {"id": "002_liquid_type", "role": "gallery-sketch", "current_refinement": "gesture-velocity-memory"},
-    {"id": "003_chroma_lens", "role": "gallery-sketch", "current_refinement": "quantized-editorial-grid-hierarchy"},
-    {"id": "004_gommage_type", "role": "gallery-sketch", "current_refinement": "directional-erosion-memory"},
-    {"id": "005_pressure_lattice", "role": "gallery-shader", "engine": "canvas_item_shader", "concept": "editorial-grid_to_field_to_gesture-pressure_to_temporal-memory_to_duotone"}
+    {"id": "002_liquid_type", "role": "gallery-sketch", "current_refinement": "gesture-velocity-memory", "tags": ["TYPOGRAPHY", "ELASTIC", "INTERACTIVE"]},
+    {"id": "003_chroma_lens", "role": "gallery-sketch", "current_refinement": "quantized-editorial-grid-hierarchy", "tags": ["TYPOGRAPHY", "OPTICAL", "INTERACTIVE"]},
+    {"id": "004_gommage_type", "role": "gallery-sketch", "current_refinement": "directional-erosion-memory", "tags": ["TYPOGRAPHY", "EROSION", "INTERACTIVE"]},
+    {
+      "id": "005_pressure_lattice",
+      "visible_title": "REGISTER TYPE",
+      "role": "gallery-sketch",
+      "engine": "gdscript_plus_canvas_item_shader",
+      "rejected_previous_concept": "Pressure Lattice",
+      "concept": "editorial-hierarchy_to_typographic-metrics_to_local-compression_to_print-misregistration_to_damped-recovery",
+      "tags": ["TYPOGRAPHY", "PRINT", "INTERACTIVE"]
+    }
   ],
   "telemetry": {
     "remote_branch": "telemetry/runtime",
@@ -46,9 +54,10 @@
     "creative_coding": "knowledge/creative-coding/",
     "design": "knowledge/design/",
     "cross_domain": "knowledge/cross-domain/",
+    "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md",
     "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
     "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
-    "creative_work_rule": "For substantial new work, combine several independent sources across multiple domains, use at least one genuine representation bridge, mutate the first coherent concept, then define identity rules before implementation."
+    "creative_work_rule": "Define frozen-frame composition and identity invariants, build meaningful representation bridges, mutate the first coherent concept, design causal interaction/recovery, then choose the cheapest Godot representation that preserves the idea."
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
@@ -59,7 +68,7 @@
       "main_scene_smoke_test",
       "tracked_file_cleanliness"
     ],
-    "latest_creative_pass_host_state": "IMPLEMENTED_NOT_VALIDATED"
+    "register_type_host_state": "IMPLEMENTED_NOT_VALIDATED"
   },
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
@@ -67,6 +76,8 @@
     "do_not_create_new_sketch_without_user_request": true,
     "do_not_block_godot_ui_with_telemetry_publish": true,
     "do_not_stop_program_on_navigation": true,
-    "do_not_create_independent_linked_output_timeline": true
+    "do_not_create_independent_linked_output_timeline": true,
+    "do_not_restore_pressure_lattice_visual_concept": true,
+    "keep_gallery_taxonomy_small_and_semantic": true
   }
 }
