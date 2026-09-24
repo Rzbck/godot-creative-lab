@@ -3,18 +3,22 @@ extends "res://app/main/main_runtime_atomic_exit.gd"
 # Persistent live-output workstation layer.
 #
 # The workstation preview and the physical output are two render surfaces, but
-# they must NEVER be two independent generative simulations. The preview is the
-# authoritative simulation. A live-output clone mirrors parameters plus the
-# sketch's explicit runtime synchronization state every frame.
+# they share one simulation authority. Parameters and runtime state flow from the
+# workstation source sketch to the native output renderer every frame.
 #
-# This keeps the control UI open, gives the output its own native render surface
-# (avoiding the cross-window gray texture path), and still guarantees that both
-# surfaces show the same generative composition.
+# Input can originate from EITHER surface. Mouse/touch events received by the
+# native output window are mapped into the shared 1280x720 design space and sent
+# back to the workstation source sketch. The synchronized output renderer then
+# receives the resulting state, so a touchscreen used as SCREEN 2/3/4 behaves as
+# a real interactive installation surface rather than a passive display.
 
-const LIVE_OUTPUT_REVISION: int = 13
+const LIVE_OUTPUT_REVISION: int = 14
 const LIVE_PREVIEW_FPS: float = 15.0
 const LIVE_PREVIEW_SHRINK: int = 2
 const LIVE_OUTPUT_OVERSCAN: Vector2i = Vector2i(2, 2)
+const LIVE_DESIGN_SIZE: Vector2 = Vector2(1280.0, 720.0)
+const LIVE_INPUT_SAMPLE_MSEC: int = 120
+const TOUCH_MOUSE_SUPPRESSION_MSEC: int = 180
 
 var _live_output_active: bool = false
 var _live_output_sketch: Node = null
@@ -22,6 +26,19 @@ var _live_output_screen: int = -1
 var _live_preview_accumulator: float = 0.0
 var _live_state_sync_supported: bool = false
 var _live_state_sync_count: int = 0
+
+var _live_output_pointer_down: bool = false
+var _live_output_input_count: int = 0
+var _live_output_touch_event_count: int = 0
+var _live_output_mouse_event_count: int = 0
+var _live_output_last_input_kind: String = "none"
+var _live_output_last_surface_position: Vector2 = Vector2.ZERO
+var _live_output_last_design_position: Vector2 = LIVE_DESIGN_SIZE * 0.5
+var _live_output_last_touch_index: int = -1
+var _live_output_last_input_forwarded: bool = false
+var _live_output_last_input_msec: int = 0
+var _live_output_last_sample_msec: int = 0
+var _live_output_last_touch_msec: int = -10000
 
 
 func _ready() -> void:
@@ -36,9 +53,6 @@ func _process(delta: float) -> void:
     if not _live_output_active:
         return
 
-    # State synchronization is independent from preview rendering frequency.
-    # The preview may redraw at 15 Hz to save GPU while its simulation state is
-    # still the single source of truth mirrored to the full-rate output.
     _sync_live_output_runtime_state()
 
     _live_preview_accumulator += delta
@@ -49,17 +63,19 @@ func _process(delta: float) -> void:
         if is_instance_valid(_active_sketch) and _active_sketch is CanvasItem:
             (_active_sketch as CanvasItem).queue_redraw()
 
+    # Keep the toolbar compact. The previous long "LIVE PREVIEW 15 FPS" label
+    # increased ProjectView's minimum width enough to push the 1280 px shell into
+    # negative coordinates while LIVE OUT was running (visible in telemetry).
     if is_instance_valid(preview_resolution):
-        preview_resolution.text = "%d×%d / LIVE PREVIEW %d FPS" % [
+        preview_resolution.text = "%d×%d" % [
             sketch_viewport.size.x,
             sketch_viewport.size.y,
-            int(LIVE_PREVIEW_FPS),
         ]
+        preview_resolution.tooltip_text = "LIVE preview budget: %d FPS / output: realtime" % int(LIVE_PREVIEW_FPS)
 
 
 func _ensure_realtime_viewport_updates() -> void:
     if _live_output_active:
-        # Output is native and realtime. Preview redraw is budgeted separately.
         if sketch_viewport.render_target_update_mode == SubViewport.UPDATE_ALWAYS:
             sketch_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
         return
@@ -68,8 +84,6 @@ func _ensure_realtime_viewport_updates() -> void:
 
 
 func _enter_render_fullscreen() -> void:
-    # F11 / LIVE OUT is a persistent presentation toggle. The workstation never
-    # enters fullscreen and remains usable throughout the show.
     if _live_output_active:
         _stop_live_output("toggle")
         return
@@ -95,20 +109,23 @@ func _enter_render_fullscreen() -> void:
     _live_output_sketch = (scene_resource as PackedScene).instantiate()
     _presentation_output.add_child(_live_output_sketch)
 
-    # If a sketch implements the live-sync contract, the output instance becomes
-    # a passive renderer. It does not advance a second clock or react to its own
-    # input. The workstation instance remains the only simulation authority.
     if _live_output_sketch.has_method("set_live_sync_follower"):
         _live_output_sketch.call("set_live_sync_follower", true)
 
     _sync_all_live_output_parameters()
     _live_state_sync_supported = _has_live_state_sync_contract()
     _live_state_sync_count = 0
+    _live_output_pointer_down = false
+    _live_output_input_count = 0
+    _live_output_touch_event_count = 0
+    _live_output_mouse_event_count = 0
+    _live_output_last_input_kind = "none"
+    _live_output_last_touch_index = -1
+    _live_output_last_input_forwarded = false
+    _live_output_last_touch_msec = -10000
     _sync_live_output_runtime_state(true)
 
     if is_instance_valid(_presentation_output_texture):
-        # Never sample the workstation SubViewport texture in a second native
-        # Window on this GPU. The output sketch draws locally in its own Window.
         _presentation_output_texture.visible = false
         _presentation_output_texture.texture = null
     if is_instance_valid(_presentation_output_background):
@@ -137,14 +154,11 @@ func _enter_render_fullscreen() -> void:
     sketch_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 
     _presentation_output.show()
-
-    # Never steal control from the workstation when output is on another screen.
     get_window().grab_focus()
 
     page_tag.text = "[LIVE OUT]"
-    status_label.text = "LIVE OUT / SCREEN %d / SYNCED / PREVIEW %d FPS / F11 OR ESC=STOP" % [
+    status_label.text = "LIVE OUT / SCREEN %d / TOUCH+POINTER ACTIVE / F11 OR ESC=STOP" % [
         _live_output_screen + 1,
-        int(LIVE_PREVIEW_FPS),
     ]
 
     _presentation_transition = false
@@ -161,6 +175,7 @@ func _enter_render_fullscreen() -> void:
         "separate_renderer": true,
         "single_simulation_authority": true,
         "state_sync_supported": _live_state_sync_supported,
+        "external_pointer_supported": _active_sketch.has_method("apply_external_pointer"),
         "source_sync_state": _live_sync_debug_state(_active_sketch),
         "output_sync_state": _live_sync_debug_state(_live_output_sketch),
         "root_mode": DisplayServer.window_get_mode(),
@@ -185,13 +200,12 @@ func _stop_live_output(reason: String) -> void:
 
     _presentation_transition = true
 
-    # One operation only: hide the independent output. The workstation has never
-    # moved or changed mode, so there is nothing to restore visually.
     if is_instance_valid(_presentation_output):
         _presentation_output.hide()
 
     _live_output_active = false
     _live_preview_accumulator = 0.0
+    _live_output_pointer_down = false
     sketch_viewport_container.stretch_shrink = 1
     sketch_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
@@ -216,6 +230,10 @@ func _stop_live_output(reason: String) -> void:
         "reason": reason,
         "screen": _live_output_screen,
         "state_sync_count": _live_state_sync_count,
+        "input_count": _live_output_input_count,
+        "touch_event_count": _live_output_touch_event_count,
+        "mouse_event_count": _live_output_mouse_event_count,
+        "last_input_forwarded": _live_output_last_input_forwarded,
         "preview_update_mode": int(sketch_viewport.render_target_update_mode),
         "root_mode": DisplayServer.window_get_mode(),
         "root_position": _vec2i_array(DisplayServer.window_get_position()),
@@ -338,10 +356,143 @@ func _on_bool_parameter_changed(enabled: bool, parameter_id: String) -> void:
     _sync_live_output_parameter(parameter_id)
 
 
-func _on_presentation_output_input_forwarded(_event: InputEvent) -> void:
-    # Output is a follower. User interaction stays on the workstation preview and
-    # is mirrored through the same runtime-state contract.
-    pass
+func _on_presentation_output_input_forwarded(event: InputEvent) -> void:
+    if not _live_output_active \
+    or not is_instance_valid(_active_sketch) \
+    or not is_instance_valid(_presentation_output):
+        return
+
+    var now_msec: int = Time.get_ticks_msec()
+    var surface_size: Vector2 = Vector2(_presentation_output.size)
+
+    if event is InputEventScreenTouch:
+        var touch: InputEventScreenTouch = event as InputEventScreenTouch
+        _live_output_last_touch_msec = now_msec
+        _live_output_pointer_down = touch.pressed
+        _forward_live_output_pointer(
+            "touch_down" if touch.pressed else "touch_up",
+            touch.position,
+            surface_size,
+            touch.pressed,
+            touch.index,
+            true
+        )
+        if not touch.pressed:
+            _publish_telemetry_to_github("live_output_touch_complete")
+        return
+
+    if event is InputEventScreenDrag:
+        var drag: InputEventScreenDrag = event as InputEventScreenDrag
+        _live_output_last_touch_msec = now_msec
+        _live_output_pointer_down = true
+        var emit_touch_sample: bool = now_msec - _live_output_last_sample_msec >= LIVE_INPUT_SAMPLE_MSEC
+        _forward_live_output_pointer(
+            "touch_drag",
+            drag.position,
+            surface_size,
+            true,
+            drag.index,
+            emit_touch_sample
+        )
+        return
+
+    # Windows can synthesize mouse events from a touchscreen. Ignore those for a
+    # short period after native touch activity so one finger does not generate a
+    # duplicate press/drag stream.
+    if now_msec - _live_output_last_touch_msec <= TOUCH_MOUSE_SUPPRESSION_MSEC:
+        return
+
+    if event is InputEventMouseButton:
+        var button: InputEventMouseButton = event as InputEventMouseButton
+        if button.button_index != MOUSE_BUTTON_LEFT:
+            return
+        _live_output_pointer_down = button.pressed
+        _forward_live_output_pointer(
+            "mouse_down" if button.pressed else "mouse_up",
+            button.position,
+            surface_size,
+            button.pressed,
+            -1,
+            true
+        )
+        if not button.pressed:
+            _publish_telemetry_to_github("live_output_pointer_complete")
+        return
+
+    if event is InputEventMouseMotion:
+        var motion: InputEventMouseMotion = event as InputEventMouseMotion
+        var emit_mouse_sample: bool = now_msec - _live_output_last_sample_msec >= LIVE_INPUT_SAMPLE_MSEC
+        _forward_live_output_pointer(
+            "mouse_move",
+            motion.position,
+            surface_size,
+            _live_output_pointer_down,
+            -1,
+            emit_mouse_sample
+        )
+
+
+func _forward_live_output_pointer(
+    input_kind: String,
+    surface_position: Vector2,
+    surface_size: Vector2,
+    pressed: bool,
+    touch_index: int,
+    emit_telemetry_sample: bool
+) -> void:
+    _live_output_input_count += 1
+    if input_kind.begins_with("touch"):
+        _live_output_touch_event_count += 1
+    elif input_kind.begins_with("mouse"):
+        _live_output_mouse_event_count += 1
+
+    _live_output_last_input_kind = input_kind
+    _live_output_last_surface_position = surface_position
+    _live_output_last_design_position = _live_surface_to_design(surface_position, surface_size)
+    _live_output_last_touch_index = touch_index
+    _live_output_last_input_msec = Time.get_ticks_msec()
+    _live_output_last_input_forwarded = false
+
+    if _active_sketch.has_method("apply_external_pointer"):
+        _active_sketch.call(
+            "apply_external_pointer",
+            surface_position,
+            surface_size,
+            pressed,
+            true
+        )
+        _live_output_last_input_forwarded = true
+
+    # Apply to the follower immediately instead of waiting for the next process
+    # frame. Touch feedback on an installation screen should feel direct.
+    _sync_live_output_runtime_state()
+
+    if emit_telemetry_sample:
+        _live_output_last_sample_msec = _live_output_last_input_msec
+        _telemetry_event("live_output_pointer_input", {
+            "input_kind": input_kind,
+            "touch_index": touch_index,
+            "pressed": pressed,
+            "forwarded": _live_output_last_input_forwarded,
+            "surface_position": _vec2_array(surface_position),
+            "surface_size": _vec2_array(surface_size),
+            "design_position": _vec2_array(_live_output_last_design_position),
+            "input_count": _live_output_input_count,
+            "touch_event_count": _live_output_touch_event_count,
+            "mouse_event_count": _live_output_mouse_event_count,
+            "source_sync_state": _live_sync_debug_state(_active_sketch),
+            "output_sync_state": _live_sync_debug_state(_live_output_sketch),
+        })
+
+
+func _live_surface_to_design(point: Vector2, surface_size: Vector2) -> Vector2:
+    var safe_x: float = maxf(1.0, surface_size.x)
+    var safe_y: float = maxf(1.0, surface_size.y)
+    var scale_value: float = minf(safe_x / LIVE_DESIGN_SIZE.x, safe_y / LIVE_DESIGN_SIZE.y)
+    scale_value = maxf(0.0001, scale_value)
+    var fitted_size: Vector2 = LIVE_DESIGN_SIZE * scale_value
+    var origin: Vector2 = (surface_size - fitted_size) * 0.5
+    return (point - origin) / scale_value
 
 
 func _input(event: InputEvent) -> void:
@@ -353,8 +504,6 @@ func _input(event: InputEvent) -> void:
                 get_viewport().set_input_as_handled()
                 return
 
-    # LIVE OUT leaves _fullscreen_active false, so the inherited workstation
-    # input path keeps sliders, resize and normal UI interaction available.
     super._input(event)
 
 
@@ -372,4 +521,12 @@ func _telemetry_event(event_name: String, data: Dictionary = {}) -> void:
     enriched["live_output_renderer_valid"] = is_instance_valid(_live_output_sketch)
     enriched["live_state_sync_supported"] = _live_state_sync_supported
     enriched["live_state_sync_count"] = _live_state_sync_count
+    enriched["live_output_input_count"] = _live_output_input_count
+    enriched["live_output_touch_event_count"] = _live_output_touch_event_count
+    enriched["live_output_mouse_event_count"] = _live_output_mouse_event_count
+    enriched["live_output_last_input_kind"] = _live_output_last_input_kind
+    enriched["live_output_last_input_forwarded"] = _live_output_last_input_forwarded
+    enriched["live_output_last_surface_position"] = _vec2_array(_live_output_last_surface_position)
+    enriched["live_output_last_design_position"] = _vec2_array(_live_output_last_design_position)
+    enriched["live_output_last_touch_index"] = _live_output_last_touch_index
     super._telemetry_event(event_name, enriched)
