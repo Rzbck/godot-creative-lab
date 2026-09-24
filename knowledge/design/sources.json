@@ -1,0 +1,354 @@
+{
+  "schema": 1,
+  "last_research_pass": "2026-09-24",
+  "sources": [
+    {
+      "id": "google-fonts-knowledge",
+      "name": "Google Fonts Knowledge",
+      "tier": "A",
+      "kind": "reference",
+      "url": "https://fonts.google.com/knowledge",
+      "tags": ["typography", "type-fundamentals", "digital-type"]
+    },
+    {
+      "id": "thinking-with-type",
+      "name": "Thinking with Type",
+      "tier": "A",
+      "kind": "book-site",
+      "url": "https://thinkingwithtype.com/",
+      "tags": ["typography", "hierarchy", "grid", "layout"]
+    },
+    {
+      "id": "practical-typography",
+      "name": "Butterick's Practical Typography",
+      "tier": "A",
+      "kind": "reference",
+      "url": "https://practicaltypography.com/",
+      "tags": ["typography", "spacing", "line-length", "leading", "tracking"]
+    },
+    {
+      "id": "typotheque-stories",
+      "name": "Typotheque Articles & Research",
+      "tier": "A",
+      "kind": "research",
+      "url": "https://www.typotheque.com/stories",
+      "tags": ["typography", "research", "multi-script", "type-design"]
+    },
+    {
+      "id": "typographica",
+      "name": "Typographica",
+      "tier": "B",
+      "kind": "criticism",
+      "url": "https://typographica.org/",
+      "tags": ["typefaces", "criticism", "type-design"]
+    },
+    {
+      "id": "typewolf-resources",
+      "name": "Typewolf Resources",
+      "tier": "B",
+      "kind": "curation",
+      "url": "https://www.typewolf.com/resources",
+      "tags": ["typography", "foundries", "books", "web-type"]
+    },
+    {
+      "id": "fontstand-news",
+      "name": "Fontstand News",
+      "tier": "B",
+      "kind": "publication",
+      "url": "https://news.fontstand.com/",
+      "tags": ["typefaces", "foundries", "contemporary-type"]
+    },
+    {
+      "id": "fonts-in-use",
+      "name": "Fonts In Use",
+      "tier": "A/B",
+      "kind": "archive",
+      "url": "https://fontsinuse.com/",
+      "tags": ["typography", "applied-type", "identity", "poster", "editorial", "web"]
+    },
+    {
+      "id": "letterform-archive",
+      "name": "Letterform Archive Online Archive",
+      "tier": "A",
+      "kind": "archive",
+      "url": "https://letterformarchive.org/online-archive/",
+      "tags": ["typography", "lettering", "graphic-design", "poster", "history"]
+    },
+    {
+      "id": "poster-house",
+      "name": "Poster House Online Collection",
+      "tier": "A",
+      "kind": "museum-archive",
+      "url": "https://collection.posterhouse.org/collection/",
+      "tags": ["poster", "graphic-design", "typography", "history"]
+    },
+    {
+      "id": "moma-typography-poster",
+      "name": "MoMA — Typography and the Poster",
+      "tier": "A",
+      "kind": "museum-exhibition",
+      "url": "https://www.moma.org/calendar/exhibitions/443",
+      "tags": ["poster", "typography", "modernism", "history"]
+    },
+    {
+      "id": "moma-collection",
+      "name": "MoMA Collection",
+      "tier": "A",
+      "kind": "museum-archive",
+      "url": "https://www.moma.org/collection/",
+      "tags": ["graphic-design", "modernism", "visual-culture"]
+    },
+    {
+      "id": "cooper-hewitt",
+      "name": "Cooper Hewitt Collections",
+      "tier": "A",
+      "kind": "museum-archive",
+      "url": "https://www.cooperhewitt.org/collections/",
+      "tags": ["design-history", "graphic-design", "communication-design"]
+    },
+    {
+      "id": "museum-fuer-gestaltung",
+      "name": "Museum für Gestaltung Zürich / eMuseum",
+      "tier": "A",
+      "kind": "museum-archive",
+      "url": "https://www.emuseum.ch/en/collections",
+      "tags": ["swiss-design", "poster", "typography", "grid", "graphic-design"]
+    },
+    {
+      "id": "eye-magazine",
+      "name": "Eye Magazine",
+      "tier": "B",
+      "kind": "publication",
+      "url": "https://www.eyemagazine.com/",
+      "tags": ["graphic-design", "criticism", "typography", "visual-culture"]
+    },
+    {
+      "id": "slanted",
+      "name": "Slanted",
+      "tier": "B",
+      "kind": "publication",
+      "url": "https://www.slanted.de/",
+      "tags": ["typography", "graphic-design", "visual-culture", "contemporary"]
+    },
+    {
+      "id": "opentype-spec",
+      "name": "OpenType Specification",
+      "tier": "A",
+      "kind": "technical-spec",
+      "url": "https://learn.microsoft.com/en-us/typography/opentype/spec/",
+      "tags": ["font-technology", "shaping", "metrics", "variable-fonts", "color-fonts"]
+    },
+    {
+      "id": "opentype-variations",
+      "name": "OpenType Font Variations Overview",
+      "tier": "A",
+      "kind": "technical-spec",
+      "url": "https://learn.microsoft.com/en-us/typography/opentype/spec/otvaroverview",
+      "tags": ["variable-fonts", "axes", "interpolation", "font-technology"]
+    },
+    {
+      "id": "harfbuzz",
+      "name": "HarfBuzz",
+      "tier": "A",
+      "kind": "engine-docs",
+      "url": "https://harfbuzz.github.io/",
+      "repo": "https://github.com/harfbuzz/harfbuzz",
+      "tags": ["text-shaping", "multi-script", "glyph-positioning"]
+    },
+    {
+      "id": "freetype",
+      "name": "FreeType",
+      "tier": "A",
+      "kind": "engine-docs",
+      "url": "https://freetype.org/",
+      "repo": "https://github.com/freetype/freetype",
+      "tags": ["font-rendering", "rasterization", "glyph-metrics"]
+    },
+    {
+      "id": "fonttools",
+      "name": "fontTools",
+      "tier": "A",
+      "kind": "tooling",
+      "url": "https://github.com/fonttools/fonttools",
+      "repo": "https://github.com/fonttools/fonttools",
+      "tags": ["font-inspection", "opentype", "variable-fonts", "tooling"]
+    },
+    {
+      "id": "msdfgen",
+      "name": "msdfgen",
+      "tier": "A/B",
+      "kind": "technical-library",
+      "url": "https://github.com/Chlumsky/msdfgen",
+      "repo": "https://github.com/Chlumsky/msdfgen",
+      "tags": ["msdf", "sdf", "realtime-type", "shader-text"]
+    },
+    {
+      "id": "apple-hig-typography",
+      "name": "Apple HIG — Typography",
+      "tier": "A",
+      "kind": "design-guideline",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/typography",
+      "tags": ["screen-type", "hierarchy", "legibility"]
+    },
+    {
+      "id": "apple-hig-color",
+      "name": "Apple HIG — Color",
+      "tier": "A",
+      "kind": "design-guideline",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/color",
+      "tags": ["color", "contrast", "accessibility", "hierarchy"]
+    },
+    {
+      "id": "apple-hig-motion",
+      "name": "Apple HIG — Motion",
+      "tier": "A",
+      "kind": "design-guideline",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/motion",
+      "tags": ["motion", "interaction", "accessibility"]
+    },
+    {
+      "id": "material-design-3",
+      "name": "Material Design 3",
+      "tier": "A",
+      "kind": "design-system",
+      "url": "https://m3.material.io/",
+      "tags": ["design-system", "typography", "color", "layout", "motion"]
+    },
+    {
+      "id": "carbon-design-system",
+      "name": "IBM Carbon Design System",
+      "tier": "A/B",
+      "kind": "design-system",
+      "url": "https://carbondesignsystem.com/",
+      "tags": ["design-system", "grid", "spacing", "typography", "components"]
+    },
+    {
+      "id": "wcag-22",
+      "name": "W3C WCAG 2.2",
+      "tier": "A",
+      "kind": "standard",
+      "url": "https://www.w3.org/WAI/WCAG22/quickref/",
+      "tags": ["accessibility", "contrast", "text-spacing", "motion"]
+    },
+    {
+      "id": "w3c-i18n",
+      "name": "W3C Internationalization",
+      "tier": "A",
+      "kind": "standard-guidance",
+      "url": "https://www.w3.org/International/",
+      "tags": ["multi-script", "bidi", "line-breaking", "internationalization"]
+    },
+    {
+      "id": "brand-new",
+      "name": "Brand New / UnderConsideration",
+      "tier": "B",
+      "kind": "criticism-archive",
+      "url": "https://www.underconsideration.com/brandnew/",
+      "tags": ["identity", "branding", "logo", "systems", "criticism"]
+    },
+    {
+      "id": "pentagram",
+      "name": "Pentagram Work",
+      "tier": "B",
+      "kind": "studio-archive",
+      "url": "https://www.pentagram.com/work",
+      "tags": ["identity", "editorial", "exhibition", "typography"]
+    },
+    {
+      "id": "collins",
+      "name": "COLLINS Work",
+      "tier": "B",
+      "kind": "studio-archive",
+      "url": "https://www.wearecollins.com/work/",
+      "tags": ["identity", "branding", "typography", "systems"]
+    },
+    {
+      "id": "experimental-jetset",
+      "name": "Experimental Jetset",
+      "tier": "B",
+      "kind": "studio-archive",
+      "url": "https://www.experimentaljetset.nl/",
+      "tags": ["typography", "graphic-design", "identity", "conceptual"]
+    },
+    {
+      "id": "studio-dumbar",
+      "name": "Studio Dumbar",
+      "tier": "B",
+      "kind": "studio-archive",
+      "url": "https://studiodumbar.com/work",
+      "tags": ["motion-identity", "typography", "branding", "creative-coding"]
+    },
+    {
+      "id": "dia",
+      "name": "DIA",
+      "tier": "B",
+      "kind": "studio-archive",
+      "url": "https://dia.tv/",
+      "tags": ["kinetic-type", "motion-identity", "branding", "systems"]
+    },
+    {
+      "id": "motionographer",
+      "name": "Motionographer",
+      "tier": "B",
+      "kind": "publication",
+      "url": "https://motionographer.com/",
+      "tags": ["motion-design", "kinetic-type", "process", "titles"]
+    },
+    {
+      "id": "art-of-the-title",
+      "name": "Art of the Title",
+      "tier": "B",
+      "kind": "archive",
+      "url": "https://www.artofthetitle.com/",
+      "tags": ["title-design", "typography", "motion", "editorial-timing"]
+    },
+    {
+      "id": "demo-festival",
+      "name": "DEMO Festival",
+      "tier": "B/C",
+      "kind": "festival-archive",
+      "url": "https://demofestival.com/",
+      "tags": ["motion-design", "public-screens", "typography", "spatial-design"]
+    },
+    {
+      "id": "onformative",
+      "name": "onformative",
+      "tier": "B",
+      "kind": "studio-archive",
+      "url": "https://onformative.com/",
+      "tags": ["generative-design", "data", "installation", "identity"]
+    },
+    {
+      "id": "field",
+      "name": "FIELD.IO",
+      "tier": "B",
+      "kind": "studio-archive",
+      "url": "https://field.io/",
+      "tags": ["generative-design", "motion", "identity", "realtime"]
+    },
+    {
+      "id": "its-nice-that",
+      "name": "It's Nice That — Graphic Design",
+      "tier": "C",
+      "kind": "discovery",
+      "url": "https://www.itsnicethat.com/graphic-design",
+      "tags": ["contemporary", "graphic-design", "discovery"]
+    },
+    {
+      "id": "bpando",
+      "name": "BP&O",
+      "tier": "C",
+      "kind": "curation",
+      "url": "https://bpando.org/",
+      "tags": ["branding", "packaging", "identity", "graphic-design"]
+    },
+    {
+      "id": "arena",
+      "name": "Are.na",
+      "tier": "C",
+      "kind": "research-platform",
+      "url": "https://www.are.na/",
+      "tags": ["visual-research", "moodboards", "cross-disciplinary"]
+    }
+  ]
+}
