@@ -25,6 +25,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Margin" type="MarginContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -115,6 +116,7 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="Rail" type="PanelContainer" parent="Margin/Shell/Body"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 theme_type_variation = &"RailPanel"
@@ -210,126 +212,208 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"BodyMutedLabel"
-text = "001 SIGNAL FIELD IS READY. RUN THE PATCH TO START THE FIRST REALTIME SYSTEM."
+text = "SELECT A PATCH."
 autowrap_mode = 2
 
-[node name="GalleryHost" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
+[node name="GalleryView" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="PatchPanel" type="PanelContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost"]
-custom_minimum_size = Vector2(230, 0)
+[node name="GalleryToolbar" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryView"]
 layout_mode = 2
+
+[node name="GalleryLabel" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryView/GalleryToolbar"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "PATCH LIBRARY / CLICK TO OPEN"
+
+[node name="GalleryToolbarSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryView/GalleryToolbar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GalleryHint" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryView/GalleryToolbar"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "ONE ACTIVE PATCH MAX"
+
+[node name="GalleryScroll" type="ScrollContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryView"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="GalleryGrid" type="GridContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryView/GalleryScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3
+
+[node name="ProjectView" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RenderPanel" type="PanelContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_type_variation = &"WorkspacePanel"
 
-[node name="PatchMargin" type="MarginContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel"]
-layout_mode = 2
-theme_type_variation = &"WorkspaceMargin"
-
-[node name="PatchInfo" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin"]
+[node name="RenderColumn" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel"]
 layout_mode = 2
 
-[node name="PatchIndex" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+[node name="ProjectToolbar" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn"]
+layout_mode = 2
+
+[node name="ProjectBackButton" type="Button" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn/ProjectToolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 24)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"ToolButton"
+text = "< GALLERY"
+
+[node name="ProjectIndex" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn/ProjectToolbar"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"AccentLabel"
 text = "001"
 
-[node name="PatchTitle" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
+[node name="ProjectTitle" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn/ProjectToolbar"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"PageTitleLabel"
+theme_type_variation = &"CaptionLabel"
 text = "SIGNAL FIELD"
 
-[node name="PatchMeta" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
-layout_mode = 2
-theme_type_variation = &"MicroLabel"
-text = "NODE2D / REALTIME / ADAPTIVE"
-
-[node name="PatchDescription" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
-layout_mode = 2
-theme_type_variation = &"BodyMutedLabel"
-text = "MOVING SIGNAL NODES WITH DISTANCE-BASED CONNECTIONS AND ORGANIC DRIFT."
-autowrap_mode = 2
-
-[node name="PatchSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="PatchState" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"TagLabel"
-text = "[STOPPED]"
-
-[node name="RunPatchButton" type="Button" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 2
-theme_type_variation = &"ToolButton"
-text = "RUN 001"
-
-[node name="StopPatchButton" type="Button" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PatchPanel/PatchMargin/PatchInfo"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 2
-disabled = true
-theme_type_variation = &"ToolButton"
-text = "STOP"
-
-[node name="PreviewPanel" type="PanelContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_type_variation = &"WorkspacePanel"
-
-[node name="PreviewColumn" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel"]
-layout_mode = 2
-
-[node name="PreviewHeader" type="HBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn"]
-layout_mode = 2
-
-[node name="PreviewLabel" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn/PreviewHeader"]
-layout_mode = 2
-theme_type_variation = &"MicroLabel"
-text = "PREVIEW / LIVE RENDER"
-
-[node name="PreviewSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn/PreviewHeader"]
+[node name="ProjectToolbarSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn/ProjectToolbar"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PreviewResolution" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn/PreviewHeader"]
+[node name="ProjectMeta" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn/ProjectToolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "GDSCRIPT / NODE2D"
+
+[node name="PreviewResolution" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn/ProjectToolbar"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MicroLabel"
 text = "AUTO"
 
-[node name="PreviewSeparator" type="HSeparator" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn"]
+[node name="FullscreenButton" type="Button" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn/ProjectToolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(88, 24)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"ToolButton"
+text = "FULLSCREEN"
+
+[node name="RenderSeparator" type="HSeparator" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn"]
 layout_mode = 2
 
-[node name="SketchViewportContainer" type="SubViewportContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn"]
+[node name="SketchViewportContainer" type="SubViewportContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-stretch = true
+stretch = false
 
-[node name="SketchViewport" type="SubViewport" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/GalleryHost/PreviewPanel/PreviewColumn/SketchViewportContainer"]
+[node name="SketchViewport" type="SubViewport" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/RenderPanel/RenderColumn/SketchViewportContainer"]
 unique_name_in_owner = true
 size = Vector2i(640, 360)
 disable_3d = true
+handle_input_locally = false
 render_target_update_mode = 4
+
+[node name="InspectorPanel" type="PanelContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_type_variation = &"WorkspacePanel"
+
+[node name="InspectorScroll" type="ScrollContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="InspectorMargin" type="MarginContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"WorkspaceMargin"
+
+[node name="InspectorContent" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ParameterTitle" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+theme_type_variation = &"AccentLabel"
+text = "PARAMETERS"
+
+[node name="ParameterHint" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "LIVE / APPLIED IMMEDIATELY"
+
+[node name="ParameterSeparator" type="HSeparator" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+
+[node name="ParameterList" type="VBoxContainer" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OutputSeparator" type="HSeparator" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+
+[node name="OutputTitle" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+theme_type_variation = &"AccentLabel"
+text = "OUTPUT ROUTING"
+
+[node name="LocalOutput" type="CheckButton" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+disabled = true
+button_pressed = true
+text = "LOCAL / PREVIEW"
+
+[node name="SpoutOutput" type="CheckButton" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+disabled = true
+text = "SPOUT / ADAPTER NOT INSTALLED"
+tooltip_text = "Reserved output adapter. Not active yet."
+
+[node name="NdiOutput" type="CheckButton" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+disabled = true
+text = "NDI / ADAPTER NOT INSTALLED"
+tooltip_text = "Reserved output adapter. Not active yet."
+
+[node name="OutputHint" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content/ProjectView/InspectorPanel/InspectorScroll/InspectorMargin/InspectorContent"]
+layout_mode = 2
+theme_type_variation = &"MicroLabel"
+text = "THE SKETCH RENDERS ONCE. OUTPUT ADAPTERS WILL ROUTE THIS SAME FRAME."
+autowrap_mode = 2
 
 [node name="PageSpacer" type="Control" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
-visible = false
 
 [node name="Hint" type="Label" parent="Margin/Shell/Body/Workspace/WorkspaceMargin/Content"]
 layout_mode = 2
 theme_type_variation = &"MicroLabel"
-text = "SELECT MODULE / LOAD PATCH / ROUTE OUTPUT"
+text = "GALLERY / PATCH / PARAMETERS / OUTPUT"
 
 [node name="StatusBar" type="PanelContainer" parent="Margin/Shell"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
 theme_type_variation = &"StatusPanel"
@@ -346,7 +430,7 @@ text = "●"
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MicroLabel"
-text = "GALLERY / 001 READY"
+text = "GALLERY / READY"
 
 [node name="StatusSpacer" type="Control" parent="Margin/Shell/StatusBar/StatusRow"]
 layout_mode = 2
@@ -377,3 +461,38 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MicroLabel"
 text = "FPS --"
+
+[node name="FullscreenOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 2
+mouse_filter = 0
+
+[node name="FullscreenBackground" type="ColorRect" parent="FullscreenOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="FullscreenTexture" type="TextureRect" parent="FullscreenOverlay"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0

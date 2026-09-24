@@ -11,6 +11,9 @@ export/
 *.tmp
 *.temp
 
+# Runtime telemetry (published separately to telemetry/runtime)
+.telemetry_runtime/
+
 # IDE
 .vscode/
 .idea/

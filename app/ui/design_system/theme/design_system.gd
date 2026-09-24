@@ -120,6 +120,16 @@ static func _define_buttons(theme: Theme) -> void:
     theme.set_stylebox("hover", "ToolButton", _box(COLOR_SURFACE_HOVER, COLOR_BORDER, RADIUS_SMALL, 1, 7.0, 3.0))
     theme.set_stylebox("pressed", "ToolButton", _box(COLOR_ACCENT_SOFT, COLOR_ACCENT, RADIUS_SMALL, 1, 7.0, 3.0))
 
+    theme.set_type_variation("GalleryCardButton", "Button")
+    theme.set_font_size("font_size", "GalleryCardButton", FONT_CAPTION)
+    theme.set_color("font_color", "GalleryCardButton", COLOR_TEXT_MUTED)
+    theme.set_color("font_hover_color", "GalleryCardButton", COLOR_TEXT)
+    theme.set_color("font_pressed_color", "GalleryCardButton", COLOR_ACCENT)
+    theme.set_stylebox("normal", "GalleryCardButton", _box(COLOR_SURFACE_RAISED, COLOR_BORDER_SOFT, RADIUS_SMALL, 1, 12.0, 10.0))
+    theme.set_stylebox("hover", "GalleryCardButton", _box(COLOR_SURFACE_HOVER, COLOR_ACCENT, RADIUS_SMALL, 1, 12.0, 10.0))
+    theme.set_stylebox("pressed", "GalleryCardButton", _box(COLOR_ACCENT_SOFT, COLOR_ACCENT, RADIUS_SMALL, 1, 12.0, 10.0))
+    theme.set_stylebox("focus", "GalleryCardButton", _box(Color(0, 0, 0, 0), COLOR_ACCENT, RADIUS_SMALL, 1, 12.0, 10.0))
+
     theme.set_type_variation("WindowButton", "Button")
     theme.set_font_size("font_size", "WindowButton", FONT_CAPTION)
     theme.set_color("font_color", "WindowButton", COLOR_TEXT_DIM)
@@ -141,6 +151,17 @@ static func _define_buttons(theme: Theme) -> void:
     theme.set_stylebox("hover", "WindowCloseButton", _box(COLOR_DANGER_SOFT, COLOR_DANGER, RADIUS_SMALL, 1, 4.0, 2.0))
     theme.set_stylebox("pressed", "WindowCloseButton", _box(COLOR_DANGER, COLOR_DANGER, RADIUS_SMALL, 1, 4.0, 2.0))
     theme.set_stylebox("focus", "WindowCloseButton", _box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), RADIUS_SMALL, 0, 4.0, 2.0))
+
+    theme.set_color("font_color", "CheckButton", COLOR_TEXT_MUTED)
+    theme.set_color("font_hover_color", "CheckButton", COLOR_TEXT)
+    theme.set_color("font_pressed_color", "CheckButton", COLOR_ACCENT)
+    theme.set_color("font_disabled_color", "CheckButton", COLOR_TEXT_DIM)
+    theme.set_font_size("font_size", "CheckButton", FONT_CAPTION)
+
+    theme.set_color("font_color", "CheckBox", COLOR_TEXT_MUTED)
+    theme.set_color("font_hover_color", "CheckBox", COLOR_TEXT)
+    theme.set_color("font_pressed_color", "CheckBox", COLOR_ACCENT)
+    theme.set_font_size("font_size", "CheckBox", FONT_CAPTION)
 
 
 static func _define_panels(theme: Theme) -> void:
@@ -170,6 +191,8 @@ static func _define_margins(theme: Theme) -> void:
 static func _define_containers(theme: Theme) -> void:
     theme.set_constant("separation", "HBoxContainer", SPACE_2)
     theme.set_constant("separation", "VBoxContainer", SPACE_2)
+    theme.set_constant("h_separation", "GridContainer", SPACE_4)
+    theme.set_constant("v_separation", "GridContainer", SPACE_4)
 
 
 static func _define_separators(theme: Theme) -> void:

@@ -1,0 +1,9 @@
+{
+  "id": "001_signal_field",
+  "index": "001",
+  "title": "SIGNAL FIELD",
+  "scene": "res://sketches/001_signal_field/runtime/signal_field.tscn",
+  "engine": "GDSCRIPT / NODE2D",
+  "tags": ["REALTIME", "INTERACTIVE", "ADAPTIVE"],
+  "description": "Technical test patch for the gallery runtime. Moving signal nodes, distance connections and pointer interaction."
+}
