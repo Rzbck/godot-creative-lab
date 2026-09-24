@@ -83,9 +83,29 @@ func _open_sketch(definition: Dictionary) -> void:
 
 
 func _sync_preview_resolution(force: bool = false) -> void:
-    # The container owns layout. The SubViewport follows it, never the reverse.
+    if not is_instance_valid(sketch_viewport) or not is_instance_valid(sketch_viewport_container):
+        return
+
+    # IMPORTANT: when SubViewportContainer.stretch is enabled, Godot owns the
+    # child SubViewport size. Writing sketch_viewport.size ourselves creates the
+    # exact feedback loop that made a large preview become the shell's minimum
+    # width and broke subsequent window shrinking.
+    sketch_viewport_container.stretch = true
     sketch_viewport_container.custom_minimum_size = RESPONSIVE_PREVIEW_MIN_SIZE
-    super._sync_preview_resolution(force)
+
+    var target_size: Vector2 = sketch_viewport_container.size
+    var target: Vector2i = Vector2i(
+        maxi(1, roundi(target_size.x)),
+        maxi(1, roundi(target_size.y))
+    )
+
+    if force or target != _last_preview_size:
+        _last_preview_size = target
+        preview_resolution.text = "%d×%d" % [target.x, target.y]
+        if _active_sketch is CanvasItem:
+            (_active_sketch as CanvasItem).queue_redraw()
+
+    _ensure_realtime_viewport_updates()
 
 
 func _apply_responsive_layout() -> void:
