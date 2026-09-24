@@ -26,8 +26,10 @@ Do **not** rely on previous-chat memory. Reconstruct the current state from the 
 5. If the request is creative/design related, read the relevant material under:
    - `knowledge/creative-coding/`
    - `knowledge/design/`
-6. Resolve current CI status before assuming the branch is healthy.
-7. If the user's message follows a runtime test, read the online sanitized telemetry branch `telemetry/runtime` (`latest.jsonl` and session snapshots as necessary) before asking for copied logs.
+   - `knowledge/cross-domain/`
+6. For a substantial new artwork/shader, specifically read `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md` and `knowledge/cross-domain/IDEA_ENGINE.md`. Use them to generate and mutate a concept before implementation; do not simply combine a single visual reference with a stock effect.
+7. Resolve current CI status before assuming the branch is healthy.
+8. If the user's message follows a runtime test, read the online sanitized telemetry branch `telemetry/runtime` (`latest.jsonl` and session snapshots as necessary) before asking for copied logs.
 
 ## Operating rules
 
@@ -64,7 +66,13 @@ Existing sketches:
 
 Do not invent sketch 005 unless the user asks for a new creative work.
 
-There is a versioned external knowledge library in the repo. Use it as the project's research memory rather than starting only from model memory. In particular, combine professional typography/graphic-design principles with realtime shader/generative techniques.
+There is a versioned external knowledge library in the repo. It has three layers:
+
+- `knowledge/creative-coding/` — technical methods and generative/GPU vocabulary;
+- `knowledge/design/` — typography, composition, grids, color, hierarchy and professional design constraints;
+- `knowledge/cross-domain/` — representation bridges, mutation operators and an idea engine for producing original identities from the first two layers.
+
+For substantial new work, extract principles from several independent references, build genuine representation changes between domains, mutate the first coherent combination, and define persistent identity rules before choosing the Godot implementation.
 
 Longer-term live-performance direction may include A/B/C decks, crossfade/mixing, timeline/cues and compositing, but these are future directions, not automatic implementation tasks.
 
