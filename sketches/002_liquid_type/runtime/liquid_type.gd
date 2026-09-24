@@ -149,11 +149,6 @@ func _draw() -> void:
 
         cursor_x += glyph_width + tracking
 
-    var caption_color: Color = accent
-    caption_color.a = 0.72
-    draw_string(font, Vector2(76.0, 92.0), "002 / LIQUID TYPE", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 20, caption_color)
-    draw_string(font, Vector2(76.0, 656.0), "POINTER FIELD / ELASTIC LETTERFORM / LIVE SYNC", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 15, Color(0.78, 0.8, 0.86, 0.48))
-
     end_design_draw()
 
 
