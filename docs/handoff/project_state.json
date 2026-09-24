@@ -5,7 +5,6 @@
   "active_branch": "feat/creative-sketches-002-004-20260924",
   "draft_pr": 7,
   "pr_base": "feat/gallery-project-workflow-20260923",
-  "baseline_before_handoff_refresh": "eef780c02ddc1535f1c252bf50ffbec7b1813ee0",
   "head_policy": "Resolve current remote branch HEAD from GitHub at session start; do not treat this file as the authoritative latest SHA.",
   "engine": {
     "name": "Godot",
@@ -31,9 +30,10 @@
   },
   "sketches": [
     {"id": "001_signal_field", "role": "technical-foundation"},
-    {"id": "002_liquid_type", "role": "gallery-sketch"},
-    {"id": "003_chroma_lens", "role": "gallery-sketch"},
-    {"id": "004_gommage_type", "role": "gallery-sketch"}
+    {"id": "002_liquid_type", "role": "gallery-sketch", "current_refinement": "gesture-velocity-memory"},
+    {"id": "003_chroma_lens", "role": "gallery-sketch", "current_refinement": "quantized-editorial-grid-hierarchy"},
+    {"id": "004_gommage_type", "role": "gallery-sketch", "current_refinement": "directional-erosion-memory"},
+    {"id": "005_pressure_lattice", "role": "gallery-shader", "engine": "canvas_item_shader", "concept": "editorial-grid_to_field_to_gesture-pressure_to_temporal-memory_to_duotone"}
   ],
   "telemetry": {
     "remote_branch": "telemetry/runtime",
@@ -58,7 +58,8 @@
       "godot_4_7_1_headless_import",
       "main_scene_smoke_test",
       "tracked_file_cleanliness"
-    ]
+    ],
+    "latest_creative_pass_host_state": "IMPLEMENTED_NOT_VALIDATED"
   },
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
