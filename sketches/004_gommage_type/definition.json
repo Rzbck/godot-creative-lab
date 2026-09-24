@@ -3,7 +3,7 @@
   "index": "004",
   "title": "GOMMAGE TYPE",
   "scene": "res://sketches/004_gommage_type/runtime/gommage_type.tscn",
-  "engine": "GDSCRIPT / TYPOGRAPHY",
-  "tags": ["TYPE", "DISSOLVE", "DUST", "INTERACTIVE", "LIVE"],
-  "description": "Typographic erosion and reconstruction with pointer-driven dissolve trails, dust fragments and synchronized live output."
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "EROSION", "INTERACTIVE"],
+  "description": "Interactive typographic erosion with directional dust, gesture memory and controlled reconstruction."
 }
