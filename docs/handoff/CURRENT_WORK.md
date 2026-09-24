@@ -79,7 +79,7 @@ The problem is not lack of effects. It is lack of **different underlying mechani
 
 The user explicitly wants a more stochastic process before assigning artistic meaning.
 
-Two modes are now valid:
+Two modes are valid:
 
 ### Intent-first
 
@@ -183,6 +183,22 @@ Any artistic interpretation attached to these before a prototype is only a hypot
 5. Parameters should bias a strong system, not rescue a weak default.
 6. Interaction should exploit the mechanism actually discovered, not automatically use a radial cursor effect.
 7. A collision should exchange state across systems rather than stack independent effects.
+
+## Mandatory AI operational completion
+
+The user should not need to ask for repository hygiene, CI waiting or the test launcher after each change.
+
+After every material repository change, every AI must automatically:
+
+1. update the durable handoff/state documents affected by the change;
+2. resolve the final remote HEAD after all code + documentation commits;
+3. wait for CI on that exact final SHA and inspect required jobs;
+4. report exact short HEAD + CI result;
+5. when host validation is relevant, include the canonical `sync + exact-head CI wait + launch Godot` PowerShell block from `docs/handoff/OPERATIONS.md`;
+6. never launch/recommend launch before CI success in that block;
+7. after host testing, read `telemetry/runtime` before requesting manual logs.
+
+This is part of task completion, not optional cleanup. See `AGENTS.md` for the full protocol.
 
 ## Telemetry state
 
