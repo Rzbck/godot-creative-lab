@@ -59,12 +59,13 @@ Do **not** rely on previous-chat memory. Reconstruct the current state from the 
 ## Current content / direction
 
 Existing sketches:
-- 001 Signal Field — technical foundation/test patch.
-- 002 Liquid Type.
-- 003 Chroma Lens.
-- 004 Gommage Type.
+- 001 Signal Field — technical foundation/test patch; preserve mainly as a contract/regression reference.
+- 002 Liquid Type — refined with gesture-velocity memory affecting spacing, phase, field direction, smear and chromatic behavior.
+- 003 Chroma Lens — refined with fixed safe margins, stable cell hierarchy, quantized graphic lens states and seven-column editorial structure.
+- 004 Gommage Type — refined with directional gesture-memory in erosion, dust and residual marks.
+- 005 Pressure Lattice — real Godot `canvas_item` shader crossing editorial grid, procedural field, gesture-injected vector pressure, decaying temporal memory and duotone identity.
 
-Do not invent sketch 005 unless the user asks for a new creative work.
+`005_pressure_lattice` is approved and implemented. Do not rely on older documentation claiming there is no 005. Do not invent 006 unless the user asks for another creative work.
 
 There is a versioned external knowledge library in the repo. It has three layers:
 
@@ -73,6 +74,8 @@ There is a versioned external knowledge library in the repo. It has three layers
 - `knowledge/cross-domain/` — representation bridges, mutation operators and an idea engine for producing original identities from the first two layers.
 
 For substantial new work, extract principles from several independent references, build genuine representation changes between domains, mutate the first coherent combination, and define persistent identity rules before choosing the Godot implementation.
+
+The current immediate validation task is to host-test the knowledge-driven 002–005 creative pass, especially 005 in PREVIEW and PROGRAM with touch/mouse interaction. If the user reports a test result, inspect `telemetry/runtime` before asking for logs.
 
 Longer-term live-performance direction may include A/B/C decks, crossfade/mixing, timeline/cues and compositing, but these are future directions, not automatic implementation tasks.
 
