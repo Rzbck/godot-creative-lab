@@ -27,12 +27,13 @@ This file is intentionally short. It records what a new AI should treat as the a
 
 ## Current creative content
 
-- `001_signal_field` — technical foundation/test patch.
-- `002_liquid_type` — accepted Gallery sketch; may be visually refined later.
-- `003_chroma_lens` — accepted; grid density/margins recently corrected.
-- `004_gommage_type` — accepted; tactile PROGRAM interaction validated.
+- `001_signal_field` — technical foundation/test patch; keep as a contract/regression reference rather than forcing it into the artistic direction.
+- `002_liquid_type` — accepted Gallery sketch; gesture velocity now becomes temporal energy that changes spacing, phase, field tangency, smear and chromatic direction instead of acting only as a radial pointer deformation.
+- `003_chroma_lens` — accepted Gallery sketch; fixed safe margins remain, and the visual field now uses stable cell hierarchy plus quantized graphic lens states tied to a seven-column editorial grid.
+- `004_gommage_type` — accepted Gallery sketch; tactile erase/rebuild now stores directional gesture velocity so erosion, dust and residual marks inherit authored motion before rebuilding.
+- `005_pressure_lattice` — newly approved/implemented Godot `canvas_item` shader. Cross-domain chain: editorial grid -> procedural signal field -> gesture-injected vector pressure -> decaying temporal memory -> duotone identity. It exposes live-safe parameters and synchronizes memory state through the existing sketch contract.
 
-No 005 has been approved. Do not invent one.
+005 is now a real project entry; do not treat documentation that says "no 005" as current.
 
 ## Knowledge system
 
@@ -45,6 +46,10 @@ Use these before proposing substantial new creative directions:
 For a new creative direction, do not merely pick one shader technique and one visual reference. Identify carriers/representations/operators, build at least one genuine cross-domain bridge, then use `CROSS_DOMAIN_ATLAS.md` and `IDEA_ENGINE.md` to mutate the first coherent combination before implementation.
 
 The goal is professional generative systems with their own identity rather than generic effect demos or source imitation.
+
+## Immediate validation state
+
+The 002–005 creative pass is implemented on the active branch. CI must be resolved against the latest HEAD before calling it `REPO_VALIDATED`. Host visual/touch behavior for this exact pass remains `IMPLEMENTED_NOT_VALIDATED` until the user runs it on the Windows workstation; after that, inspect `telemetry/runtime` before requesting logs.
 
 ## Longer-term direction — not an automatic task
 
