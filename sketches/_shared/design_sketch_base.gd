@@ -1,6 +1,7 @@
 extends Node2D
 
 const DESIGN_SIZE: Vector2 = Vector2(1280.0, 720.0)
+const GlyphContourTools = preload("res://sketches/_shared/glyph_contour_tools.gd")
 
 var sketch_time: float = 0.0
 var pointer_position: Vector2 = DESIGN_SIZE * 0.5
@@ -182,6 +183,81 @@ func begin_design_draw(background_color: Color) -> float:
 
 func end_design_draw() -> void:
     draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+# Returns sampled real vector outlines for one glyph in design coordinates.
+# The contour data returned by TextServer uses a font-style Y-up coordinate
+# system, so Y is inverted here and translated from the supplied baseline.
+func get_glyph_outline_contours(
+    font: Font,
+    glyph: String,
+    font_size: int,
+    baseline: Vector2,
+    curve_steps: int = 6
+) -> Array[PackedVector2Array]:
+    var raw: Array[PackedVector2Array] = GlyphContourTools.get_sampled_contours(
+        font,
+        glyph,
+        font_size,
+        curve_steps
+    )
+    var transformed: Array[PackedVector2Array] = []
+    for contour: PackedVector2Array in raw:
+        var mapped: PackedVector2Array = PackedVector2Array()
+        for point: Vector2 in contour:
+            mapped.append(baseline + Vector2(point.x, -point.y))
+        transformed.append(mapped)
+    return transformed
+
+
+func map_outline_contours(
+    source: Array[PackedVector2Array],
+    mapper: Callable
+) -> Array[PackedVector2Array]:
+    var result: Array[PackedVector2Array] = []
+    for contour_index: int in range(source.size()):
+        var contour: PackedVector2Array = source[contour_index]
+        var mapped: PackedVector2Array = PackedVector2Array()
+        for point_index: int in range(contour.size()):
+            var point: Vector2 = contour[point_index]
+            if mapper.is_valid():
+                var value: Variant = mapper.call(point, contour_index, point_index)
+                if value is Vector2:
+                    point = value as Vector2
+            mapped.append(point)
+        result.append(mapped)
+    return result
+
+
+func draw_outline_contours(
+    contours: Array[PackedVector2Array],
+    color: Color,
+    width: float = 1.0,
+    antialiased: bool = true
+) -> void:
+    for contour: PackedVector2Array in contours:
+        if contour.size() >= 2:
+            draw_polyline(contour, color, width, antialiased)
+
+
+func outline_bounds(contours: Array[PackedVector2Array]) -> Rect2:
+    var has_point: bool = false
+    var min_point: Vector2 = Vector2.ZERO
+    var max_point: Vector2 = Vector2.ZERO
+    for contour: PackedVector2Array in contours:
+        for point: Vector2 in contour:
+            if not has_point:
+                min_point = point
+                max_point = point
+                has_point = true
+            else:
+                min_point.x = minf(min_point.x, point.x)
+                min_point.y = minf(min_point.y, point.y)
+                max_point.x = maxf(max_point.x, point.x)
+                max_point.y = maxf(max_point.y, point.y)
+    if not has_point:
+        return Rect2()
+    return Rect2(min_point, max_point - min_point)
 
 
 func palette_lerp(a: Color, b: Color, amount: float) -> Color:

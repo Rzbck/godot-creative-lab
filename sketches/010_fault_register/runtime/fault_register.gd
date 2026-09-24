@@ -5,13 +5,13 @@ const INK: Color = Color(0.055, 0.055, 0.06, 1.0)
 const RED: Color = Color(0.92, 0.08, 0.07, 1.0)
 const BLUE: Color = Color(0.05, 0.28, 0.88, 1.0)
 const LINES: Array[String] = ["ORDER", "IS A TEMPORARY", "AGREEMENT"]
-const BASELINES: Array[float] = [245.0, 390.0, 540.0]
-const MAX_SCARS: int = 8
+const BASELINES: Array[float] = [232.0, 400.0, 574.0]
+const MAX_SCARS: int = 10
 
-@export_range(90.0, 340.0, 1.0) var fracture_radius: float = 210.0
+@export_range(0.0, 1.0, 0.01) var tectonic_drift: float = 0.56
 @export_range(0.2, 2.8, 0.01) var stress_gain: float = 1.0
 @export_range(0.0, 1.0, 0.01) var scar_memory: float = 0.78
-@export_range(0.2, 3.0, 0.01) var recovery: float = 1.1
+@export_range(0.2, 3.0, 0.01) var repair: float = 1.0
 @export_range(0.0, 24.0, 0.1) var registration: float = 8.0
 @export_range(0.0, 1.0, 0.01) var grid_tension: float = 0.82
 
@@ -24,25 +24,27 @@ var _was_down: bool = false
 var _last_pointer: Vector2 = Vector2.ZERO
 var _pointer_ready: bool = false
 var _gesture_velocity: Vector2 = Vector2.ZERO
+var _auto_accumulator: float = 0.0
+var _auto_serial: int = 0
 
 
 func get_parameter_schema() -> Array[Dictionary]:
     return [
-        {"id": "fracture_radius", "label": "FAULT RADIUS", "type": "float", "min": 90.0, "max": 340.0, "step": 1.0},
+        {"id": "tectonic_drift", "label": "TECTONIC DRIFT", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01},
         {"id": "stress_gain", "label": "STRESS", "type": "float", "min": 0.2, "max": 2.8, "step": 0.01},
         {"id": "scar_memory", "label": "SCAR MEMORY", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01},
-        {"id": "recovery", "label": "RECOVERY", "type": "float", "min": 0.2, "max": 3.0, "step": 0.01},
-        {"id": "registration", "label": "REGISTRATION", "type": "float", "min": 0.0, "max": 24.0, "step": 0.1},
+        {"id": "repair", "label": "REPAIR", "type": "float", "min": 0.2, "max": 3.0, "step": 0.01},
+        {"id": "registration", "label": "INK REGISTER", "type": "float", "min": 0.0, "max": 24.0, "step": 0.1},
         {"id": "grid_tension", "label": "GRID TENSION", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01}
     ]
 
 
 func get_parameter_value(parameter_id: String) -> Variant:
     match parameter_id:
-        "fracture_radius": return fracture_radius
+        "tectonic_drift": return tectonic_drift
         "stress_gain": return stress_gain
         "scar_memory": return scar_memory
-        "recovery": return recovery
+        "repair": return repair
         "registration": return registration
         "grid_tension": return grid_tension
         _: return null
@@ -50,10 +52,10 @@ func get_parameter_value(parameter_id: String) -> Variant:
 
 func set_parameter_value(parameter_id: String, value: Variant) -> void:
     match parameter_id:
-        "fracture_radius": fracture_radius = clampf(float(value), 90.0, 340.0)
+        "tectonic_drift": tectonic_drift = clampf(float(value), 0.0, 1.0)
         "stress_gain": stress_gain = clampf(float(value), 0.2, 2.8)
         "scar_memory": scar_memory = clampf(float(value), 0.0, 1.0)
-        "recovery": recovery = clampf(float(value), 0.2, 3.0)
+        "repair": repair = clampf(float(value), 0.2, 3.0)
         "registration": registration = clampf(float(value), 0.0, 24.0)
         "grid_tension": grid_tension = clampf(float(value), 0.0, 1.0)
         _: return
@@ -63,13 +65,20 @@ func set_parameter_value(parameter_id: String, value: Variant) -> void:
 func _update_source_simulation(delta: float) -> void:
     for scar_index: int in range(_scars.size() - 1, -1, -1):
         var scar: Dictionary = _scars[scar_index]
-        var decay_rate: float = lerpf(0.22, 0.018, scar_memory)
+        var decay_rate: float = lerpf(0.22, 0.018, scar_memory) * repair
         var energy: float = float(scar.get("energy", 0.0)) - delta * decay_rate
         if energy <= 0.0:
             _scars.remove_at(scar_index)
             continue
         scar["energy"] = energy
+        scar["age"] = float(scar.get("age", 0.0)) + delta
         _scars[scar_index] = scar
+
+    # Even untouched, the structure accumulates and releases small faults.
+    _auto_accumulator += delta * (0.32 + tectonic_drift * 0.92)
+    if tectonic_drift > 0.02 and _auto_accumulator >= 3.6:
+        _auto_accumulator = fmod(_auto_accumulator, 3.6)
+        _seed_autonomous_fault()
 
     var target_velocity: Vector2 = Vector2.ZERO
     if pointer_active:
@@ -93,23 +102,47 @@ func _update_source_simulation(delta: float) -> void:
         var velocity_term: Vector2 = _gesture_velocity * 0.035
         var target_shear: Vector2 = (displacement * 0.42 + velocity_term) * stress_gain
         _active_shear = _active_shear.lerp(target_shear, clampf(delta * 7.5, 0.0, 1.0))
-        _active_shear.x = clampf(_active_shear.x, -180.0, 180.0)
-        _active_shear.y = clampf(_active_shear.y, -110.0, 110.0)
-        _active_energy = clampf(0.18 + _press_age * 0.34 + _active_shear.length() / 240.0, 0.0, 1.5)
+        _active_shear.x = clampf(_active_shear.x, -190.0, 190.0)
+        _active_shear.y = clampf(_active_shear.y, -120.0, 120.0)
+        _active_energy = clampf(0.18 + _press_age * 0.34 + _active_shear.length() / 230.0, 0.0, 1.55)
     else:
         if _was_down and _active_energy > 0.05:
-            _scars.append({
-                "anchor": _active_anchor,
-                "shear": _active_shear * (0.28 + scar_memory * 0.44),
-                "energy": clampf(_active_energy * (0.35 + scar_memory * 0.55), 0.0, 1.35),
-            })
-            while _scars.size() > MAX_SCARS:
-                _scars.remove_at(0)
+            _append_scar(
+                _active_anchor,
+                _active_shear * (0.30 + scar_memory * 0.48),
+                clampf(_active_energy * (0.35 + scar_memory * 0.58), 0.0, 1.4),
+                false
+            )
         _press_age = 0.0
-        _active_shear = _active_shear.lerp(Vector2.ZERO, clampf(delta * recovery * 2.0, 0.0, 1.0))
-        _active_energy = lerpf(_active_energy, 0.0, clampf(delta * recovery * 2.4, 0.0, 1.0))
+        _active_shear = _active_shear.lerp(Vector2.ZERO, clampf(delta * repair * 2.0, 0.0, 1.0))
+        _active_energy = lerpf(_active_energy, 0.0, clampf(delta * repair * 2.4, 0.0, 1.0))
 
     _was_down = pointer_down
+
+
+func _seed_autonomous_fault() -> void:
+    _auto_serial += 1
+    var seed: float = float(_auto_serial)
+    var anchor: Vector2 = Vector2(
+        lerpf(110.0, 1170.0, hash01(seed * 7.1 + 2.0)),
+        lerpf(90.0, 630.0, hash01(seed * 5.3 + 9.0))
+    )
+    var angle: float = hash01(seed * 11.7 + 3.0) * TAU
+    var amplitude: float = (12.0 + hash01(seed * 4.7) * 42.0) * tectonic_drift
+    var shear: Vector2 = Vector2(cos(angle), sin(angle) * 0.55) * amplitude
+    _append_scar(anchor, shear, 0.16 + tectonic_drift * 0.22, true)
+
+
+func _append_scar(anchor: Vector2, shear: Vector2, energy: float, autonomous: bool) -> void:
+    _scars.append({
+        "anchor": anchor,
+        "shear": shear,
+        "energy": energy,
+        "autonomous": autonomous,
+        "age": 0.0,
+    })
+    while _scars.size() > MAX_SCARS:
+        _scars.remove_at(0)
 
 
 func _get_custom_live_sync_state() -> Dictionary:
@@ -123,6 +156,8 @@ func _get_custom_live_sync_state() -> Dictionary:
         "last_pointer": _last_pointer,
         "pointer_ready": _pointer_ready,
         "gesture_velocity": _gesture_velocity,
+        "auto_accumulator": _auto_accumulator,
+        "auto_serial": _auto_serial,
     }
 
 
@@ -149,6 +184,8 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
     var velocity_variant: Variant = state.get("gesture_velocity", _gesture_velocity)
     if velocity_variant is Vector2:
         _gesture_velocity = velocity_variant as Vector2
+    _auto_accumulator = float(state.get("auto_accumulator", _auto_accumulator))
+    _auto_serial = int(state.get("auto_serial", _auto_serial))
 
 
 func _get_custom_live_debug_state() -> Dictionary:
@@ -156,85 +193,118 @@ func _get_custom_live_debug_state() -> Dictionary:
         "scar_count": _scars.size(),
         "active_energy": _active_energy,
         "active_shear": _active_shear,
+        "auto_serial": _auto_serial,
     }
 
 
 func _draw() -> void:
     begin_design_draw(BG)
     var font: Font = ThemeDB.fallback_font
-    _draw_grid(font)
+    _draw_living_grid()
     _draw_statement(font)
-    _draw_fault_markers()
     end_design_draw()
 
 
-func _draw_grid(font: Font) -> void:
-    var left: float = 88.0
-    var top: float = 102.0
-    var width: float = 1104.0
-    var height: float = 510.0
+func _draw_living_grid() -> void:
     var grid_color: Color = INK
-    grid_color.a = 0.13 + grid_tension * 0.08
+    grid_color.a = 0.065 + grid_tension * 0.09
 
-    for column: int in range(7):
-        var x: float = left + float(column) * width / 6.0
-        var p0: Vector2 = Vector2(x, top)
-        var p1: Vector2 = Vector2(x, top + height)
-        p0 += _fault_offset(p0) * 0.35
-        p1 += _fault_offset(p1) * 0.35
-        draw_line(p0, p1, grid_color, 1.0)
+    for column: int in range(9):
+        var x: float = float(column) / 8.0 * DESIGN_SIZE.x
+        var points: PackedVector2Array = PackedVector2Array()
+        for step: int in range(19):
+            var y: float = float(step) / 18.0 * DESIGN_SIZE.y
+            var p: Vector2 = Vector2(x, y)
+            p += _fault_offset(p) * 0.32
+            points.append(p)
+        draw_polyline(points, grid_color, 1.0, true)
 
-    for row: int in range(9):
-        var y: float = top + float(row) * height / 8.0
-        var p0: Vector2 = Vector2(left, y)
-        var p1: Vector2 = Vector2(left + width, y)
-        p0 += _fault_offset(p0) * 0.25
-        p1 += _fault_offset(p1) * 0.25
-        draw_line(p0, p1, grid_color, 1.0)
-
-    draw_string(font, Vector2(88.0, 82.0), "STRUCTURE / STRESS / RESIDUE", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 18, Color(0.055, 0.055, 0.06, 0.45))
-    draw_string(font, Vector2(1130.0, 82.0), "10", HORIZONTAL_ALIGNMENT_LEFT, -1.0, 18, RED)
+    for row: int in range(7):
+        var y: float = float(row) / 6.0 * DESIGN_SIZE.y
+        var points: PackedVector2Array = PackedVector2Array()
+        for step: int in range(25):
+            var x: float = float(step) / 24.0 * DESIGN_SIZE.x
+            var p: Vector2 = Vector2(x, y)
+            p += _fault_offset(p) * 0.26
+            points.append(p)
+        draw_polyline(points, grid_color, 1.0, true)
 
 
 func _draw_statement(font: Font) -> void:
     for line_index: int in range(LINES.size()):
         var text: String = LINES[line_index]
-        var font_size: int = [118, 64, 98][line_index]
-        var tracking: float = [10.0, 8.0, 12.0][line_index]
+        var font_size: int = [128, 68, 108][line_index]
+        var tracking: float = [12.0, 10.0, 14.0][line_index]
         var widths: Array[float] = []
         var total_width: float = 0.0
-        for index: int in range(text.length()):
-            var glyph: String = text.substr(index, 1)
+        for char_index: int in range(text.length()):
+            var glyph: String = text.substr(char_index, 1)
             var width: float = font.get_string_size(glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
             widths.append(width)
             total_width += width
-            if index < text.length() - 1:
+            if char_index < text.length() - 1:
                 total_width += tracking
 
-        var cursor_x: float = 120.0 if line_index != 1 else 310.0
-        var baseline: float = BASELINES[line_index]
-        if cursor_x + total_width > 1160.0:
-            cursor_x = maxf(104.0, 1160.0 - total_width)
+        var cursor_x: float = (DESIGN_SIZE.x - total_width) * 0.5
+        for char_index: int in range(text.length()):
+            var glyph: String = text.substr(char_index, 1)
+            if glyph == " ":
+                cursor_x += widths[char_index] + tracking
+                continue
+            var baseline: Vector2 = Vector2(cursor_x, BASELINES[line_index])
+            _draw_faulted_glyph(font, glyph, font_size, baseline, line_index, char_index)
+            cursor_x += widths[char_index] + tracking
 
-        for index: int in range(text.length()):
-            var glyph: String = text.substr(index, 1)
-            var center: Vector2 = Vector2(cursor_x + widths[index] * 0.5, baseline - float(font_size) * 0.36)
-            var offset: Vector2 = _fault_offset(center)
-            var local_energy: float = _fault_energy(center)
-            var base_pos: Vector2 = Vector2(cursor_x, baseline) + offset
 
-            if glyph != " ":
-                var split: Vector2 = Vector2(registration * local_energy, -registration * 0.35 * local_energy)
-                var blue_color: Color = BLUE
-                blue_color.a = local_energy * 0.34
-                var red_color: Color = RED
-                red_color.a = local_energy * 0.38
-                if local_energy > 0.02:
-                    draw_string(font, base_pos - split, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, blue_color)
-                    draw_string(font, base_pos + split, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, red_color)
-                draw_string(font, base_pos, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, INK)
+func _draw_faulted_glyph(
+    font: Font,
+    glyph: String,
+    font_size: int,
+    baseline: Vector2,
+    line_index: int,
+    char_index: int
+) -> void:
+    var contours: Array[PackedVector2Array] = get_glyph_outline_contours(font, glyph, font_size, baseline, 7)
+    if contours.is_empty():
+        draw_string(font, baseline, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, INK)
+        return
 
-            cursor_x += widths[index] + tracking
+    var black_set: Array[PackedVector2Array] = []
+    var red_set: Array[PackedVector2Array] = []
+    var blue_set: Array[PackedVector2Array] = []
+    var max_energy: float = 0.0
+
+    for contour_index: int in range(contours.size()):
+        var black: PackedVector2Array = PackedVector2Array()
+        var red: PackedVector2Array = PackedVector2Array()
+        var blue: PackedVector2Array = PackedVector2Array()
+        for point_index: int in range(contours[contour_index].size()):
+            var p: Vector2 = contours[contour_index][point_index]
+            var offset: Vector2 = _fault_offset(p)
+            var energy: float = _fault_energy(p)
+            max_energy = maxf(max_energy, energy)
+            var anatomy: float = sin(p.x * 0.025 + p.y * 0.018 + float(char_index) * 0.7 + float(line_index))
+            var structural_offset: Vector2 = offset * (0.72 + anatomy * 0.12)
+            var q: Vector2 = p + structural_offset
+            black.append(q)
+            var split: Vector2 = Vector2(registration * energy, -registration * energy * 0.32)
+            red.append(q + split)
+            blue.append(q - split)
+        black_set.append(black)
+        red_set.append(red)
+        blue_set.append(blue)
+
+    if max_energy > 0.015:
+        var red_color: Color = RED
+        red_color.a = max_energy * 0.40
+        var blue_color: Color = BLUE
+        blue_color.a = max_energy * 0.34
+        draw_outline_contours(red_set, red_color, 1.5, true)
+        draw_outline_contours(blue_set, blue_color, 1.4, true)
+
+    var ink: Color = INK
+    ink.a = 0.94
+    draw_outline_contours(black_set, ink, 2.2, true)
 
 
 func _fault_offset(point: Vector2) -> Vector2:
@@ -246,6 +316,7 @@ func _fault_offset(point: Vector2) -> Vector2:
             "anchor": _active_anchor,
             "shear": _active_shear,
             "energy": _active_energy,
+            "age": _press_age,
         })
     return total
 
@@ -257,44 +328,34 @@ func _single_fault_offset(point: Vector2, fault: Dictionary) -> Vector2:
         return Vector2.ZERO
     var anchor: Vector2 = anchor_variant as Vector2
     var shear: Vector2 = shear_variant as Vector2
+    var radius: float = 145.0 + grid_tension * 120.0
     var distance: float = point.distance_to(anchor)
-    if distance >= fracture_radius:
+    if distance >= radius:
         return Vector2.ZERO
-    var radial: float = 1.0 - distance / fracture_radius
-    var side: float = -1.0 if point.y < anchor.y else 1.0
+    var radial: float = 1.0 - distance / radius
+    var fault_angle: float = atan2(shear.y, shear.x + 0.001)
+    var normal: Vector2 = Vector2(-sin(fault_angle), cos(fault_angle))
+    var side: float = signf((point - anchor).dot(normal))
+    if absf(side) < 0.1:
+        side = 1.0
     var energy: float = float(fault.get("energy", 0.0))
-    return Vector2(shear.x * side, shear.y) * radial * energy * grid_tension
+    var age: float = float(fault.get("age", 0.0))
+    var slip: float = 0.86 + 0.14 * sin(age * 2.7 + distance * 0.03)
+    return shear * side * radial * energy * grid_tension * slip
 
 
 func _fault_energy(point: Vector2) -> float:
     var energy: float = 0.0
+    var radius: float = 145.0 + grid_tension * 120.0
     for scar: Dictionary in _scars:
         var anchor_variant: Variant = scar.get("anchor", Vector2.ZERO)
         if not anchor_variant is Vector2:
             continue
         var distance: float = point.distance_to(anchor_variant as Vector2)
-        if distance < fracture_radius:
-            energy = maxf(energy, (1.0 - distance / fracture_radius) * float(scar.get("energy", 0.0)))
+        if distance < radius:
+            energy = maxf(energy, (1.0 - distance / radius) * float(scar.get("energy", 0.0)))
     if _active_energy > 0.001:
         var active_distance: float = point.distance_to(_active_anchor)
-        if active_distance < fracture_radius:
-            energy = maxf(energy, (1.0 - active_distance / fracture_radius) * _active_energy)
+        if active_distance < radius:
+            energy = maxf(energy, (1.0 - active_distance / radius) * _active_energy)
     return clampf(energy, 0.0, 1.0)
-
-
-func _draw_fault_markers() -> void:
-    for scar: Dictionary in _scars:
-        var anchor_variant: Variant = scar.get("anchor", Vector2.ZERO)
-        if not anchor_variant is Vector2:
-            continue
-        var anchor: Vector2 = anchor_variant as Vector2
-        var energy: float = clampf(float(scar.get("energy", 0.0)), 0.0, 1.0)
-        var c: Color = RED
-        c.a = 0.08 + energy * 0.12
-        draw_circle(anchor, 3.0 + energy * 4.0, c)
-
-    if _active_energy > 0.02:
-        var c: Color = RED
-        c.a = 0.62
-        draw_line(_active_anchor - Vector2(14.0, 0.0), _active_anchor + Vector2(14.0, 0.0), c, 2.0)
-        draw_line(_active_anchor - Vector2(0.0, 14.0), _active_anchor + Vector2(0.0, 14.0), c, 2.0)
