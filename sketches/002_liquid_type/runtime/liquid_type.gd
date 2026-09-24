@@ -19,6 +19,11 @@ const MAGENTA: Color = Color(1.0, 0.16, 0.52, 1.0)
 @export_range(0.0, 1.0, 0.01) var glow_amount: float = 0.35
 @export_range(0.0, 1.0, 0.01) var palette_mix: float = 0.2
 
+var _gesture_velocity: Vector2 = Vector2.ZERO
+var _gesture_energy: float = 0.0
+var _last_pointer: Vector2 = Vector2.ZERO
+var _pointer_history_ready: bool = false
+
 
 func get_parameter_schema() -> Array[Dictionary]:
     return [
@@ -66,12 +71,62 @@ func set_parameter_value(parameter_id: String, value: Variant) -> void:
     queue_redraw()
 
 
+func _update_source_simulation(delta: float) -> void:
+    var target_velocity: Vector2 = Vector2.ZERO
+    if pointer_active:
+        if _pointer_history_ready and delta > 0.0001:
+            target_velocity = (pointer_position - _last_pointer) / delta
+        _last_pointer = pointer_position
+        _pointer_history_ready = true
+    else:
+        _pointer_history_ready = false
+
+    var velocity_blend: float = clampf(delta * 8.0, 0.0, 1.0)
+    _gesture_velocity = _gesture_velocity.lerp(target_velocity, velocity_blend)
+
+    var speed_energy: float = clampf(_gesture_velocity.length() / 980.0, 0.0, 1.0)
+    var target_energy: float = speed_energy * (1.0 if pointer_down else 0.55)
+    var energy_rate: float = 10.0 if target_energy > _gesture_energy else 2.2
+    _gesture_energy = lerpf(
+        _gesture_energy,
+        target_energy,
+        clampf(delta * energy_rate, 0.0, 1.0)
+    )
+
+
+func _get_custom_live_sync_state() -> Dictionary:
+    return {
+        "gesture_velocity": _gesture_velocity,
+        "gesture_energy": _gesture_energy,
+        "last_pointer": _last_pointer,
+        "pointer_history_ready": _pointer_history_ready,
+    }
+
+
+func _apply_custom_live_sync_state(state: Dictionary) -> void:
+    var velocity_variant: Variant = state.get("gesture_velocity", _gesture_velocity)
+    if velocity_variant is Vector2:
+        _gesture_velocity = velocity_variant as Vector2
+    _gesture_energy = float(state.get("gesture_energy", _gesture_energy))
+    var pointer_variant: Variant = state.get("last_pointer", _last_pointer)
+    if pointer_variant is Vector2:
+        _last_pointer = pointer_variant as Vector2
+    _pointer_history_ready = bool(state.get("pointer_history_ready", _pointer_history_ready))
+
+
+func _get_custom_live_debug_state() -> Dictionary:
+    return {
+        "gesture_energy": _gesture_energy,
+        "gesture_speed": _gesture_velocity.length(),
+    }
+
+
 func _draw() -> void:
     begin_design_draw(palette_lerp(BG_A, BG_B, palette_mix))
 
     var font: Font = ThemeDB.fallback_font
     var font_size: int = maxi(18, roundi(126.0 * type_scale))
-    var tracking: float = 9.0 * type_scale
+    var tracking: float = (9.0 + _gesture_energy * 5.0) * type_scale
     var widths: Array[float] = []
     var total_width: float = 0.0
 
@@ -96,13 +151,17 @@ func _draw() -> void:
     var baseline: float = DESIGN_SIZE.y * 0.56
     var accent: Color = palette_lerp(AMBER, MAGENTA, palette_mix)
     var secondary: Color = palette_lerp(CYAN, AMBER, palette_mix)
+    var gesture_dir: Vector2 = Vector2.ZERO
+    if _gesture_velocity.length() > 0.001:
+        gesture_dir = _gesture_velocity.normalized()
 
     for index: int in range(TEXT_VALUE.length()):
         var glyph: String = TEXT_VALUE.substr(index, 1)
         var glyph_width: float = widths[index]
         var glyph_center: Vector2 = Vector2(cursor_x + glyph_width * 0.5, baseline - float(font_size) * 0.35)
-        var wave: float = sin(sketch_time * wave_speed * 2.0 + float(index) * 0.72) * wave_amount
-        var sideways: float = cos(sketch_time * wave_speed * 1.35 + float(index) * 0.51) * wave_amount * 0.28
+        var phase_shift: float = _gesture_energy * float(index) * 0.18
+        var wave: float = sin(sketch_time * wave_speed * 2.0 + float(index) * 0.72 + phase_shift) * wave_amount
+        var sideways: float = cos(sketch_time * wave_speed * 1.35 + float(index) * 0.51 - phase_shift) * wave_amount * 0.28
 
         var field_offset: Vector2 = Vector2.ZERO
         var to_glyph: Vector2 = glyph_center - focus
@@ -112,27 +171,32 @@ func _draw() -> void:
             var pressed_boost: float = 1.65 if pointer_down else 1.0
             var direction: Vector2 = to_glyph / distance
             var tangent: Vector2 = Vector2(-direction.y, direction.x)
+            var authored_drift: Vector2 = _gesture_velocity.limit_length(650.0) * 0.035 * field_amount * elasticity
             field_offset = (
                 direction * warp_strength * field_amount * pointer_force * pressed_boost
-                + tangent * warp_strength * 0.34 * field_amount * sin(sketch_time * 2.4 + float(index))
+                + tangent * warp_strength * (0.24 + _gesture_energy * 0.46) * field_amount * sin(sketch_time * 2.4 + float(index))
+                + authored_drift
             )
 
-        var elastic_wave: float = sin(sketch_time * 3.2 - float(index) * 0.9) * wave_amount * elasticity * 0.32
+        var elastic_wave: float = sin(sketch_time * 3.2 - float(index) * 0.9) * wave_amount * elasticity * (0.24 + _gesture_energy * 0.22)
         var position: Vector2 = Vector2(cursor_x + sideways, baseline + wave + elastic_wave) + field_offset
 
         if glyph != " ":
-            var split_direction: Vector2 = Vector2(
+            var orbit_dir: Vector2 = Vector2(
                 cos(sketch_time * 0.8 + float(index)),
                 sin(sketch_time * 0.9 + float(index) * 0.7)
             )
-            var split: Vector2 = split_direction * chroma_split
+            var split_direction: Vector2 = orbit_dir
+            if gesture_dir.length() > 0.0:
+                split_direction = orbit_dir.lerp(gesture_dir, _gesture_energy * 0.72).normalized()
+            var split: Vector2 = split_direction * chroma_split * (1.0 + _gesture_energy * 0.55)
 
             var cyan_color: Color = secondary
-            cyan_color.a = 0.18 + glow_amount * 0.22
+            cyan_color.a = 0.16 + glow_amount * 0.22
             draw_string(font, position - split, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, cyan_color)
 
             var magenta_color: Color = accent
-            magenta_color.a = 0.18 + glow_amount * 0.22
+            magenta_color.a = 0.16 + glow_amount * 0.22
             draw_string(font, position + split, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, magenta_color)
 
             for smear_index: int in range(4):
@@ -140,9 +204,9 @@ func _draw() -> void:
                 var smear_offset: Vector2 = Vector2(
                     -field_offset.x * smear_t * 0.22,
                     -wave * smear_t * 0.16
-                )
+                ) - _gesture_velocity.limit_length(500.0) * smear_t * 0.012 * elasticity
                 var smear_color: Color = accent
-                smear_color.a = glow_amount * (0.11 - smear_t * 0.018)
+                smear_color.a = glow_amount * (0.11 - smear_t * 0.018) * (1.0 + _gesture_energy * 0.55)
                 draw_string(font, position + smear_offset, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, smear_color)
 
             draw_string(font, position, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, INK)
@@ -157,10 +221,13 @@ func _draw_background_field(focus: Vector2) -> void:
     for ring_index: int in range(5):
         var radius: float = pointer_radius * (0.35 + float(ring_index) * 0.18)
         var ring_color: Color = accent
-        ring_color.a = 0.025 + glow_amount * 0.012
+        ring_color.a = 0.018 + glow_amount * 0.012 + _gesture_energy * 0.012
         draw_arc(focus, radius, 0.0, TAU, 96, ring_color, 1.0, true)
 
+    # Baseline-rhythm bands turn the background into a typographic constraint,
+    # not merely decoration. Gesture energy changes phase, never the margins.
     for line_index: int in range(7):
         var y: float = 142.0 + float(line_index) * 72.0
-        var line_color: Color = Color(0.8, 0.85, 0.95, 0.018 + float(line_index % 2) * 0.01)
-        draw_line(Vector2(56.0, y), Vector2(1224.0, y), line_color, 1.0, true)
+        var phase: float = sin(sketch_time * 0.7 + float(line_index) * 0.9) * _gesture_energy * 18.0
+        var line_color: Color = Color(0.8, 0.85, 0.95, 0.016 + float(line_index % 2) * 0.012 + _gesture_energy * 0.008)
+        draw_line(Vector2(56.0 + phase, y), Vector2(1224.0 - phase, y), line_color, 1.0, true)
