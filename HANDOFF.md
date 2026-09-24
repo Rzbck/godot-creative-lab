@@ -64,86 +64,35 @@ Text is valid when it is genuinely part of the artwork.
 - `009_chorus_drift` — **CHORUS DRIFT**.
 - `010_fault_register` — **FAULT REGISTER**.
 
-### Important correction for 006–010
+A later pass (`6c20a094...`) generalized glyph-contour deformation across 006–010. It was host-rejected because it looked worse, some glyphs rendered inverted/broken, and the five pieces converged technically/aesthetically. The rollback beginning at `3a437fe...` restores the earlier behavior while keeping unwanted presentation captions out of the canvas. Do not restore the contour-everywhere pass.
 
-A later pass (`6c20a094...`) attempted to make all five more autonomous and structural by applying glyph-contour deformation broadly.
+## Current creative direction — collision-first research
 
-That pass was **host-rejected** and must not be restored as the default direction.
+The current problem is not lack of effects; 001–010 reuse too many of the same underlying mechanisms: 2D typography, direct drawing, pointer/drag, local deformation, springs/oscillation and simple recovery.
 
-Failures observed by the user:
+The next exploration phase deliberately prioritizes **collision-first** research:
 
-- several glyph-contour renderings appeared inverted / visually wrong;
-- contours were used as the answer to nearly every piece;
-- the five works became technically/aesthetically more similar instead of more diverse;
-- one feedback point (`work more deeply with letter structure`) was over-applied and replaced the wider creative problem;
-- the result was worse than the previous host-tested version.
+`blind random technical draw -> coupled raw prototype -> observe -> interpret -> art-direct -> mutate`
 
-The rollback beginning at `3a437fe...` restores the earlier 006–010 behavior while keeping project title/number/presentation chrome out of the canvas through thin wrappers where needed.
-
-The shared glyph-contour helper may remain in the codebase as **one optional technique**. Do not infer that DC//LAB should use contours by default.
-
-## Creative research system
-
-Use all three roots:
-
-- `knowledge/creative-coding/`
-- `knowledge/design/`
-- `knowledge/cross-domain/`
-
-### Mandatory current read order for substantial creative work
+Mandatory creative research files:
 
 1. `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
-2. `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`
-3. `knowledge/cross-domain/IDEA_ENGINE.md`
-4. relevant technical/design atlases
-5. `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`
+2. `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
+3. `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
+4. relevant creative-coding/design atlases
+5. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` when turning a successful accident into an artwork.
 
-`LIVING_SYSTEMS.md` and `STRUCTURAL_TYPOGRAPHY.md` are specialist bricks, not universal requirements.
+Current blind research seeds A–E are recorded in `docs/handoff/CURRENT_WORK.md`. They deliberately spread across particles/instancing, reaction-diffusion/advection, Voronoi/topology, raster/mesh/ribbons and raymarched SDF/cellular systems.
+
+Do not assign polished titles/messages/DA before the raw mechanism shows interesting behavior. Random stacking without state coupling is technical soup and should be rejected.
 
 ## Technique-selection rule
 
-Do not choose the renderer/technique first.
+No technique is the default house style.
 
-Start from:
+Available families include direct/variable typography, raster/masks, SDF/MSDF, fragment shaders, temporal feedback, particles/agents, vector fields, physical constraints, cellular/reaction-diffusion, procedural geometry/meshes, graphs/topology, data/semantic systems and external/audio/touch drivers.
 
-1. artistic intention;
-2. carrier/material;
-3. desired behavior;
-4. interaction consequence;
-5. temporal model;
-6. composition/design system.
-
-Then compare at least **three plausible technical chains** before implementation.
-
-Available families include, among others:
-
-- direct/variable typography and layout systems;
-- whole-glyph and per-glyph transforms;
-- vector contours / sampled points;
-- raster masks and morphology;
-- SDF/MSDF;
-- fragment shaders / UV systems;
-- temporal feedback buffers;
-- particle and agent systems;
-- vector fields / advection;
-- physical constraints / springs;
-- cellular automata / reaction-diffusion / diffusion systems;
-- procedural geometry / meshes / instancing;
-- graph/grid/topology systems;
-- data/semantic state machines;
-- audio/multitouch/external drivers.
-
-The concept chooses the representation. The most recently added technique does not.
-
-### Diversity rule for a series
-
-When building several artworks:
-
-- no more than two should share the same primary representation;
-- no more than two should share the same primary temporal model;
-- interaction consequences should materially differ;
-- palette/text changes alone do not count as diversity;
-- if five works could be made by changing text/colors/cursor mapping in one renderer, the series has failed.
+Structural typography and glyph contours remain optional specialist tools only.
 
 ## PROGRAM / LIVE OUT architecture
 
@@ -173,6 +122,40 @@ After any host runtime test:
 
 If telemetry does not correspond to the tested HEAD/session, say so rather than inferring results.
 
+## Mandatory AI completion protocol
+
+The user should never need to remind the AI to update GitHub continuity, wait for CI or provide the test launcher.
+
+After every material repository change, before the final response, every AI must automatically:
+
+1. finish all intended commits on the active branch;
+2. update `docs/handoff/CURRENT_WORK.md` when durable state/NEXT/validation/rejections changed;
+3. update this `HANDOFF.md` when a future session would otherwise reconstruct stale state;
+4. update `docs/handoff/project_state.json` when machine-readable state/constraints/knowledge pointers changed;
+5. update `docs/handoff/NEXT_AI_PROMPT.md` when startup rules, creative method or immediate next task changed;
+6. update `docs/handoff/OPERATIONS.md` whenever the canonical test/sync/launch workflow changes;
+7. resolve the final remote branch HEAD after all documentation commits;
+8. wait for and inspect CI for that exact final SHA;
+9. report exact short HEAD + CI conclusion;
+10. when host validation is relevant, automatically include the canonical PowerShell from `OPERATIONS.md`, which syncs the branch, waits for CI success for the exact SHA, and only then launches Godot;
+11. after the user tests, inspect telemetry before requesting manual logs/screenshots that telemetry can answer.
+
+This completion protocol is mandatory repository hygiene, not optional cleanup.
+
+## CI / validation
+
+Workflow: `.github/workflows/ci.yml`
+
+Required gates for runtime/code changes:
+
+- repository policy;
+- Godot 4.7.1 setup/version;
+- headless import;
+- main-scene smoke test;
+- tracked-file cleanliness.
+
+Never use an older green CI run as validation for a newer HEAD.
+
 ## Rejected regressions
 
 Do not casually reintroduce:
@@ -187,36 +170,8 @@ Do not casually reintroduce:
 - project metadata burned into artwork;
 - glyph contours as the default creative solution.
 
-## CI / validation
+## Immediate next step
 
-Workflow: `.github/workflows/ci.yml`
+Build raw experimental prototypes from several collision seeds with minimal art direction. The purpose is to discover genuinely different mechanisms first. Only successful accidents receive an artistic-impact pass.
 
-Required gates for runtime/code changes:
-
-- repository policy;
-- Godot 4.7.1 setup/version;
-- headless import;
-- main-scene smoke test;
-- tracked-file cleanliness.
-
-Do not call runtime work complete until CI for the exact current HEAD is green.
-
-## Immediate creative next step
-
-Do **not** immediately generate another batch of five pieces.
-
-First perform a serious creative/technical gap analysis of sketches 001–010:
-
-- primary representation;
-- temporal model;
-- interaction consequence;
-- typography/design system;
-- shader/simulation/material mechanism;
-- autonomous behavior;
-- visual strengths/failures;
-- overrepresented technique families;
-- missing technique families.
-
-Then research the missing families and expand the knowledge library before the next major art direction.
-
-See `docs/handoff/CURRENT_WORK.md` for the newest concise state and `docs/handoff/NEXT_AI_PROMPT.md` for the fresh-session bootstrap.
+See `docs/handoff/CURRENT_WORK.md` for the newest detailed state, `docs/handoff/OPERATIONS.md` for the canonical CI-waiting PowerShell, and `docs/handoff/NEXT_AI_PROMPT.md` for fresh-session bootstrap.
