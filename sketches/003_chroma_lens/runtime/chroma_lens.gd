@@ -8,6 +8,11 @@ const BLUE: Color = Color(0.22, 0.36, 1.0, 1.0)
 const ACCENT: Color = Color(1.0, 0.68, 0.18, 1.0)
 const GLYPH_STREAM: String = "CHROMA//TYPE//SIGNAL//LENS//RGB//"
 
+# The typography lives inside one fixed, centred safe area. GRID DENSITY only
+# changes how many cells are fitted inside it; it never changes the outer margins.
+const TYPE_SAFE_RECT: Rect2 = Rect2(80.0, 96.0, 1120.0, 528.0)
+const TYPE_EDGE_GAP: float = 5.0
+
 @export_range(80.0, 360.0, 1.0) var lens_size: float = 210.0
 @export_range(0.0, 2.0, 0.01) var distortion: float = 0.72
 @export_range(0.0, 24.0, 0.1) var chroma_amount: float = 7.0
@@ -77,11 +82,18 @@ func _draw() -> void:
 
     var cols: int = grid_density
     var rows: int = maxi(4, roundi(float(grid_density) * 0.56))
-    var margin_x: float = 84.0
-    var margin_y: float = 122.0
-    var step_x: float = (DESIGN_SIZE.x - margin_x * 2.0) / float(maxi(1, cols - 1))
-    var step_y: float = (DESIGN_SIZE.y - margin_y * 2.0) / float(maxi(1, rows - 1))
-    var font_size: int = maxi(18, roundi(step_x * 0.48))
+
+    # Use cell centres instead of using the first/last glyph as the grid bounds.
+    # This keeps the complete composition centred for every density value.
+    var cell_width: float = TYPE_SAFE_RECT.size.x / float(cols)
+    var cell_height: float = TYPE_SAFE_RECT.size.y / float(rows)
+    var font_size: int = maxi(
+        18,
+        mini(
+            roundi(cell_width * 0.56),
+            roundi(cell_height * 0.58)
+        )
+    )
 
     var red_color: Color = palette_lerp(RED, ACCENT, palette_mix)
     var cyan_color: Color = palette_lerp(CYAN, BLUE, palette_mix)
@@ -90,9 +102,13 @@ func _draw() -> void:
     for row: int in range(rows):
         for col: int in range(cols):
             var phase: float = sketch_time * motion_speed + float(row) * 0.47 + float(col) * 0.31
-            var base_position: Vector2 = Vector2(
-                margin_x + float(col) * step_x + sin(phase * 1.7) * 5.0,
-                margin_y + float(row) * step_y + cos(phase * 1.25) * 5.0
+            var cell_center: Vector2 = Vector2(
+                TYPE_SAFE_RECT.position.x + (float(col) + 0.5) * cell_width,
+                TYPE_SAFE_RECT.position.y + (float(row) + 0.5) * cell_height
+            )
+            var base_position: Vector2 = cell_center + Vector2(
+                sin(phase * 1.7) * minf(5.0, cell_width * 0.07),
+                cos(phase * 1.25) * minf(5.0, cell_height * 0.07)
             )
 
             var glyph: String = GLYPH_STREAM.substr(glyph_index % GLYPH_STREAM.length(), 1)
@@ -109,7 +125,8 @@ func _draw() -> void:
                 var outside_alpha: float = 0.24 + contrast * 0.22
                 var outside_color: Color = BASE_INK
                 outside_color.a = outside_alpha
-                draw_string(font, base_position, glyph, HORIZONTAL_ALIGNMENT_CENTER, step_x * 0.75, font_size, outside_color)
+                var safe_base: Vector2 = _clamp_glyph_center(base_position, font, glyph, font_size, 0.0)
+                _draw_centered_glyph(font, safe_base, glyph, font_size, outside_color)
                 continue
 
             var lens_amount: float = 1.0 - normalized
@@ -126,18 +143,86 @@ func _draw() -> void:
             var pressed_boost: float = 1.35 if pointer_down else 1.0
             target += radial * distortion * 13.0 * smooth_amount * pressed_boost
 
+            # The lens may distort a glyph, but it may not break the typography
+            # safe area. Account for the RGB split as well as the glyph itself.
+            target = _clamp_glyph_center(
+                target,
+                font,
+                glyph,
+                font_size,
+                split.length()
+            )
+
             var shadow_red: Color = red_color
             shadow_red.a = 0.42 + 0.42 * smooth_amount
             var shadow_cyan: Color = cyan_color
             shadow_cyan.a = 0.42 + 0.42 * smooth_amount
             var core: Color = Color(0.98, 0.98, 0.96, 0.72 + 0.28 * smooth_amount)
 
-            draw_string(font, target - split, glyph, HORIZONTAL_ALIGNMENT_CENTER, step_x * 0.78, font_size, shadow_cyan)
-            draw_string(font, target + split, glyph, HORIZONTAL_ALIGNMENT_CENTER, step_x * 0.78, font_size, shadow_red)
-            draw_string(font, target, glyph, HORIZONTAL_ALIGNMENT_CENTER, step_x * 0.78, font_size, core)
+            _draw_centered_glyph(font, target - split, glyph, font_size, shadow_cyan)
+            _draw_centered_glyph(font, target + split, glyph, font_size, shadow_red)
+            _draw_centered_glyph(font, target, glyph, font_size, core)
 
     _draw_lens_overlay(lens_center, red_color, cyan_color)
     end_design_draw()
+
+
+func _draw_centered_glyph(
+    font: Font,
+    center: Vector2,
+    glyph: String,
+    font_size: int,
+    color: Color
+) -> void:
+    var glyph_size: Vector2 = font.get_string_size(
+        glyph,
+        HORIZONTAL_ALIGNMENT_LEFT,
+        -1.0,
+        font_size
+    )
+    var ascent: float = font.get_ascent(font_size)
+    var descent: float = font.get_descent(font_size)
+    var baseline: Vector2 = Vector2(
+        center.x - glyph_size.x * 0.5,
+        center.y + (ascent - descent) * 0.5
+    )
+    draw_string(
+        font,
+        baseline,
+        glyph,
+        HORIZONTAL_ALIGNMENT_LEFT,
+        -1.0,
+        font_size,
+        color
+    )
+
+
+func _clamp_glyph_center(
+    center: Vector2,
+    font: Font,
+    glyph: String,
+    font_size: int,
+    extra_radius: float
+) -> Vector2:
+    var glyph_size: Vector2 = font.get_string_size(
+        glyph,
+        HORIZONTAL_ALIGNMENT_LEFT,
+        -1.0,
+        font_size
+    )
+    var glyph_height: float = font.get_height(font_size)
+    var pad_x: float = glyph_size.x * 0.5 + extra_radius + TYPE_EDGE_GAP
+    var pad_y: float = glyph_height * 0.5 + extra_radius + TYPE_EDGE_GAP
+
+    var min_x: float = TYPE_SAFE_RECT.position.x + pad_x
+    var max_x: float = TYPE_SAFE_RECT.end.x - pad_x
+    var min_y: float = TYPE_SAFE_RECT.position.y + pad_y
+    var max_y: float = TYPE_SAFE_RECT.end.y - pad_y
+
+    return Vector2(
+        clampf(center.x, min_x, max_x),
+        clampf(center.y, min_y, max_y)
+    )
 
 
 func _draw_background_grid(lens_center: Vector2) -> void:
