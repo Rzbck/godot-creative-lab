@@ -16,15 +16,13 @@ Last material handoff refresh: **2026-09-24**.
 - Renderer validated on host: Vulkan / Forward+ / NVIDIA GeForce RTX 5080
 - Active branch: `feat/creative-sketches-002-004-20260924`
 - Draft PR: `#7`, base `feat/gallery-project-workflow-20260923`
-- Baseline immediately before this handoff refresh: `eef780c02ddc1535f1c252bf50ffbec7b1813ee0`
-- CI at that baseline: green (`Repository policy` + `Godot 4.7.1 headless`)
 - `main` must not be merged/changed without explicit user approval.
 
-Use GitHub to resolve the actual current HEAD because handoff/documentation commits occur after the baseline above.
+Use GitHub to resolve the actual current HEAD because handoff/documentation commits occur after any recorded implementation baseline.
 
 ## Product now implemented
 
-DC//LAB is no longer an architecture-only scaffold. It is a functioning custom Godot creative-coding workstation with:
+DC//LAB is a functioning custom Godot creative-coding workstation with:
 
 - custom dark compact workstation UI;
 - Gallery with dynamically discovered sketches;
@@ -47,21 +45,38 @@ DC//LAB is no longer an architecture-only scaffold. It is a functioning custom G
 
 ### 001 — SIGNAL FIELD
 
-Technical/test sketch: moving signal points, distance connections and pointer interaction. It established the basic sketch/parameter/live-sync contract. Do not treat it as the approved artistic direction for future work.
+Technical/test sketch: moving signal points, distance connections and pointer interaction. It established the basic sketch/parameter/live-sync contract. Keep it primarily as a contract/regression reference; do not force it into the artistic direction merely for visual consistency.
 
 ### 002 — LIQUID TYPE
 
-Interactive generative typography with elastic deformation / chromatic behavior. Accepted as a Gallery entry even though visual refinement can continue.
+Interactive generative typography with elastic deformation / chromatic behavior. The 2026-09-24 knowledge-driven refinement adds gesture-velocity memory: authored motion changes tracking, wave phase, tangential field response, smear and chromatic direction instead of acting only as a radial cursor deformation.
 
 ### 003 — CHROMA LENS
 
-Typographic field with chromatic interactive lens. The grid was corrected so `GRID DENSITY` preserves controlled centered margins and glyphs do not spill outside the intended composition.
+Typographic field with chromatic interactive lens. `GRID DENSITY` still preserves the controlled centered safe area. The current refinement adds stable per-cell hierarchy, four quantized graphic lens states and a seven-column/baseline background structure so the lens behaves like a realtime editorial system rather than an undifferentiated radial effect.
 
 ### 004 — GOMMAGE TYPE
 
-Interactive erase/rebuild typography with dust/trail behavior. Used heavily to validate tactile PROGRAM output.
+Interactive erase/rebuild typography with dust/trail behavior. The current refinement stores directional gesture velocity in each erosion mark: fast gestures create anisotropic erase regions, dust inherits gesture direction and residual mark traces encode authored motion while the work rebuilds.
 
-Do not invent 005 or another new sketch without user approval.
+### 005 — PRESSURE LATTICE
+
+New cross-domain Godot `canvas_item` shader approved by the user on 2026-09-24.
+
+Concept chain:
+
+`editorial modular grid -> procedural signal field -> gesture-injected vector pressure -> decaying temporal memory -> duotone identity`
+
+Implementation:
+
+- scene: `res://sketches/005_pressure_lattice/runtime/pressure_lattice.tscn`;
+- runtime: `pressure_lattice.gd` extends the shared design/live-sync base;
+- shader: `pressure_lattice.gdshader`;
+- four synchronized decaying gesture-memory marks are passed into the shader;
+- parameters expose grid columns, field strength, line density, memory decay, gesture energy, contrast, pulse and palette;
+- no debug/project title is burned into PROGRAM output.
+
+The first CI after adding 005 passed import/smoke and failed only because Godot generated the new `.gd.uid` and `.gdshader.uid`; those UID files were then explicitly tracked. Resolve the newest CI before calling the final implementation `REPO_VALIDATED`.
 
 ## PROGRAM / LIVE OUT architecture — validated direction
 
@@ -71,11 +86,11 @@ The workstation must stay open and usable while PROGRAM runs on a selected displ
 
 Expected workflow:
 
-1. Open project 004 in editor.
+1. Open a project in editor.
 2. Send it to `LIVE OUT` / PROGRAM on a selected display.
-3. Return to Gallery or Settings; 004 keeps running on PROGRAM.
-4. Open 002 in PREVIEW while 004 is still live.
-5. Press `TAKE LIVE`; 002 replaces 004 on PROGRAM.
+3. Return to Gallery or Settings; the live project keeps running on PROGRAM.
+4. Open another project in PREVIEW while the previous project is still live.
+5. Press `TAKE LIVE`; the PREVIEW project replaces PROGRAM.
 
 Navigation is not a transport stop command.
 
@@ -83,17 +98,19 @@ When editor and PROGRAM are linked to the same project, the editor simulation is
 
 The active runtime scene is `res://app/main/main_runtime.tscn`. Inspect its script and `extends` chain before changing output behavior. Current top-level runtime layers include Gallery organizer -> PROGRAM output -> Gallery persistence -> LIVE output, with lower window/telemetry layers beneath them.
 
-## Input / touch — HOST_VALIDATED
+## Input / touch — HOST_VALIDATED foundation
 
 A physical touchscreen can be selected as the PROGRAM display. Touch/drag/mouse events from the native PROGRAM window are mapped into the sketch logical coordinate space and forwarded to the correct live sketch.
 
 This must keep working even when the workstation is in Gallery or editing a different project while another project remains in PROGRAM.
 
+The shared foundation is host-validated. Any newly introduced sketch-specific interaction, including 005, still requires a host pass before its exact visual/tactile behavior is promoted to `HOST_VALIDATED`.
+
 ## Preview / PROGRAM synchronization
 
 A major past bug was having two independent generative simulations: editor preview and output looked different.
 
-Current rule: a linked PROGRAM renderer is a follower, not an independent second timeline. Runtime generative state (e.g. time/pointer state) is synchronized through the sketch live-sync contract. Resolution differences must not alter the composition logic; current design sketches use a stable logical design space.
+Current rule: a linked PROGRAM renderer is a follower, not an independent second timeline. Runtime generative state (e.g. time/pointer/custom memory state) is synchronized through the sketch live-sync contract. Resolution differences must not alter the composition logic; current design sketches use a stable logical design space.
 
 Do not reintroduce an independent second generator for a linked PROGRAM surface.
 
@@ -203,7 +220,7 @@ Use these to cross professional design principles (grid, hierarchy, margins, rhy
 
 `knowledge/cross-domain/`
 
-This layer exists to turn the two libraries above into a concept engine rather than a reference archive.
+This layer turns the two libraries above into a concept engine rather than a reference archive.
 
 Current files:
 
@@ -242,20 +259,19 @@ The user wants the AI to do the repo work directly and avoid generic explanation
 - commit directly on the active feature branch where appropriate;
 - do not merge `main` without explicit approval;
 - after code changes, verify CI;
-- when host testing is required, provide one compact PowerShell `& { ... }` block;
+- when host validation is required, give one compact PowerShell `& { ... }` block;
 - before asking for logs, inspect telemetry online.
 
 See `docs/handoff/OPERATIONS.md` for the exact tested PowerShell patterns.
 
 ## CURRENT WORK / NEXT
 
-The immediate product foundation is in a good usable state. Current development direction is:
-
-1. Keep Gallery / PROGRAM / persistence / touch / telemetry stable.
-2. Use all three knowledge layers when designing the next creative work: technical vocabulary + professional design discipline + cross-domain mutation.
-3. For the next approved shader/sketch, begin with a concept-generation pass from `knowledge/cross-domain/` before choosing the implementation.
-4. Continue improving visual quality of existing sketches only when requested.
-5. Longer-term live-performance direction: PROGRAM transport can evolve toward A/B/C decks, crossfade/mix, timeline/cues/compositing — but do not build that without an explicit user task.
-6. Spout and NDI remain future adapters and must not be faked.
+1. Resolve the final CI for the latest 002–005 creative pass.
+2. User host-tests Gallery previews plus PREVIEW/PROGRAM/touch for 002–005, especially the new 005 shader.
+3. After that test, inspect `telemetry/runtime` before asking for logs and fix any runtime-specific visual/input issue with evidence.
+4. Keep using all three knowledge layers for future creative work: technical vocabulary + professional design discipline + cross-domain mutation.
+5. Keep Gallery / PROGRAM / persistence / touch / telemetry stable.
+6. Longer-term live-performance direction may include A/B/C decks, crossfade/mix, timeline/cues/compositing — do not build that without an explicit user task.
+7. Spout and NDI remain future adapters and must not be faked.
 
 For a fresh AI session, use the prompt in `docs/handoff/NEXT_AI_PROMPT.md`.
