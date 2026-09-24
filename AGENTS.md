@@ -1,179 +1,136 @@
 # AGENTS.md — DataC0re Creative Lab
 
-This repository is a Godot-based creative-coding laboratory.
+This repository is a Godot 4.7.1 creative-coding workstation developed through human + AI sessions.
 
-Its goals are:
-- learn Godot progressively through real creative-coding experiments;
-- keep every experiment accessible from a central gallery;
-- isolate sketches so experiments cannot silently break each other;
-- provide reusable real-time outputs such as Window, Spout and NDI;
-- remain understandable and maintainable across human and AI sessions.
-
-This file contains permanent working rules.
-Current operational state belongs in HANDOFF.md.
+The repository itself is the continuity system. Do not reconstruct the project only from chat memory.
 
 ## Bootstrap for every substantial session
 
-Before modifying the project:
+Before modifying anything:
 
-1. Verify the real repository path.
-2. Verify active branch, HEAD and CLEAN/DIRTY state.
-3. Read AGENTS.md.
-4. Read HANDOFF.md.
-5. Read only the architecture, decision or active exec-plan documents relevant to the task.
-6. Inspect the actual scene/script/shader involved before proposing changes.
+1. Resolve the real remote branch HEAD and CI state from GitHub.
+2. Read this file.
+3. Read `HANDOFF.md`.
+4. Read `docs/handoff/CURRENT_WORK.md` and `docs/handoff/OPERATIONS.md`.
+5. Read `docs/ARCHITECTURE.md` for the implemented runtime model.
+6. Inspect the exact scene/script/shader involved before proposing changes.
+7. For creative/design work, consult the relevant material under `knowledge/` before inventing from model memory alone.
 
-Never reconstruct current project state only from an old chat.
+If documentation disagrees with current code or telemetry, investigate. Git HEAD + runtime evidence win.
 
 ## Evidence vocabulary
 
 Keep these states distinct:
 
-- HOST_VALIDATED: observed on the user's real machine/runtime.
-- REPO_VALIDATED: durable repository state verified in Git.
-- IMPLEMENTED_NOT_VALIDATED: implemented but not yet validated as required.
-- EXPERIMENTAL: prototype or hypothesis.
-- BLOCKER: prevents the next safe step.
-- NEXT: agreed next operation.
+- **HOST_VALIDATED** — observed on the user's real Windows/Godot runtime.
+- **REPO_VALIDATED** — committed state validated by CI/repository checks.
+- **IMPLEMENTED_NOT_VALIDATED** — code exists but required validation is missing.
+- **EXPERIMENTAL** — prototype/hypothesis, not a stable product behavior.
+- **BLOCKER** — prevents the next safe step.
+- **NEXT** — agreed next operation.
 
 Existing code is not automatically validated behavior.
 
 ## Git discipline
 
-main is the published baseline.
+- Repository: `Rzbck/godot-creative-lab`.
+- `main` is not to be merged/changed without explicit user approval.
+- Feature-branch commits/pushes through the GitHub connector are expected during normal work.
+- Keep the current stacked branch/PR structure unless there is a concrete reason to change it.
+- Never force-push as routine recovery.
+- Never use destructive reset/clean without explicit need.
+- Never overwrite unrelated concurrent work.
+- Never instruct the user to use blind `git add -A`.
+- Human validation decides promotion/merge to `main`.
 
-For non-trivial work:
-- use a dedicated branch;
-- if several tasks run concurrently: one task = one branch = one worktree;
-- verify path, branch, HEAD and status before writing;
-- never force-push as routine recovery;
-- never use destructive reset/clean without explicit need;
-- never overwrite unrelated concurrent work;
-- do not use blind git add -A;
-- do not push or merge without explicit user approval.
+## User workflow
 
-Human validation decides promotion to main.
+The user does not want to write code manually.
 
-## PowerShell
+Preferred loop:
 
-The user pastes commands directly into PowerShell 7.
+1. AI inspects GitHub/telemetry.
+2. AI edits the feature branch directly.
+3. AI waits for CI and verifies it.
+4. AI gives one compact PowerShell sync/run block only when a host test is required.
+5. User tests behavior.
+6. AI reads online telemetry before asking for copied logs.
 
-Interactive command blocks must therefore be complete copy/paste blocks wrapped as:
+PowerShell blocks supplied to the user must be complete copy/paste blocks wrapped in:
 
-    & {
-        ...
-    }
+```powershell
+& {
+    ...
+}
+```
 
-Avoid constructs split across separate pastes that can leave PowerShell at the >> continuation prompt.
-
-For substantial reusable automation, create a versioned .ps1 under scripts/ instead.
-
-## Godot architecture
-
-Each creative sketch must remain isolated.
-
-Target flow:
-
-Gallery
-  -> selected Sketch
-  -> central render target / SubViewport
-  -> Window
-  -> optional Spout
-  -> optional NDI
-
-Sketches must not directly depend on Spout or NDI.
-
-Outputs are adapters around the central render path.
-
-If an optional output extension is missing, the gallery and sketches must still work.
-
-Shared systems belong under shared/.
-Sketch-specific code and assets belong inside that sketch whenever practical.
-
-## Creative coding principles
-
-Prefer small experiments that teach one concept clearly.
-
-Do not hide Godot fundamentals behind excessive framework code.
-
-When introducing a Godot concept, explain:
-- what the node/resource/script is;
-- why it exists;
-- how data flows through it;
-- what is Godot-specific versus general creative-coding logic.
-
-## Output dependencies
-
-Spout and NDI are optional integrations.
-
-Before adding a native extension:
-- verify supported Godot version;
-- verify supported renderer/platform;
-- document upstream source and license;
-- pin the version used;
-- confirm a clean fallback when unavailable.
-
-Do not commit arbitrary downloaded binaries without documenting their origin and licensing.
-
-## Sources of truth
-
-- Git HEAD + active files = what exists.
-- Runtime result = what actually ran.
-- HANDOFF.md = compact current state.
-- docs/ARCHITECTURE.md = durable architecture.
-- docs/decisions/ = durable decisions.
-- docs/exec-plans/active/ = bounded ongoing work.
-- docs/SESSION_LOG.md = compact material session history.
-
-If these disagree, investigate instead of silently reconciling them.
-
-## Handoff maintenance
-
-Update HANDOFF.md after material changes:
-- meaningful validation;
-- rejection of an approach;
-- architectural decision;
-- new blocker;
-- release/promotion;
-- genuine change of NEXT.
-
-Do not store conversation transcripts.
-
-Keep durable decisions, evidence, commit references and next actions.
-
-## Godot project configuration
-
-`project.godot` is tracked and important, but the Godot editor may legitimately rewrite it.
-
-Before treating a dirty worktree as a blocker:
-
-1. run `scripts/preflight.ps1`;
-2. if only `project.godot` changed, inspect its exact diff;
-3. distinguish editor normalization from intentional Project Settings changes;
-4. never automatically restore, stage, or accept arbitrary `project.godot` changes.
-
-Prefer the Godot editor / Project Settings UI for ordinary engine configuration.
-
-Use `.gitattributes` as the repository source of truth for line-ending policy.
+The known workstation paths and canonical block are documented in `docs/handoff/OPERATIONS.md`.
 
 ## Automated validation
 
-Prefer repeatable repository scripts and CI over repeatedly asking the user to perform equivalent manual checks.
-
 Local standard check:
 
-    scripts/check.ps1
+`scripts/check.ps1`
 
 GitHub CI:
 
-    .github/workflows/ci.yml
+`.github/workflows/ci.yml`
 
-For PowerShell 7 automation that invokes native commands such as Git or Godot, enable:
+Expected CI gates:
 
-    $PSNativeCommandUseErrorActionPreference = $true
+- repository policy;
+- Godot 4.7.1 headless import;
+- main-scene runtime smoke test;
+- no tracked-file modifications caused by Godot import.
 
-A failing native process must not be silently treated as success.
+A runtime/code change is not finished until the relevant CI is green.
 
-Godot CI must remain pinned to the validated project engine version until an explicit engine upgrade is validated.
+## Telemetry-first debugging
 
-Do not add expensive build/export matrices before the project actually needs them.
+Before asking the user for logs, inspect the sanitized public telemetry branch:
+
+- branch: `telemetry/runtime`
+- rolling file: `latest.jsonl`
+- historical snapshots: `sessions/`
+
+Telemetry was built specifically to debug window state, layout, rendering, PROGRAM/LIVE OUT, touch input and resize behavior. It publishes asynchronously so Git/network work must not block the Godot UI.
+
+Do not claim a publisher PID means upload succeeded; verify the telemetry branch itself. Do not ask the user to copy information that is already present there.
+
+## Product behavior that must not regress
+
+- Workstation UI remains usable while PROGRAM/LIVE OUT runs on a selected display.
+- Gallery/Settings/project navigation must not automatically stop the current PROGRAM output.
+- Another preview can replace the current PROGRAM via `TAKE LIVE`.
+- Touch/mouse input on the physical output display controls the PROGRAM sketch.
+- While editor and PROGRAM are linked, preview and output must represent the same generative state.
+- Per-sketch parameters persist across app sessions.
+- Gallery cards show real rendered thumbnails; only the hovered preview animates.
+- Gallery organization/search/filtering is generated from `definition.json` tags/metadata.
+- Final PROGRAM output contains no debug labels or sketch-title chrome unless text is intentionally part of the artwork.
+- Selecting a fullscreen display must not move/destroy the workstation UI.
+
+## Sketch contract
+
+Creative works live under `sketches/<id>/` and are discovered from `definition.json`.
+
+The host owns Gallery/navigation/PROGRAM transport. Sketches own their creative rendering and parameter/state contract.
+
+For synchronized live rendering, sketches should expose the existing runtime synchronization methods used by the implemented sketches, rather than creating an unrelated second generative simulation.
+
+Do not fake Spout or NDI. They remain future adapters until actually implemented and validated.
+
+## Knowledge library
+
+External research memory is versioned in the repo:
+
+- `knowledge/creative-coding/` — shaders, simulation, generative systems, GPU techniques, references.
+- `knowledge/design/` — typography, graphic design, grids, hierarchy, color, poster/layout systems, realtime-design translation and review checklist.
+
+Use these sources as research starting points. Do not vendor/copy third-party code blindly; check license/provenance first.
+
+## Handoff maintenance
+
+After a material validated change, update `HANDOFF.md` and `docs/handoff/CURRENT_WORK.md` when the durable project state or NEXT changes.
+
+Do not store conversation transcripts. Store concise state, evidence, decisions, branch/PR references, known failures, validation results and next actions.
