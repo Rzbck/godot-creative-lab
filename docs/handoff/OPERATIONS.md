@@ -16,9 +16,19 @@ Draft PR: #7
 
 Always resolve current remote HEAD before editing or telling the user which SHA to expect.
 
-## Standard sync + run block
+## Canonical sync + wait for exact CI + run block
 
-Use this form after a repo change requiring host validation. Keep it compact and wrapped in a single PowerShell script block.
+After any repository change that needs or benefits from host validation, the AI should provide this workflow **automatically** in its final response. The user should not have to ask for it.
+
+The block:
+
+1. fetches/synchronizes the active branch;
+2. confirms local HEAD equals `origin/<branch>`;
+3. waits for the GitHub Actions workflow named `CI` for that **exact SHA**;
+4. aborts if CI fails/cancels/times out;
+5. only after CI is green, closes running Godot processes for this project and launches Godot.
+
+It prefers GitHub CLI (`gh`) when installed/authenticated. If `gh` is unavailable, it falls back to the public GitHub Actions REST API; `GITHUB_TOKEN` is used automatically when present but is not required for a public repository.
 
 ```powershell
 & {
@@ -27,7 +37,107 @@ Use this form after a repo change requiring host validation. Keep it compact and
 
     $Root     = "E:\_Project\GodotCreativeLab"
     $Branch   = "feat/creative-sketches-002-004-20260924"
+    $Repo     = "Rzbck/godot-creative-lab"
     $GodotExe = "C:\Godot\Godot_v4.7.1-stable_win64.exe"
+    $Timeout  = [TimeSpan]::FromMinutes(30)
+
+    Set-Location $Root
+
+    git fetch origin $Branch
+    git switch $Branch
+    git pull --ff-only origin $Branch
+
+    $Head       = (git rev-parse HEAD).Trim()
+    $RemoteHead = (git rev-parse "origin/$Branch").Trim()
+    if ($Head -ne $RemoteHead) {
+        throw "HEAD local ($Head) != origin/$Branch ($RemoteHead)"
+    }
+
+    Write-Host "`nHEAD :" ($Head.Substring(0, 8)) -ForegroundColor Green
+    Write-Host "CI   : attente du workflow CI pour ce SHA exact..." -ForegroundColor Cyan
+
+    $Deadline = (Get-Date) + $Timeout
+    $Gh = Get-Command gh -ErrorAction SilentlyContinue
+
+    if ($Gh) {
+        $Run = $null
+        while (-not $Run) {
+            if ((Get-Date) -gt $Deadline) {
+                throw "Timeout: aucun run CI trouvé pour $Head"
+            }
+
+            $Raw = & gh run list `
+                --repo $Repo `
+                --commit $Head `
+                --workflow ".github/workflows/ci.yml" `
+                --limit 10 `
+                --json databaseId,status,conclusion,headSha,url 2>$null
+
+            if ($LASTEXITCODE -ne 0) {
+                throw "gh run list a échoué. Vérifie l'authentification GitHub CLI."
+            }
+
+            if ($Raw) {
+                $Runs = @($Raw | ConvertFrom-Json)
+                $Run = $Runs |
+                    Where-Object { $_.headSha -eq $Head } |
+                    Sort-Object databaseId -Descending |
+                    Select-Object -First 1
+            }
+
+            if (-not $Run) {
+                Start-Sleep -Seconds 5
+            }
+        }
+
+        Write-Host "Run  :" $Run.url -ForegroundColor DarkGray
+        & gh run watch $Run.databaseId --repo $Repo --exit-status
+        if ($LASTEXITCODE -ne 0) {
+            throw "CI en échec pour $Head — Godot ne sera pas lancé."
+        }
+    }
+    else {
+        $Headers = @{
+            "Accept"     = "application/vnd.github+json"
+            "User-Agent" = "DC-LAB-CI-Waiter"
+        }
+        if ($env:GITHUB_TOKEN) {
+            $Headers["Authorization"] = "Bearer $($env:GITHUB_TOKEN)"
+        }
+
+        $Run = $null
+        while ($true) {
+            if ((Get-Date) -gt $Deadline) {
+                throw "Timeout CI pour $Head"
+            }
+
+            $Uri = "https://api.github.com/repos/$Repo/actions/runs?head_sha=$Head&per_page=20"
+            $Response = Invoke-RestMethod -Uri $Uri -Headers $Headers -Method Get
+            $Run = $Response.workflow_runs |
+                Where-Object { $_.name -eq "CI" -and $_.head_sha -eq $Head } |
+                Sort-Object id -Descending |
+                Select-Object -First 1
+
+            if (-not $Run) {
+                Write-Host "CI   : run pas encore créé..." -ForegroundColor DarkGray
+                Start-Sleep -Seconds 15
+                continue
+            }
+
+            Write-Host ("CI   : {0} / {1}" -f $Run.status, $Run.conclusion) -ForegroundColor Cyan
+
+            if ($Run.status -eq "completed") {
+                if ($Run.conclusion -ne "success") {
+                    throw "CI $($Run.conclusion) pour $Head — Godot ne sera pas lancé."
+                }
+                break
+            }
+
+            Start-Sleep -Seconds 15
+        }
+    }
+
+    Write-Host "CI   : GREEN" -ForegroundColor Green
 
     Get-CimInstance Win32_Process |
         Where-Object {
@@ -38,19 +148,13 @@ Use this form after a repo change requiring host validation. Keep it compact and
             Stop-Process -Id $_.ProcessId -Force
         }
 
-    Set-Location $Root
-
-    git fetch origin $Branch
-    git switch $Branch
-    git pull --ff-only origin $Branch
-
-    Write-Host "`nHEAD :" (git rev-parse --short HEAD) -ForegroundColor Green
-
     Start-Process `
         -FilePath $GodotExe `
         -ArgumentList "--path", $Root
 }
 ```
+
+Do not downgrade this back to a plain `git pull + Start-Process` block after a material repo change. Exact-head CI gating is part of the canonical host-test workflow.
 
 Do not ask the user to manually edit files or enter long sequences of Git commands when the GitHub connector can perform the repo work directly.
 
@@ -71,7 +175,21 @@ For runtime/code changes, wait for and inspect the CI jobs. Expected checks incl
 - main-scene smoke test
 - tracked-file cleanliness after import
 
+For documentation/knowledge changes, still resolve and verify CI for the final exact HEAD when a workflow run is produced. Never cite an older green run as proof for a newer commit.
+
 Do not claim success from parser confidence alone.
+
+## Mandatory end-of-task repository hygiene
+
+After any material change, before final response:
+
+1. update durable handoff/state docs affected by the change;
+2. resolve the final remote HEAD after those documentation commits;
+3. verify CI for that exact final HEAD;
+4. report the exact short HEAD + CI state;
+5. when a host test is relevant, include the canonical block above automatically.
+
+See `AGENTS.md` for the complete mandatory AI completion protocol.
 
 ## Telemetry workflow
 
@@ -173,4 +291,5 @@ The user values:
 - CI verification;
 - minimal manual steps;
 - telemetry-first diagnosis;
+- canonical CI-waiting PowerShell supplied automatically after material repo changes;
 - no generic filler.
