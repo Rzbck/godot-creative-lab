@@ -1,7 +1,5 @@
 # DataC0re Creative Lab
 
-A Godot-based real-time creative-coding laboratory.
+Godot 4.7.1 workspace for realtime creative-coding sketches, interactive visual systems, shaders and output adapters.
 
-The project is designed as a gallery of independent visual experiments with optional professional real-time outputs such as Spout and NDI.
-
-Current status: bootstrap.
+Current architecture work lives on feature branches until explicitly merged.
