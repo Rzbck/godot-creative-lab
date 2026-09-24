@@ -28,21 +28,52 @@ func _input(event: InputEvent) -> void:
     if live_sync_follower:
         return
 
+    var viewport_size: Vector2 = get_viewport_rect().size
+
+    if event is InputEventScreenTouch:
+        var touch: InputEventScreenTouch = event as InputEventScreenTouch
+        apply_external_pointer(touch.position, viewport_size, touch.pressed, true)
+        return
+
+    if event is InputEventScreenDrag:
+        var drag: InputEventScreenDrag = event as InputEventScreenDrag
+        apply_external_pointer(drag.position, viewport_size, true, true)
+        return
+
     if event is InputEventMouseMotion:
-        pointer_position = viewport_to_design((event as InputEventMouseMotion).position)
-        pointer_active = true
-        _on_pointer_changed()
-        queue_redraw()
+        var motion: InputEventMouseMotion = event as InputEventMouseMotion
+        apply_external_pointer(motion.position, viewport_size, pointer_down, true)
         return
 
     if event is InputEventMouseButton:
         var button: InputEventMouseButton = event as InputEventMouseButton
         if button.button_index == MOUSE_BUTTON_LEFT:
-            pointer_position = viewport_to_design(button.position)
-            pointer_active = true
-            pointer_down = button.pressed
-            _on_pointer_changed()
-            queue_redraw()
+            apply_external_pointer(button.position, viewport_size, button.pressed, true)
+
+
+# Public interaction contract used by the native LIVE OUT surface. The event is
+# expressed in that surface's local pixel coordinates, then mapped through the
+# same aspect-fit transform as the sketch rendering. This means a finger at the
+# centre of a 1920x1080 output and a mouse at the centre of a 440x246 preview
+# control the exact same logical point in the 1280x720 design space.
+func apply_external_pointer(
+    surface_position: Vector2,
+    surface_size: Vector2,
+    pressed: bool,
+    active: bool = true
+) -> void:
+    pointer_position = surface_to_design(surface_position, surface_size)
+    pointer_active = active
+    pointer_down = pressed
+    _on_pointer_changed()
+    queue_redraw()
+
+
+func surface_to_design(point: Vector2, surface_size: Vector2) -> Vector2:
+    var transform_data: Dictionary = get_design_transform_for_size(surface_size)
+    var scale_value: float = maxf(0.0001, float(transform_data["scale"]))
+    var origin: Vector2 = transform_data["origin"] as Vector2
+    return (point - origin) / scale_value
 
 
 func _update_source_simulation(_delta: float) -> void:
@@ -98,6 +129,7 @@ func _apply_custom_live_sync_state(_state: Dictionary) -> void:
 func get_live_sync_debug_state() -> Dictionary:
     var state: Dictionary = {
         "time": sketch_time,
+        "pointer_position": pointer_position,
         "pointer_active": pointer_active,
         "pointer_down": pointer_down,
         "follower": live_sync_follower,
@@ -112,10 +144,7 @@ func _get_custom_live_debug_state() -> Dictionary:
 
 
 func viewport_to_design(point: Vector2) -> Vector2:
-    var transform_data: Dictionary = get_design_transform()
-    var scale_value: float = maxf(0.0001, float(transform_data["scale"]))
-    var origin: Vector2 = transform_data["origin"] as Vector2
-    return (point - origin) / scale_value
+    return surface_to_design(point, get_viewport_rect().size)
 
 
 func design_to_viewport(point: Vector2) -> Vector2:
@@ -124,15 +153,18 @@ func design_to_viewport(point: Vector2) -> Vector2:
 
 
 func get_design_transform() -> Dictionary:
-    var viewport_size: Vector2 = get_viewport_rect().size
-    var safe_x: float = maxf(1.0, viewport_size.x)
-    var safe_y: float = maxf(1.0, viewport_size.y)
+    return get_design_transform_for_size(get_viewport_rect().size)
+
+
+func get_design_transform_for_size(surface_size: Vector2) -> Dictionary:
+    var safe_x: float = maxf(1.0, surface_size.x)
+    var safe_y: float = maxf(1.0, surface_size.y)
     var scale_value: float = minf(safe_x / DESIGN_SIZE.x, safe_y / DESIGN_SIZE.y)
     var fitted_size: Vector2 = DESIGN_SIZE * scale_value
     return {
         "scale": scale_value,
-        "origin": (viewport_size - fitted_size) * 0.5,
-        "viewport_size": viewport_size,
+        "origin": (surface_size - fitted_size) * 0.5,
+        "viewport_size": surface_size,
     }
 
 
