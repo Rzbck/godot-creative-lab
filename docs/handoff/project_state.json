@@ -26,45 +26,56 @@
     "gallery_hover_animation": true,
     "gallery_auto_groups_from_tags": true,
     "gallery_tag_filter": true,
-    "gallery_search": true
+    "gallery_search": true,
+    "logical_design_size": [1280, 720]
   },
   "sketches": [
     {"id": "001_signal_field", "role": "technical-foundation"},
-    {"id": "002_liquid_type", "role": "gallery-sketch", "current_refinement": "gesture-velocity-memory", "tags": ["TYPOGRAPHY", "ELASTIC", "INTERACTIVE"]},
-    {"id": "003_chroma_lens", "role": "gallery-sketch", "current_refinement": "quantized-editorial-grid-hierarchy", "tags": ["TYPOGRAPHY", "OPTICAL", "INTERACTIVE"]},
-    {"id": "004_gommage_type", "role": "gallery-sketch", "current_refinement": "directional-erosion-memory", "tags": ["TYPOGRAPHY", "EROSION", "INTERACTIVE"]},
+    {"id": "002_liquid_type", "role": "gallery-sketch", "tags": ["TYPOGRAPHY", "ELASTIC", "INTERACTIVE"]},
+    {"id": "003_chroma_lens", "role": "gallery-sketch", "tags": ["TYPOGRAPHY", "OPTICAL", "INTERACTIVE"]},
+    {"id": "004_gommage_type", "role": "gallery-sketch", "tags": ["TYPOGRAPHY", "EROSION", "INTERACTIVE"]},
     {"id": "005_pressure_lattice", "visible_title": "REGISTER TYPE", "role": "gallery-sketch", "rejected_previous_concept": "Pressure Lattice", "tags": ["TYPOGRAPHY", "PRINT", "INTERACTIVE"]},
-    {"id": "006_breath_score", "visible_title": "BREATH SCORE", "role": "gallery-sketch", "concept": "press_inhale_to_hold_tension_to_release_exhale", "tags": ["TYPOGRAPHY", "RHYTHM", "INTERACTIVE"]},
-    {"id": "007_redaction_field", "visible_title": "REDACTION FIELD", "role": "gallery-sketch", "concept": "editorial_visibility_as_bidirectional_gesture_and_memory", "tags": ["TYPOGRAPHY", "REDACTION", "INTERACTIVE"]},
-    {"id": "008_palimpsest", "visible_title": "PALIMPSEST", "role": "gallery-sketch", "concept": "gesture_speed_selects_archive_depth_then_present_rewrites_over_memory", "tags": ["TYPOGRAPHY", "MEMORY", "INTERACTIVE"]},
-    {"id": "009_chorus_drift", "visible_title": "CHORUS DRIFT", "role": "gallery-sketch", "concept": "individual_voice_isolated_displaced_then_reabsorbed_by_crowd", "tags": ["TYPOGRAPHY", "CHORUS", "INTERACTIVE"]},
-    {"id": "010_fault_register", "visible_title": "FAULT REGISTER", "role": "gallery-sketch", "concept": "strict_editorial_order_fractures_under_touch_and_retains_scar_memory", "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"]}
+    {"id": "006_breath_score", "visible_title": "BREATH SCORE", "role": "gallery-sketch", "current_refinement": "autonomous_contour_breathing_and_local_touch_pressure", "tags": ["TYPOGRAPHY", "RHYTHM", "INTERACTIVE"]},
+    {"id": "007_redaction_field", "visible_title": "REDACTION FIELD", "role": "gallery-sketch", "current_refinement": "autonomous_per_character_censorship_and_contour_collapse", "tags": ["TYPOGRAPHY", "REDACTION", "INTERACTIVE"]},
+    {"id": "008_palimpsest", "visible_title": "PALIMPSEST", "role": "gallery-sketch", "current_refinement": "autonomous_sediment_layers_and_contour_archive_excavation", "tags": ["TYPOGRAPHY", "MEMORY", "INTERACTIVE"]},
+    {"id": "009_chorus_drift", "visible_title": "CHORUS DRIFT", "role": "gallery-sketch", "current_refinement": "coupled_oscillator_crowd_with_emergent_contour_voices", "tags": ["TYPOGRAPHY", "CHORUS", "INTERACTIVE"]},
+    {"id": "010_fault_register", "visible_title": "FAULT REGISTER", "role": "gallery-sketch", "current_refinement": "autonomous_faults_and_per_contour_point_structural_fracture", "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"]}
   ],
+  "shared_creative_infrastructure": {
+    "glyph_contour_tools": "sketches/_shared/glyph_contour_tools.gd",
+    "structural_type_support": true,
+    "outline_source": "Godot TextServer.font_get_glyph_contours",
+    "design_base": "sketches/_shared/design_sketch_base.gd"
+  },
   "telemetry": {
     "remote_branch": "telemetry/runtime",
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "local_runtime_directory": "res://.telemetry_runtime/",
-    "publication": "asynchronous_queued_sanitized"
+    "publication": "asynchronous_queued_sanitized",
+    "last_observed_remote_runtime_head": "0e9a002988c2",
+    "last_observed_remote_runtime_head_is_stale_for_006_010_structural_pass": true
   },
   "knowledge": {
     "creative_coding": "knowledge/creative-coding/",
     "design": "knowledge/design/",
     "cross_domain": "knowledge/cross-domain/",
     "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md",
+    "structural_typography": "knowledge/design/STRUCTURAL_TYPOGRAPHY.md",
     "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
     "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
-    "creative_work_rule": "Define frozen-frame composition and identity invariants, build meaningful representation bridges, mutate the first coherent concept, design causal interaction/recovery, then choose the cheapest Godot representation that preserves the idea.",
-    "next_research_goal": "After host-testing 006-010, identify recurring studio-quality gaps in interaction dramaturgy, semantic/narrative systems, richer type systems, spatial choreography, material/simulation vocabulary and temporal state design, then expand knowledge before the next major art direction."
+    "living_systems": "knowledge/cross-domain/LIVING_SYSTEMS.md",
+    "creative_work_rule": "The full canvas is artwork-only; create a meaningful autonomous system before interaction; use representation depth appropriate to the artistic claim; interaction perturbs internal state; exposed parameters bias behavior rather than rescue weak visuals.",
+    "acceptance_tests": ["frozen_frame", "thirty_second_no_input", "one_gesture_then_hands_off", "structural_typography_if_claimed"]
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
     "required_for_runtime_code": ["repository_policy", "godot_4_7_1_headless_import", "main_scene_smoke_test", "tracked_file_cleanliness"],
-    "creative_006_010_implementation_commit": "6fc8e854dadcc6a67f74babbeefc45ddb92c0205",
-    "creative_006_010_ci_run": 36031022484,
-    "creative_006_010_ci_conclusion": "success",
-    "creative_006_010_host_state": "IMPLEMENTED_NOT_VALIDATED"
+    "structural_autonomous_006_010_commit": "6c20a0948a512809ad16014c7fef67e0ffaf4ae9",
+    "structural_autonomous_006_010_ci_run": 36032793642,
+    "structural_autonomous_006_010_ci_conclusion": "success",
+    "structural_autonomous_006_010_host_state": "IMPLEMENTED_NOT_VALIDATED"
   },
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
@@ -74,6 +85,10 @@
     "do_not_stop_program_on_navigation": true,
     "do_not_create_independent_linked_output_timeline": true,
     "do_not_restore_pressure_lattice_visual_concept": true,
-    "keep_gallery_taxonomy_small_and_semantic": true
+    "keep_gallery_taxonomy_small_and_semantic": true,
+    "no_sketch_metadata_inside_artwork_canvas": true,
+    "default_state_must_be_coherent_without_slider_tuning": true,
+    "prefer_autonomous_living_systems_over_click_to_effect_patterns": true,
+    "structural_typography_requires_structural_representation": true
   }
 }

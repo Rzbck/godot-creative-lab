@@ -10,14 +10,16 @@ A source is therefore not a look to imitate. It is raw material for a transforma
 
 1. `CROSS_DOMAIN_ATLAS.md` — maps reusable bridges between typography, graphic design, shaders, simulation, geometry, interaction and realtime systems.
 2. `IDEA_ENGINE.md` — method for multiplying, mutating and filtering combinations into original concepts.
-3. `SOURCE_CATALOG.md` — references selected specifically because they demonstrate movement between disciplines.
-4. `sources.json` — machine-readable index for later tooling, search or automated concept generation.
+3. `LIVING_SYSTEMS.md` — autonomy, coupling, internal state, multiple time scales, emergence and interaction-as-perturbation.
+4. `SOURCE_CATALOG.md` — references selected specifically because they demonstrate movement between disciplines.
+5. `sources.json` — machine-readable index for later tooling, search or automated concept generation.
 
 Use these together with:
 
 - `../creative-coding/CONCEPT_ATLAS.md`
 - `../creative-coding/SOURCE_CATALOG.md`
 - `../design/TYPOGRAPHY_ATLAS.md`
+- `../design/STRUCTURAL_TYPOGRAPHY.md`
 - `../design/GRAPHIC_DESIGN_ATLAS.md`
 - `../design/REALTIME_DESIGN_BRIDGE.md`
 - `../design/DESIGN_REVIEW_CHECKLIST.md`
@@ -38,6 +40,8 @@ The form in which the carrier becomes manipulable.
 
 Examples: raster mask, vector path, sampled points, signed distance field, scalar field, vector field, graph, particle cloud, texture buffer, mesh, parameter vector.
 
+Representation depth matters. A concept about internal glyph anatomy should not stop at a rigid glyph instance; move to contours, sampled points or SDF/MSDF when necessary.
+
 ### Operator
 
 A transformation applied to a representation.
@@ -50,11 +54,13 @@ The signal that changes the system.
 
 Examples: time, pointer position, touch velocity, multiple touches, audio envelope, glyph metrics, text content, simulation state, noise, camera, external data.
 
+A driver should not automatically be direct control. It may inject energy, change a boundary condition, alter coupling or seed an event.
+
 ### Temporal model
 
 How state behaves through time.
 
-Examples: stateless, oscillator, eased transition, spring, hysteresis, accumulation, decay, feedback, simulation, autonomous agent system.
+Examples: stateless, oscillator, eased transition, spring, hysteresis, accumulation, decay, feedback, simulation, autonomous agent system, fatigue/repair, regime change.
 
 ### Design constraint
 
@@ -76,27 +82,28 @@ For substantial new work, choose deliberately:
 1 carrier
 + 1 representation change
 + 2 operators from different domains
-+ 1 driver
-+ 1 temporal model
++ 1 autonomous process
++ 1 interaction perturbation
++ 1 temporal model with memory/coupling when appropriate
 + 1 professional design constraint
-+ 1 interaction rule when interaction is meaningful
 ```
 
-Then run the result through the mutation process in `IDEA_ENGINE.md`.
+Then run the result through the mutation process in `IDEA_ENGINE.md` and the living-system checks in `LIVING_SYSTEMS.md`.
 
 Example structure, not a prescribed visual:
 
 ```text
 glyph outlines
--> sampled point cloud
--> flow-field advection
--> density reconstructed as an SDF
--> touch velocity changes field curl
--> feedback adds temporal memory
--> composition remains locked to a modular editorial grid
+-> sampled contour population
+-> neighbour spring coupling
+-> counter area becomes local pressure
+-> autonomous pressure oscillation changes contours
+-> touch injects fatigue rather than directly setting position
+-> damaged regions repair with hysteresis
+-> composition remains governed by a fixed editorial hierarchy
 ```
 
-The value is in the chain of transformations, not any single effect.
+The value is in the chain of transformations and feedback relationships, not any single effect.
 
 ## Originality rule
 
@@ -107,10 +114,45 @@ Prefer combinations where:
 - multiple independent references contribute different principles;
 - at least one bridge crosses a genuinely different discipline;
 - the implementation changes representation, behavior or temporal logic rather than only color/style;
-- interaction changes the system's internal logic instead of merely moving a cursor effect;
+- the system has meaningful autonomous behavior before interaction;
+- interaction changes internal state rather than merely moving a cursor effect;
+- consequences can propagate, persist, repair or alter later behavior;
 - the final composition still has a deliberate graphic-design identity.
 
 If the description can be reduced to "make source X but with our colors", the research process has failed.
+
+## Artwork / interface boundary
+
+The logical PROGRAM canvas is the artwork.
+
+Do not burn project/interface metadata into it:
+
+- sketch title;
+- sketch number;
+- tags/category;
+- technical labels;
+- explanatory captions that belong to the editor/Gallery.
+
+Text is welcome when it is the actual artistic carrier.
+
+A visible frame or poster-within-a-canvas is not the default. Use it only when framing itself is part of the concept.
+
+## Living-system gate
+
+Before implementation, answer:
+
+```text
+What happens for 30 seconds with no input?
+What internal variables evolve?
+What is coupled to what?
+What is the fast time scale?
+What is the slow time scale?
+What does a gesture perturb?
+What remains after release?
+What can repair, fatigue, migrate, synchronize or change regime?
+```
+
+If those answers are mostly empty, the idea is probably still an interactive effect rather than a mature realtime system.
 
 ## Implementation boundary
 

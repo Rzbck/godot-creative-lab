@@ -9,7 +9,7 @@ You are taking over the ongoing project **DC//LAB / Godot Creative Lab**.
 Repository:
 `Rzbck/godot-creative-lab`
 
-Do **not** rely on previous-chat memory. Reconstruct the current state from the repository and GitHub evidence.
+Do **not** rely on previous-chat memory. Reconstruct current state from repository/GitHub evidence.
 
 ## Mandatory startup procedure
 
@@ -27,71 +27,97 @@ Do **not** rely on previous-chat memory. Reconstruct the current state from the 
    - `knowledge/creative-coding/`
    - `knowledge/design/`
    - `knowledge/cross-domain/`
-6. For substantial artwork/shader work, specifically use `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`, `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md` and `knowledge/cross-domain/IDEA_ENGINE.md`. Define frozen-frame composition, invariants, interaction causality and recovery before implementation.
-7. Resolve current CI before assuming the branch is healthy.
-8. If the user's message follows a runtime test, read `telemetry/runtime` (`latest.jsonl` and relevant session snapshots) before asking for copied logs.
+6. For substantial realtime artwork specifically read/use:
+   - `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`
+   - `knowledge/design/STRUCTURAL_TYPOGRAPHY.md` when type anatomy/letter deformation matters
+   - `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`
+   - `knowledge/cross-domain/IDEA_ENGINE.md`
+   - `knowledge/cross-domain/LIVING_SYSTEMS.md`
+7. Resolve current CI before assuming branch health.
+8. If the user's message follows a runtime test, inspect `telemetry/runtime` before requesting copied logs. Verify telemetry runtime Git head matches the tested branch version; stale telemetry is not evidence for a newer test.
 
 ## Operating rules
 
 - Work directly through GitHub on the active feature branch.
-- The user should not have to write code manually.
-- Do not merge or modify `main` without explicit user approval.
+- User should not have to write code manually.
+- Never merge or modify `main` without explicit user approval.
 - Do not force-push/reset as routine recovery.
-- Do not use blind `git add -A` instructions.
-- After runtime/code changes, verify repository policy + Godot 4.7.1 headless import + smoke test + tracked-file cleanliness.
-- For host validation, give one concise copy/paste PowerShell block wrapped in `& { ... }` using `docs/handoff/OPERATIONS.md`.
-- Respond in concise French and answer intent rather than correcting the user's fast/phonetic spelling.
+- After runtime/code changes verify repository policy + Godot 4.7.1 import + smoke test + tracked-file cleanliness for exact HEAD.
+- For host validation give one concise copy/paste PowerShell `& { ... }` block using `docs/handoff/OPERATIONS.md`.
+- Respond in concise French; answer intent rather than correcting spelling.
 - Prefer concrete implementation/progress over generic explanation.
 
 ## Product behaviors that must not regress
 
-- Workstation remains usable while PROGRAM/LIVE OUT runs on the selected physical display.
+- Workstation remains usable while PROGRAM/LIVE OUT runs on selected physical display.
 - Navigation does not stop PROGRAM.
 - Another PREVIEW replaces PROGRAM only via `TAKE LIVE`.
 - PROGRAM touch/mouse controls the live sketch.
-- Linked PREVIEW and PROGRAM share one generative state/timeline.
+- Linked PREVIEW/PROGRAM share one generative state/timeline.
 - Per-sketch parameters persist.
 - Gallery uses real rendered thumbnails and hover-only animation.
 - Gallery groups/search/tag filters come from `definition.json`.
-- No debug/title chrome is burned into PROGRAM unless text is intentionally the artwork.
 - Telemetry publication remains asynchronous.
+
+## Artwork rules that must not regress
+
+- **The full PROGRAM canvas is the artwork.** Sketch title, index/number, tags, debug/project metadata and fake curatorial captions belong in Gallery/editor UI, not inside final artwork.
+- Do not draw an inset poster/card frame by default; framing must be conceptually necessary.
+- A realtime work should normally have meaningful autonomous behavior before user input.
+- Avoid the default `click -> effect on / release -> effect off` pattern. Interaction should perturb internal state and allow propagation, memory, repair, coupling or regime change when appropriate.
+- If the concept claims internal typographic deformation, use a representation deep enough to reach glyph anatomy (vector contours, sampled points, SDF/MSDF, etc.), not merely whole-glyph position/scale.
+- Default values must already produce a coherent piece. Sliders should bias system behavior rather than rescue weak visuals.
+
+## Shared structural typography support
+
+The repo now contains:
+
+- `sketches/_shared/glyph_contour_tools.gd`
+- contour helpers in `sketches/_shared/design_sketch_base.gd`
+
+These use Godot `TextServer.font_get_glyph_contours()` to access/sample real font outlines for structural deformation experiments.
 
 ## Current content / direction
 
-Existing sketches:
-- 001 Signal Field — technical foundation/regression patch.
-- 002 Liquid Type — gesture-memory refinement.
-- 003 Chroma Lens — safe margins + editorial/quantized optical hierarchy.
-- 004 Gommage Type — directional erosion/dust memory and reconstruction.
-- 005 internal id/path `005_pressure_lattice`, but visible artwork is now **REGISTER TYPE**.
+Existing sketches now run 001–010.
 
-Important 005 history: the original **PRESSURE LATTICE** visual concept was rejected by the user as weak. Do not restore it.
+- 001 Signal Field — technical/regression patch.
+- 002 Liquid Type.
+- 003 Chroma Lens.
+- 004 Gommage Type.
+- 005 internal id/path `005_pressure_lattice`, visible **REGISTER TYPE**. Original Pressure Lattice concept was rejected; do not restore it.
+- 006 **BREATH SCORE** — autonomous contour breathing + local touch pressure.
+- 007 **REDACTION FIELD** — autonomous per-character censorship; glyph contours collapse into censorship material; local touch editing + memory.
+- 008 **PALIMPSEST** — autonomous sediment/archive strata; gesture-depth excavation and contour-layer memory.
+- 009 **CHORUS DRIFT** — coupled oscillator population; autonomous voice emergence; interaction perturbs one row/neighbours; contour-level voice deformation.
+- 010 **FAULT REGISTER** — autonomous small faults + user scars; per-contour-point fault-plane fracture inside glyphs.
 
-REGISTER TYPE is a designed typographic print system:
+The current creative direction is explicitly trying to escape shallow “interactive poster + slider” work and move toward studio-grade living systems, structural typography, meaningful temporal depth and richer interaction dramaturgy.
 
-`editorial hierarchy -> typographic metrics -> local compression -> print misregistration -> damped recovery`
+## Host-test method for the structural/autonomous pass
 
-It uses a stable `FORM / PRESS / TRACE` poster, explicit safe area, six-column structure, limited print palette, row-local interaction, gesture direction/velocity, spring recovery and a supporting canvas shader for grain/grid/halftone registration.
+Do not begin by adjusting sliders.
 
-Gallery taxonomy for artistic sketches is intentionally small and semantic: `TYPOGRAPHY`, one meaningful family tag (`ELASTIC`, `OPTICAL`, `EROSION`, `PRINT`) and `INTERACTIVE`. Do not reintroduce noisy tags such as `TYPE`, `RGB`, `SHADER`, `LIVE` merely because they describe implementation details.
+For 006–010:
 
-Do not invent 006 unless the user asks for another work.
-
-For future creative work, extract principles from multiple sources, use genuine representation bridges, mutate the first coherent combination and keep professional design constraints. More effects are not automatically better.
-
-Immediate task after a host test: inspect telemetry first, then use the user's visual/tactile feedback to refine REGISTER TYPE or the other sketches.
-
-Longer-term A/B/C decks, crossfade/mixing, timeline/cues, compositing, Spout and NDI remain future explicit tasks.
+1. watch each untouched for ~30 seconds;
+2. verify no title/index/project metadata is rendered into artwork;
+3. judge autonomous behavior vs decorative looping;
+4. make one slow gesture, stop touching, observe persistence/propagation/repair;
+5. make one fast/long gesture and compare consequences;
+6. inspect whether letter structures deform internally where intended;
+7. test selected pieces in PROGRAM/touch;
+8. then inspect fresh matching-head telemetry + visual feedback.
 
 ## First response behavior
 
-After scanning the repository, briefly state:
-- current branch + short HEAD;
+After repository scan, briefly state:
+- branch + short HEAD;
 - PR/CI state;
 - implemented product capabilities;
 - stale/conflicting docs if any;
-- exact next task understood from the user's request.
+- exact task understood.
 
-Then work on the request. Do not ask the user to re-explain documented history.
+Then work. Do not ask the user to re-explain documented history.
 
 ---
