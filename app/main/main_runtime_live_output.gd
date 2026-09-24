@@ -2,19 +2,16 @@ extends "res://app/main/main_runtime_atomic_exit.gd"
 
 # Persistent live-output workstation layer.
 #
-# Presentation is now a real second render surface rather than a temporary
-# fullscreen state of the workstation window. The control UI never moves,
-# resizes, hides or changes native mode. A second native borderless Window owns
-# its own sketch instance, so Windows/Godot does not have to sample the preview
-# SubViewport across native windows (the path that previously produced a gray
-# output on this GPU).
+# The workstation preview and the physical output are two render surfaces, but
+# they must NEVER be two independent generative simulations. The preview is the
+# authoritative simulation. A live-output clone mirrors parameters plus the
+# sketch's explicit runtime synchronization state every frame.
 #
-# While LIVE OUT is active the normal preview stays interactive but is rendered
-# at half linear resolution and 15 Hz. Parameter changes are mirrored to the
-# output renderer immediately. This keeps the control surface useful while the
-# full-resolution output continues at the normal application frame rate.
+# This keeps the control UI open, gives the output its own native render surface
+# (avoiding the cross-window gray texture path), and still guarantees that both
+# surfaces show the same generative composition.
 
-const LIVE_OUTPUT_REVISION: int = 12
+const LIVE_OUTPUT_REVISION: int = 13
 const LIVE_PREVIEW_FPS: float = 15.0
 const LIVE_PREVIEW_SHRINK: int = 2
 const LIVE_OUTPUT_OVERSCAN: Vector2i = Vector2i(2, 2)
@@ -23,11 +20,14 @@ var _live_output_active: bool = false
 var _live_output_sketch: Node = null
 var _live_output_screen: int = -1
 var _live_preview_accumulator: float = 0.0
+var _live_state_sync_supported: bool = false
+var _live_state_sync_count: int = 0
 
 
 func _ready() -> void:
     super._ready()
-    fullscreen_button.tooltip_text = "Start / stop LIVE OUT. The workstation stays open for parameters and preview."
+    fullscreen_button.text = "LIVE OUT"
+    fullscreen_button.tooltip_text = "Start / stop LIVE OUT. Workstation, parameters and preview stay available."
 
 
 func _process(delta: float) -> void:
@@ -35,6 +35,11 @@ func _process(delta: float) -> void:
 
     if not _live_output_active:
         return
+
+    # State synchronization is independent from preview rendering frequency.
+    # The preview may redraw at 15 Hz to save GPU while its simulation state is
+    # still the single source of truth mirrored to the full-rate output.
+    _sync_live_output_runtime_state()
 
     _live_preview_accumulator += delta
     var preview_interval: float = 1.0 / LIVE_PREVIEW_FPS
@@ -54,8 +59,7 @@ func _process(delta: float) -> void:
 
 func _ensure_realtime_viewport_updates() -> void:
     if _live_output_active:
-        # The output renderer is native and realtime. The workstation preview is
-        # deliberately budgeted; UPDATE_ONCE is armed by _process at 15 Hz.
+        # Output is native and realtime. Preview redraw is budgeted separately.
         if sketch_viewport.render_target_update_mode == SubViewport.UPDATE_ALWAYS:
             sketch_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
         return
@@ -64,9 +68,8 @@ func _ensure_realtime_viewport_updates() -> void:
 
 
 func _enter_render_fullscreen() -> void:
-    # The old button/F11 name is retained for compatibility, but the behavior is
-    # now a persistent LIVE OUT toggle. There is no fullscreen transition of the
-    # workstation itself.
+    # F11 / LIVE OUT is a persistent presentation toggle. The workstation never
+    # enters fullscreen and remains usable throughout the show.
     if _live_output_active:
         _stop_live_output("toggle")
         return
@@ -91,11 +94,21 @@ func _enter_render_fullscreen() -> void:
     _destroy_live_output_sketch()
     _live_output_sketch = (scene_resource as PackedScene).instantiate()
     _presentation_output.add_child(_live_output_sketch)
+
+    # If a sketch implements the live-sync contract, the output instance becomes
+    # a passive renderer. It does not advance a second clock or react to its own
+    # input. The workstation instance remains the only simulation authority.
+    if _live_output_sketch.has_method("set_live_sync_follower"):
+        _live_output_sketch.call("set_live_sync_follower", true)
+
     _sync_all_live_output_parameters()
+    _live_state_sync_supported = _has_live_state_sync_contract()
+    _live_state_sync_count = 0
+    _sync_live_output_runtime_state(true)
 
     if is_instance_valid(_presentation_output_texture):
-        # Important: do not sample the root preview SubViewport in a native
-        # secondary window. The output sketch renders locally in this Window.
+        # Never sample the workstation SubViewport texture in a second native
+        # Window on this GPU. The output sketch draws locally in its own Window.
         _presentation_output_texture.visible = false
         _presentation_output_texture.texture = null
     if is_instance_valid(_presentation_output_background):
@@ -125,13 +138,11 @@ func _enter_render_fullscreen() -> void:
 
     _presentation_output.show()
 
-    # A second display should never steal the control surface. Re-focus the
-    # workstation immediately; the output stays visible because it is native and
-    # always-on-top on its own monitor.
+    # Never steal control from the workstation when output is on another screen.
     get_window().grab_focus()
 
     page_tag.text = "[LIVE OUT]"
-    status_label.text = "LIVE OUT / SCREEN %d / PREVIEW %d FPS / F11 OR ESC=STOP" % [
+    status_label.text = "LIVE OUT / SCREEN %d / SYNCED / PREVIEW %d FPS / F11 OR ESC=STOP" % [
         _live_output_screen + 1,
         int(LIVE_PREVIEW_FPS),
     ]
@@ -148,6 +159,10 @@ func _enter_render_fullscreen() -> void:
         "preview_fps": LIVE_PREVIEW_FPS,
         "preview_shrink": LIVE_PREVIEW_SHRINK,
         "separate_renderer": true,
+        "single_simulation_authority": true,
+        "state_sync_supported": _live_state_sync_supported,
+        "source_sync_state": _live_sync_debug_state(_active_sketch),
+        "output_sync_state": _live_sync_debug_state(_live_output_sketch),
         "root_mode": DisplayServer.window_get_mode(),
         "root_position": _vec2i_array(DisplayServer.window_get_position()),
         "root_size": _vec2i_array(DisplayServer.window_get_size()),
@@ -170,9 +185,8 @@ func _stop_live_output(reason: String) -> void:
 
     _presentation_transition = true
 
-    # The visual handoff is intentionally one operation: hide the independent
-    # output Window. The workstation has remained untouched and is already fully
-    # laid out, so there is nothing to restore or animate.
+    # One operation only: hide the independent output. The workstation has never
+    # moved or changed mode, so there is nothing to restore visually.
     if is_instance_valid(_presentation_output):
         _presentation_output.hide()
 
@@ -182,6 +196,7 @@ func _stop_live_output(reason: String) -> void:
     sketch_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
     _destroy_live_output_sketch()
+    _live_state_sync_supported = false
 
     if is_instance_valid(_presentation_output_texture):
         _presentation_output_texture.texture = sketch_viewport.get_texture()
@@ -200,6 +215,7 @@ func _stop_live_output(reason: String) -> void:
         "live_output_revision": LIVE_OUTPUT_REVISION,
         "reason": reason,
         "screen": _live_output_screen,
+        "state_sync_count": _live_state_sync_count,
         "preview_update_mode": int(sketch_viewport.render_target_update_mode),
         "root_mode": DisplayServer.window_get_mode(),
         "root_position": _vec2i_array(DisplayServer.window_get_position()),
@@ -218,6 +234,58 @@ func _destroy_live_output_sketch() -> void:
         parent.remove_child(_live_output_sketch)
     _live_output_sketch.queue_free()
     _live_output_sketch = null
+
+
+func _has_live_state_sync_contract() -> bool:
+    return is_instance_valid(_active_sketch) \
+        and is_instance_valid(_live_output_sketch) \
+        and _active_sketch.has_method("get_live_sync_state") \
+        and _live_output_sketch.has_method("apply_live_sync_state")
+
+
+func _sync_live_output_runtime_state(force: bool = false) -> void:
+    if not is_instance_valid(_active_sketch) or not is_instance_valid(_live_output_sketch):
+        return
+
+    _live_state_sync_supported = _has_live_state_sync_contract()
+    if not _live_state_sync_supported:
+        if force:
+            push_warning(
+                "Sketch %s has no live synchronization contract; output cannot be guaranteed identical to preview."
+                % str(_active_definition.get("id", "unknown"))
+            )
+        return
+
+    var state_variant: Variant = _active_sketch.call("get_live_sync_state")
+    if not state_variant is Dictionary:
+        if force:
+            push_warning("Live synchronization state must be a Dictionary.")
+        return
+
+    _live_output_sketch.call("apply_live_sync_state", state_variant as Dictionary)
+    _live_state_sync_count += 1
+
+
+func _live_sync_debug_state(sketch: Node) -> Dictionary:
+    if not is_instance_valid(sketch):
+        return {"valid": false}
+    if not sketch.has_method("get_live_sync_debug_state"):
+        return {
+            "valid": true,
+            "debug_contract": false,
+        }
+
+    var state_variant: Variant = sketch.call("get_live_sync_debug_state")
+    if state_variant is Dictionary:
+        var state: Dictionary = (state_variant as Dictionary).duplicate(true)
+        state["valid"] = true
+        state["debug_contract"] = true
+        return state
+
+    return {
+        "valid": true,
+        "debug_contract": false,
+    }
 
 
 func _sync_all_live_output_parameters() -> void:
@@ -252,6 +320,7 @@ func _sync_live_output_parameter(parameter_id: String) -> void:
 
     var value: Variant = _active_sketch.call("get_parameter_value", parameter_id)
     _live_output_sketch.call("set_parameter_value", parameter_id, value)
+    _sync_live_output_runtime_state()
 
 
 func _on_numeric_parameter_changed(
@@ -270,9 +339,8 @@ func _on_bool_parameter_changed(enabled: bool, parameter_id: String) -> void:
 
 
 func _on_presentation_output_input_forwarded(_event: InputEvent) -> void:
-    # The output sketch is a direct child of the native output Window, so Godot
-    # already dispatches that Window's input to it. Do not mirror output input
-    # back into the workstation preview.
+    # Output is a follower. User interaction stays on the workstation preview and
+    # is mirrored through the same runtime-state contract.
     pass
 
 
@@ -285,9 +353,8 @@ func _input(event: InputEvent) -> void:
                 get_viewport().set_input_as_handled()
                 return
 
-    # LIVE OUT deliberately leaves _fullscreen_active false, so the inherited
-    # workstation input path keeps parameter controls, custom resize and normal
-    # UI interaction alive while the output is running.
+    # LIVE OUT leaves _fullscreen_active false, so the inherited workstation
+    # input path keeps sliders, resize and normal UI interaction available.
     super._input(event)
 
 
@@ -303,4 +370,6 @@ func _telemetry_event(event_name: String, data: Dictionary = {}) -> void:
     enriched["live_output_active"] = _live_output_active
     enriched["live_output_screen"] = _live_output_screen
     enriched["live_output_renderer_valid"] = is_instance_valid(_live_output_sketch)
+    enriched["live_state_sync_supported"] = _live_state_sync_supported
+    enriched["live_state_sync_count"] = _live_state_sync_count
     super._telemetry_event(event_name, enriched)
