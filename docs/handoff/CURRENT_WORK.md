@@ -38,10 +38,13 @@ No 005 has been approved. Do not invent one.
 
 Use these before proposing substantial new creative directions:
 
-- `knowledge/creative-coding/`
-- `knowledge/design/`
+- `knowledge/creative-coding/` — technical vocabulary: shaders, simulation, fields, feedback, particles, GPU/generative methods.
+- `knowledge/design/` — typography, graphic design, hierarchy, grids, color, composition, realtime-design translation and review criteria.
+- `knowledge/cross-domain/` — translation atlas + idea engine for converting material between domains and deliberately mutating combinations into original visual identities.
 
-The design library includes typography, graphic design, realtime-design translation and review criteria. The purpose is to combine professional design principles with realtime GPU/generative techniques rather than produce generic effect demos.
+For a new creative direction, do not merely pick one shader technique and one visual reference. Identify carriers/representations/operators, build at least one genuine cross-domain bridge, then use `CROSS_DOMAIN_ATLAS.md` and `IDEA_ENGINE.md` to mutate the first coherent combination before implementation.
+
+The goal is professional generative systems with their own identity rather than generic effect demos or source imitation.
 
 ## Longer-term direction — not an automatic task
 
@@ -77,8 +80,9 @@ At the start of a new task:
 1. Resolve branch HEAD and CI.
 2. Read online telemetry if the task follows a host test.
 3. Read the exact involved runtime layer/sketch.
-4. Check `knowledge/` if the task is creative/design research.
-5. Implement on the feature branch.
-6. Verify CI.
-7. Give the user the standard PowerShell sync/run block only if a host test is needed.
-8. Update `HANDOFF.md` / this file only when durable state or NEXT actually changes.
+4. Check `knowledge/creative-coding/`, `knowledge/design/` and `knowledge/cross-domain/` if the task is creative/design research.
+5. For a new artwork, generate and mutate a concept before implementation rather than copying a single reference/effect.
+6. Implement on the feature branch.
+7. Verify CI.
+8. Give the user the standard PowerShell sync/run block only if a host test is needed.
+9. Update `HANDOFF.md` / this file only when durable state or NEXT actually changes.
