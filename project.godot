@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="DataC0re Creative Lab"
-run/main_scene="res://app/main/main.tscn"
+run/main_scene="res://app/main/main_runtime.tscn"
 config/features=PackedStringArray("4.7")
 
 [display]
