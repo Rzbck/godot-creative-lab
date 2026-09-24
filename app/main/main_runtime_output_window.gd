@@ -25,13 +25,13 @@ func _ensure_presentation_output() -> void:
     var output: Window = Window.new()
     output.name = "PresentationOutput"
     output.set_script(PresentationOutputWindowScript)
+    output.visible = false
     output.force_native = true
     output.borderless = true
     output.unresizable = true
     output.always_on_top = true
     output.transient = false
     output.exclusive = false
-    output.visible = false
     output.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
     output.content_scale_factor = 1.0
     output.size = Vector2i(1280, 720)
