@@ -27,7 +27,8 @@
     "gallery_auto_groups_from_tags": true,
     "gallery_tag_filter": true,
     "gallery_search": true,
-    "logical_design_size": [1280, 720]
+    "logical_design_size": [1280, 720],
+    "artwork_canvas_excludes_project_metadata": true
   },
   "sketches": [
     {"id": "001_signal_field", "role": "technical-foundation"},
@@ -35,16 +36,23 @@
     {"id": "003_chroma_lens", "role": "gallery-sketch", "tags": ["TYPOGRAPHY", "OPTICAL", "INTERACTIVE"]},
     {"id": "004_gommage_type", "role": "gallery-sketch", "tags": ["TYPOGRAPHY", "EROSION", "INTERACTIVE"]},
     {"id": "005_pressure_lattice", "visible_title": "REGISTER TYPE", "role": "gallery-sketch", "rejected_previous_concept": "Pressure Lattice", "tags": ["TYPOGRAPHY", "PRINT", "INTERACTIVE"]},
-    {"id": "006_breath_score", "visible_title": "BREATH SCORE", "role": "gallery-sketch", "current_refinement": "autonomous_contour_breathing_and_local_touch_pressure", "tags": ["TYPOGRAPHY", "RHYTHM", "INTERACTIVE"]},
-    {"id": "007_redaction_field", "visible_title": "REDACTION FIELD", "role": "gallery-sketch", "current_refinement": "autonomous_per_character_censorship_and_contour_collapse", "tags": ["TYPOGRAPHY", "REDACTION", "INTERACTIVE"]},
-    {"id": "008_palimpsest", "visible_title": "PALIMPSEST", "role": "gallery-sketch", "current_refinement": "autonomous_sediment_layers_and_contour_archive_excavation", "tags": ["TYPOGRAPHY", "MEMORY", "INTERACTIVE"]},
-    {"id": "009_chorus_drift", "visible_title": "CHORUS DRIFT", "role": "gallery-sketch", "current_refinement": "coupled_oscillator_crowd_with_emergent_contour_voices", "tags": ["TYPOGRAPHY", "CHORUS", "INTERACTIVE"]},
-    {"id": "010_fault_register", "visible_title": "FAULT REGISTER", "role": "gallery-sketch", "current_refinement": "autonomous_faults_and_per_contour_point_structural_fracture", "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"]}
+    {"id": "006_breath_score", "visible_title": "BREATH SCORE", "role": "gallery-sketch", "current_refinement": "rolled_back_to_pre_contour_overuse_version", "tags": ["TYPOGRAPHY", "RHYTHM", "INTERACTIVE"]},
+    {"id": "007_redaction_field", "visible_title": "REDACTION FIELD", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "REDACTION", "INTERACTIVE"]},
+    {"id": "008_palimpsest", "visible_title": "PALIMPSEST", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "MEMORY", "INTERACTIVE"]},
+    {"id": "009_chorus_drift", "visible_title": "CHORUS DRIFT", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "CHORUS", "INTERACTIVE"]},
+    {"id": "010_fault_register", "visible_title": "FAULT REGISTER", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_label_free_grid_wrapper", "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"]}
+  ],
+  "rejected_creative_passes": [
+    {
+      "commit": "6c20a0948a512809ad16014c7fef67e0ffaf4ae9",
+      "name": "generalized structural contour pass for 006-010",
+      "reason": "host rejected: visually worse, some glyph contour rendering appeared inverted/broken, one representation was overused across the entire series, and technique diversity collapsed",
+      "do_not_restore_as_default": true
+    }
   ],
   "shared_creative_infrastructure": {
     "glyph_contour_tools": "sketches/_shared/glyph_contour_tools.gd",
-    "structural_type_support": true,
-    "outline_source": "Godot TextServer.font_get_glyph_contours",
+    "glyph_contours_are_optional": true,
     "design_base": "sketches/_shared/design_sketch_base.gd"
   },
   "telemetry": {
@@ -53,29 +61,34 @@
     "sessions_directory": "sessions/",
     "local_runtime_directory": "res://.telemetry_runtime/",
     "publication": "asynchronous_queued_sanitized",
-    "last_observed_remote_runtime_head": "0e9a002988c2",
-    "last_observed_remote_runtime_head_is_stale_for_006_010_structural_pass": true
+    "last_observed_remote_runtime_head": "729c3a2c5133",
+    "last_observed_gallery_preview_count": 10,
+    "last_observed_error_entry_found": false
   },
   "knowledge": {
     "creative_coding": "knowledge/creative-coding/",
     "design": "knowledge/design/",
     "cross_domain": "knowledge/cross-domain/",
-    "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md",
-    "structural_typography": "knowledge/design/STRUCTURAL_TYPOGRAPHY.md",
+    "technique_palette": "knowledge/cross-domain/TECHNIQUE_PALETTE.md",
     "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
     "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
     "living_systems": "knowledge/cross-domain/LIVING_SYSTEMS.md",
-    "creative_work_rule": "The full canvas is artwork-only; create a meaningful autonomous system before interaction; use representation depth appropriate to the artistic claim; interaction perturbs internal state; exposed parameters bias behavior rather than rescue weak visuals.",
-    "acceptance_tests": ["frozen_frame", "thirty_second_no_input", "one_gesture_then_hands_off", "structural_typography_if_claimed"]
+    "structural_typography": "knowledge/design/STRUCTURAL_TYPOGRAPHY.md",
+    "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md",
+    "creative_work_rule": "Artistic intent chooses representation. Compare at least three plausible technical chains before implementation; do not let the most recently added technique become a default house style.",
+    "series_diversity_rules": {
+      "max_same_primary_representation": 2,
+      "max_same_primary_temporal_model": 2,
+      "interaction_consequence_must_materially_differ": true,
+      "palette_or_text_changes_alone_do_not_count_as_diversity": true
+    }
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
     "required_for_runtime_code": ["repository_policy", "godot_4_7_1_headless_import", "main_scene_smoke_test", "tracked_file_cleanliness"],
-    "structural_autonomous_006_010_commit": "6c20a0948a512809ad16014c7fef67e0ffaf4ae9",
-    "structural_autonomous_006_010_ci_run": 36032793642,
-    "structural_autonomous_006_010_ci_conclusion": "success",
-    "structural_autonomous_006_010_host_state": "IMPLEMENTED_NOT_VALIDATED"
+    "rollback_commit": "3a437fe2621c00c11c808b909cb6a30a5936e80a",
+    "current_host_state": "ROLLBACK_AWAITING_HOST_RETEST"
   },
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
@@ -87,8 +100,7 @@
     "do_not_restore_pressure_lattice_visual_concept": true,
     "keep_gallery_taxonomy_small_and_semantic": true,
     "no_sketch_metadata_inside_artwork_canvas": true,
-    "default_state_must_be_coherent_without_slider_tuning": true,
-    "prefer_autonomous_living_systems_over_click_to_effect_patterns": true,
-    "structural_typography_requires_structural_representation": true
+    "do_not_make_glyph_contours_default": true,
+    "compare_multiple_technical_representations_before_substantial_new_work": true
   }
 }
