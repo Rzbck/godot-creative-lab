@@ -1,123 +1,44 @@
 # Prompt for the next AI session
 
-Copy/paste the block below into a new AI conversation that has access to the GitHub repository.
+Copy/paste the block below into a fresh AI conversation with GitHub access.
 
 ---
 
-You are taking over the ongoing project **DC//LAB / Godot Creative Lab**.
+Reprends le projet **DC//LAB / Godot Creative Lab** depuis le GitHub `Rzbck/godot-creative-lab`.
 
-Repository:
-`Rzbck/godot-creative-lab`
+Ne te base pas sur une ancienne conversation. Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924`, puis lis dans cet ordre :
 
-Do **not** rely on previous-chat memory. Reconstruct current state from repository/GitHub evidence.
+1. `AGENTS.md`
+2. `HANDOFF.md`
+3. `docs/handoff/CURRENT_WORK.md`
+4. `docs/handoff/OPERATIONS.md`
+5. `docs/handoff/project_state.json`
+6. `docs/ARCHITECTURE.md`
 
-## Mandatory startup procedure
+Inspecte ensuite `app/main/main_runtime.tscn` et sa vraie chaîne `extends`, la PR #7 et la CI du HEAD exact.
 
-1. Resolve the current remote HEAD of branch `feat/creative-sketches-002-004-20260924` and inspect draft PR #7.
-2. Read, in this order:
-   - `AGENTS.md`
-   - `HANDOFF.md`
-   - `docs/handoff/CURRENT_WORK.md`
-   - `docs/handoff/OPERATIONS.md`
-   - `docs/handoff/project_state.json`
-   - `docs/ARCHITECTURE.md`
-3. Inspect `app/main/main_runtime.tscn` and follow the actual `extends` chain before changing Gallery/PROGRAM/window/telemetry behavior.
-4. Inspect the exact sketch/runtime files involved in the user's next request.
-5. For creative/design work, read the relevant material under:
-   - `knowledge/creative-coding/`
-   - `knowledge/design/`
-   - `knowledge/cross-domain/`
-6. For substantial realtime artwork specifically read/use:
-   - `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`
-   - `knowledge/design/STRUCTURAL_TYPOGRAPHY.md` when type anatomy/letter deformation matters
-   - `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`
-   - `knowledge/cross-domain/IDEA_ENGINE.md`
-   - `knowledge/cross-domain/LIVING_SYSTEMS.md`
-7. Resolve current CI before assuming branch health.
-8. If the user's message follows a runtime test, inspect `telemetry/runtime` before requesting copied logs. Verify telemetry runtime Git head matches the tested branch version; stale telemetry is not evidence for a newer test.
+Pour un retour après test runtime, consulte d'abord `telemetry/runtime` avant de demander des logs.
 
-## Operating rules
+Pour tout travail créatif, lis d'abord :
 
-- Work directly through GitHub on the active feature branch.
-- User should not have to write code manually.
-- Never merge or modify `main` without explicit user approval.
-- Do not force-push/reset as routine recovery.
-- After runtime/code changes verify repository policy + Godot 4.7.1 import + smoke test + tracked-file cleanliness for exact HEAD.
-- For host validation give one concise copy/paste PowerShell `& { ... }` block using `docs/handoff/OPERATIONS.md`.
-- Respond in concise French; answer intent rather than correcting spelling.
-- Prefer concrete implementation/progress over generic explanation.
+- `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
+- `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`
+- `knowledge/cross-domain/IDEA_ENGINE.md`
+- les atlases design/creative-coding pertinents
+- `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`
 
-## Product behaviors that must not regress
+Important : une passe récente (`6c20a094...`) a appliqué les **contours de glyphes presque partout sur 006–010**. Elle a été rejetée après test hôte : rendu parfois inversé/cassé, cinq œuvres trop similaires techniquement, surinterprétation d'un seul axe de feedback. Le rollback commence à `3a437fe...` et restaure les comportements précédents tout en supprimant les cartouches de titre/numéro du canvas. **Ne restaure pas la passe contours généralisée.**
 
-- Workstation remains usable while PROGRAM/LIVE OUT runs on selected physical display.
-- Navigation does not stop PROGRAM.
-- Another PREVIEW replaces PROGRAM only via `TAKE LIVE`.
-- PROGRAM touch/mouse controls the live sketch.
-- Linked PREVIEW/PROGRAM share one generative state/timeline.
-- Per-sketch parameters persist.
-- Gallery uses real rendered thumbnails and hover-only animation.
-- Gallery groups/search/tag filters come from `definition.json`.
-- Telemetry publication remains asynchronous.
+Les contours/vector paths restent une technique valide parmi beaucoup d'autres. Ne les traite jamais comme le style par défaut du labo.
 
-## Artwork rules that must not regress
+Pour un nouveau concept substantiel, compare au moins **trois chaînes techniques plausibles** avant d'en choisir une. Exemples de familles disponibles : direct/variable typography, raster/masks, SDF/MSDF, fragment shaders, feedback buffers, particles/agents, vector fields, physical constraints, cellular/reaction-diffusion, procedural geometry/meshes, graphs/grids/topology, data/semantic systems.
 
-- **The full PROGRAM canvas is the artwork.** Sketch title, index/number, tags, debug/project metadata and fake curatorial captions belong in Gallery/editor UI, not inside final artwork.
-- Do not draw an inset poster/card frame by default; framing must be conceptually necessary.
-- A realtime work should normally have meaningful autonomous behavior before user input.
-- Avoid the default `click -> effect on / release -> effect off` pattern. Interaction should perturb internal state and allow propagation, memory, repair, coupling or regime change when appropriate.
-- If the concept claims internal typographic deformation, use a representation deep enough to reach glyph anatomy (vector contours, sampled points, SDF/MSDF, etc.), not merely whole-glyph position/scale.
-- Default values must already produce a coherent piece. Sliders should bias system behavior rather than rescue weak visuals.
+Pour une série, évite de répéter la même représentation primaire, le même modèle temporel et la même conséquence interactive. Si plusieurs sketches ne diffèrent que par texte/couleurs/cursor mapping, la direction a échoué.
 
-## Shared structural typography support
+Le canvas PROGRAM doit rester artwork-only : pas de sketch title, numéro, tag, debug ou faux caption explicatif dans l'œuvre.
 
-The repo now contains:
+Préserve Gallery/PREVIEW/PROGRAM, TAKE LIVE, persistence, touch, live-sync et telemetry. Ne merge jamais `main` sans accord explicite.
 
-- `sketches/_shared/glyph_contour_tools.gd`
-- contour helpers in `sketches/_shared/design_sketch_base.gd`
-
-These use Godot `TextServer.font_get_glyph_contours()` to access/sample real font outlines for structural deformation experiments.
-
-## Current content / direction
-
-Existing sketches now run 001–010.
-
-- 001 Signal Field — technical/regression patch.
-- 002 Liquid Type.
-- 003 Chroma Lens.
-- 004 Gommage Type.
-- 005 internal id/path `005_pressure_lattice`, visible **REGISTER TYPE**. Original Pressure Lattice concept was rejected; do not restore it.
-- 006 **BREATH SCORE** — autonomous contour breathing + local touch pressure.
-- 007 **REDACTION FIELD** — autonomous per-character censorship; glyph contours collapse into censorship material; local touch editing + memory.
-- 008 **PALIMPSEST** — autonomous sediment/archive strata; gesture-depth excavation and contour-layer memory.
-- 009 **CHORUS DRIFT** — coupled oscillator population; autonomous voice emergence; interaction perturbs one row/neighbours; contour-level voice deformation.
-- 010 **FAULT REGISTER** — autonomous small faults + user scars; per-contour-point fault-plane fracture inside glyphs.
-
-The current creative direction is explicitly trying to escape shallow “interactive poster + slider” work and move toward studio-grade living systems, structural typography, meaningful temporal depth and richer interaction dramaturgy.
-
-## Host-test method for the structural/autonomous pass
-
-Do not begin by adjusting sliders.
-
-For 006–010:
-
-1. watch each untouched for ~30 seconds;
-2. verify no title/index/project metadata is rendered into artwork;
-3. judge autonomous behavior vs decorative looping;
-4. make one slow gesture, stop touching, observe persistence/propagation/repair;
-5. make one fast/long gesture and compare consequences;
-6. inspect whether letter structures deform internally where intended;
-7. test selected pieces in PROGRAM/touch;
-8. then inspect fresh matching-head telemetry + visual feedback.
-
-## First response behavior
-
-After repository scan, briefly state:
-- branch + short HEAD;
-- PR/CI state;
-- implemented product capabilities;
-- stale/conflicting docs if any;
-- exact task understood.
-
-Then work. Do not ask the user to re-explain documented history.
+Explique brièvement l'état réel après ton scan, puis continue directement sur GitHub.
 
 ---
