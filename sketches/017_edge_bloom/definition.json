@@ -1,0 +1,9 @@
+{
+  "id": "017_edge_bloom",
+  "index": "017",
+  "title": "EDGE BLOOM",
+  "scene": "res://sketches/017_edge_bloom/runtime/edge_bloom.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["CELLULAR", "GROWTH", "INTERACTIVE"],
+  "description": "An edge-fed excitable tissue where neighbouring cells trigger refractory waves while mobile spores follow gradients, seed new growth and split when the colony becomes rich."
+}

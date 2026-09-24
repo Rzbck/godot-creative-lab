@@ -1,0 +1,9 @@
+{
+  "id": "019_soft_flock",
+  "index": "019",
+  "title": "SOFT FLOCK",
+  "scene": "res://sketches/019_soft_flock/runtime/soft_flock.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["PHYSICS", "FLOCK", "INTERACTIVE"],
+  "description": "A two-color flock moving through a Verlet constraint membrane. Agents press, abrade and weaken links while temporary obstacles redirect both the population and the soft structure."
+}
