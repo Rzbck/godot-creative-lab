@@ -2,17 +2,22 @@ shader_type canvas_item;
 render_mode unshaded;
 
 uniform float u_time = 0.0;
-uniform float u_grid_columns : hint_range(5.0, 14.0) = 7.0;
-uniform float u_field_strength : hint_range(0.0, 2.0) = 0.9;
-uniform float u_line_density : hint_range(8.0, 36.0) = 19.0;
-uniform float u_contrast : hint_range(0.4, 1.8) = 1.05;
-uniform float u_pulse : hint_range(0.0, 1.0) = 0.32;
-uniform float u_palette_mix : hint_range(0.0, 1.0) = 0.18;
+uniform float u_grain : hint_range(0.0, 1.0) = 0.28;
+uniform float u_grid_presence : hint_range(0.0, 1.0) = 0.34;
+uniform float u_registration : hint_range(0.0, 1.0) = 0.5;
+uniform float u_palette_mix : hint_range(0.0, 1.0) = 0.08;
 
-uniform vec4 u_mark0 = vec4(-2.0, -2.0, 0.0, 0.0);
-uniform vec4 u_mark1 = vec4(-2.0, -2.0, 0.0, 0.0);
-uniform vec4 u_mark2 = vec4(-2.0, -2.0, 0.0, 0.0);
-uniform vec4 u_mark3 = vec4(-2.0, -2.0, 0.0, 0.0);
+// x = anchor x in normalized design space
+// y/z = gesture direction
+// w = spring energy
+uniform vec4 u_row0 = vec4(0.5, 1.0, 0.0, 0.0);
+uniform vec4 u_row1 = vec4(0.5, 1.0, 0.0, 0.0);
+uniform vec4 u_row2 = vec4(0.5, 1.0, 0.0, 0.0);
+
+const vec2 DESIGN = vec2(1280.0, 720.0);
+const float SAFE_LEFT = 86.0;
+const float SAFE_RIGHT = 1194.0;
+const float GRID_WIDTH = SAFE_RIGHT - SAFE_LEFT;
 
 float hash21(vec2 p) {
     p = fract(p * vec2(123.34, 456.21));
@@ -20,103 +25,89 @@ float hash21(vec2 p) {
     return fract(p.x * p.y);
 }
 
-vec2 mark_flow(vec2 uv, vec4 mark) {
-    if (mark.z <= 0.0001) {
-        return vec2(0.0);
-    }
-
-    vec2 delta = (uv - mark.xy) * vec2(1.7777778, 1.0);
-    float radius = length(delta);
-    float influence = exp(-radius * radius * 11.0) * mark.z;
-    vec2 tangent = vec2(-delta.y, delta.x) / (radius + 0.001);
-    vec2 radial = delta / (radius + 0.001);
-    float age_twist = sin(mark.w * 4.0 + radius * 17.0);
-    return (tangent * (0.064 + 0.024 * age_twist) - radial * 0.018) * influence;
+float line_mask(float value, float center, float width) {
+    return 1.0 - smoothstep(width, width + 1.25, abs(value - center));
 }
 
-float mark_energy(vec2 uv, vec4 mark) {
-    if (mark.z <= 0.0001) {
-        return 0.0;
-    }
-    vec2 delta = (uv - mark.xy) * vec2(1.7777778, 1.0);
-    float radius = length(delta);
-    return exp(-radius * radius * 15.0) * mark.z;
+float row_field(vec2 p, vec4 row, float center_y, float half_height) {
+    float anchor_x = row.x * DESIGN.x;
+    float dx = (p.x - anchor_x) / 255.0;
+    float dy = (p.y - center_y) / half_height;
+    return exp(-(dx * dx * 1.7 + dy * dy * 2.4)) * row.w;
+}
+
+float halftone(vec2 p, float scale, float radius) {
+    vec2 cell = fract(p / scale) - 0.5;
+    return 1.0 - smoothstep(radius, radius + 0.08, length(cell));
 }
 
 void fragment() {
-    vec2 uv = UV;
-    float columns = max(5.0, floor(u_grid_columns + 0.5));
-    vec2 grid = vec2(columns, max(3.0, floor(columns * 0.56 + 0.5)));
-    vec2 cell_id = floor(uv * grid);
-    vec2 cell_uv = fract(uv * grid) - 0.5;
-    float role = hash21(cell_id + vec2(3.1, 7.9));
-    float role_state = floor(role * 4.0) / 3.0;
+    vec2 p = UV * DESIGN;
 
-    vec2 warped_uv = uv;
-    vec2 base_field = vec2(
-        sin((uv.y * 3.0 + uv.x * 0.75) * 6.2831853 + u_time * 0.34),
-        cos((uv.x * 2.4 - uv.y * 0.55) * 6.2831853 - u_time * 0.27)
-    ) * 0.008;
+    vec3 paper_a = vec3(0.945, 0.915, 0.845);
+    vec3 paper_b = vec3(0.905, 0.925, 0.935);
+    vec3 paper = mix(paper_a, paper_b, u_palette_mix);
+    vec3 ink = vec3(0.035, 0.045, 0.065);
+    vec3 vermilion = mix(vec3(0.97, 0.16, 0.08), vec3(0.42, 0.18, 0.76), u_palette_mix);
+    vec3 cyan = mix(vec3(0.00, 0.55, 0.78), vec3(0.97, 0.16, 0.08), u_palette_mix);
 
-    vec2 gesture_field = vec2(0.0);
-    gesture_field += mark_flow(uv, u_mark0);
-    gesture_field += mark_flow(uv, u_mark1);
-    gesture_field += mark_flow(uv, u_mark2);
-    gesture_field += mark_flow(uv, u_mark3);
-    warped_uv += (base_field + gesture_field) * u_field_strength;
+    float paper_noise = (hash21(floor(p * 0.72)) - 0.5) * 0.055 * u_grain;
+    vec3 color = paper + vec3(paper_noise);
 
-    float hierarchy_phase = role_state * 2.35 + cell_id.x * 0.11 - cell_id.y * 0.17;
-    float line_phase = (
-        warped_uv.y * u_line_density
-        + warped_uv.x * (2.1 + role_state * 1.3)
-        + sin(warped_uv.x * 12.0 + u_time * 0.21) * (0.35 + role_state * 0.25)
-    ) * 6.2831853 + hierarchy_phase;
+    float grid = 0.0;
+    if (p.x >= SAFE_LEFT && p.x <= SAFE_RIGHT && p.y >= 64.0 && p.y <= 656.0) {
+        for (int i = 0; i <= 6; i++) {
+            float x = SAFE_LEFT + GRID_WIDTH * float(i) / 6.0;
+            grid = max(grid, line_mask(p.x, x, 0.45));
+        }
+        grid = max(grid, line_mask(p.y, 205.0, 0.45));
+        grid = max(grid, line_mask(p.y, 410.0, 0.45));
+        grid = max(grid, line_mask(p.y, 592.0, 0.45));
+    }
+    color = mix(color, ink, grid * (0.025 + 0.07 * u_grid_presence));
 
-    float cross_phase = (
-        warped_uv.x * (u_line_density * 0.54)
-        - warped_uv.y * (1.4 + role_state * 1.6)
-    ) * 6.2831853 - u_time * 0.19 + role * 5.0;
+    float f0 = row_field(p, u_row0, 170.0, 92.0);
+    float f1 = row_field(p, u_row1, 345.0, 128.0);
+    float f2 = row_field(p, u_row2, 554.0, 96.0);
 
-    float primary = abs(sin(line_phase));
-    float secondary = abs(sin(cross_phase));
-    float signal = max(primary, secondary * (0.38 + role_state * 0.28));
-    float threshold = mix(0.91, 0.70, clamp(u_contrast / 1.8, 0.0, 1.0));
-    float ink_mask = smoothstep(threshold, min(0.999, threshold + 0.09), signal);
+    vec2 d0 = vec2(u_row0.y, u_row0.z);
+    vec2 d1 = vec2(u_row1.y, u_row1.z);
+    vec2 d2 = vec2(u_row2.y, u_row2.z);
 
-    float cell_edge = max(abs(cell_uv.x), abs(cell_uv.y));
-    float grid_line = smoothstep(0.465, 0.497, cell_edge);
-    grid_line *= 0.12 + role_state * 0.12;
+    vec2 shift0 = d0 * (10.0 + 24.0 * u_registration) * u_row0.w;
+    vec2 shift1 = d1 * (12.0 + 32.0 * u_registration) * u_row1.w;
+    vec2 shift2 = d2 * (10.0 + 24.0 * u_registration) * u_row2.w;
 
-    float memory = 0.0;
-    memory += mark_energy(uv, u_mark0);
-    memory += mark_energy(uv, u_mark1);
-    memory += mark_energy(uv, u_mark2);
-    memory += mark_energy(uv, u_mark3);
-    memory = clamp(memory, 0.0, 1.0);
+    float dots_a = 0.0;
+    float dots_b = 0.0;
 
-    float pulse = 0.5 + 0.5 * sin(u_time * 0.55 + role * 6.2831853);
-    float pulse_gain = mix(1.0, 0.78 + pulse * 0.42, u_pulse);
-    ink_mask *= pulse_gain;
+    dots_a += halftone(p + shift0, 12.0, 0.28) * f0;
+    dots_b += halftone(p - shift0 * 0.75 + vec2(4.0, 2.0), 12.0, 0.24) * f0;
 
-    vec3 bg_a = vec3(0.012, 0.015, 0.022);
-    vec3 bg_b = vec3(0.026, 0.014, 0.028);
-    vec3 paper = vec3(0.94, 0.90, 0.80);
-    vec3 accent_a = vec3(1.0, 0.36, 0.08);
-    vec3 accent_b = vec3(0.08, 0.72, 1.0);
-    vec3 bg = mix(bg_a, bg_b, u_palette_mix);
-    vec3 accent = mix(accent_a, accent_b, u_palette_mix);
+    dots_a += halftone(p + shift1, 15.0, 0.31) * f1;
+    dots_b += halftone(p - shift1 * 0.72 + vec2(5.0, 3.0), 15.0, 0.27) * f1;
 
-    float accent_mask = smoothstep(0.22, 0.78, memory) * (0.55 + role_state * 0.45);
-    accent_mask += grid_line * (0.16 + memory * 0.2);
-    accent_mask = clamp(accent_mask, 0.0, 1.0);
+    dots_a += halftone(p + shift2, 11.0, 0.27) * f2;
+    dots_b += halftone(p - shift2 * 0.78 + vec2(3.0, 5.0), 11.0, 0.23) * f2;
 
-    vec3 color = mix(bg, paper, ink_mask * (0.42 + role_state * 0.52));
-    color = mix(color, accent, accent_mask * (0.48 + ink_mask * 0.28));
+    dots_a = clamp(dots_a, 0.0, 1.0);
+    dots_b = clamp(dots_b, 0.0, 1.0);
 
-    float margin_x = smoothstep(0.035, 0.078, min(uv.x, 1.0 - uv.x));
-    float margin_y = smoothstep(0.055, 0.105, min(uv.y, 1.0 - uv.y));
-    float safe_frame = margin_x * margin_y;
-    color = mix(bg, color, safe_frame);
+    color = mix(color, vermilion, dots_a * 0.34);
+    color = mix(color, cyan, dots_b * 0.27);
+
+    // Registration bars are part of the print language, not a debug overlay.
+    float registration_marks = 0.0;
+    registration_marks = max(registration_marks, line_mask(p.x, 66.0, 0.8) * line_mask(p.y, 205.0, 11.0));
+    registration_marks = max(registration_marks, line_mask(p.x, 1214.0, 0.8) * line_mask(p.y, 410.0, 11.0));
+    registration_marks = max(registration_marks, line_mask(p.x, 66.0, 0.8) * line_mask(p.y, 592.0, 11.0));
+    color = mix(color, ink, registration_marks * 0.25);
+
+    // Keep the outside frame quieter so the typographic safe area reads clearly.
+    float edge_x = smoothstep(22.0, 62.0, min(p.x, DESIGN.x - p.x));
+    float edge_y = smoothstep(22.0, 58.0, min(p.y, DESIGN.y - p.y));
+    float frame = edge_x * edge_y;
+    color = mix(paper * 0.985, color, frame);
 
     COLOR = vec4(color, 1.0);
 }
