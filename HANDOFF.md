@@ -19,113 +19,98 @@ Last material refresh: **2026-09-24**.
 
 ## Product state to preserve
 
-DC//LAB is a Godot creative-coding workstation with:
+DC//LAB is a Godot creative-coding workstation with data-driven Gallery discovery, real thumbnails, hover previews, generated parameter inspector/persistence, PREVIEW / PROGRAM separation, persistent PROGRAM while navigating, `TAKE LIVE`, physical display selection, PROGRAM touch/mouse forwarding, linked PREVIEW/PROGRAM state synchronization, async telemetry and versioned creative research.
 
-- data-driven Gallery discovery from sketch `definition.json`;
-- real thumbnails and hover-only animated previews;
-- automatic groups, tags and search;
-- generated parameter inspector + per-sketch persistence;
-- PREVIEW / PROGRAM separation;
-- persistent PROGRAM while browsing elsewhere;
-- `TAKE LIVE` replacement workflow;
-- physical output display selection;
-- PROGRAM mouse/touch forwarding;
-- linked PREVIEW/PROGRAM live-state synchronization;
-- asynchronous sanitized telemetry on `telemetry/runtime`;
-- versioned creative/design/cross-domain knowledge.
+Normal logical artwork space: `1280×720`.
 
-The normal logical artwork space is `1280×720`.
+PROGRAM canvas is artwork-only: no sketch title/index/tags/debug/project metadata unless the text is genuinely part of the artwork.
 
-PROGRAM canvas is artwork-only: never burn sketch title/index/tags/debug/project metadata into the final artwork unless that text is genuinely part of the piece.
+## Historical creative state
 
-## Sketch state
+001–010 remain available. `005_pressure_lattice` visibly remains **REGISTER TYPE**; original Pressure Lattice is rejected. A generalized contour pass (`6c20a094...`) across 006–010 was host-rejected because several glyphs looked broken/inverted and the series converged around one technique. Do not restore it.
 
-### 001–010
+## Collision-first batches
 
-- `001_signal_field` — technical/regression reference.
-- `002_liquid_type` — elastic typography.
-- `003_chroma_lens` — typographic optical system.
-- `004_gommage_type` — directional erosion/reconstruction.
-- `005_pressure_lattice` — visible artwork **REGISTER TYPE**; original Pressure Lattice is rejected and must not be restored.
-- `006_breath_score` — **BREATH SCORE**.
-- `007_redaction_field` — **REDACTION FIELD**.
-- `008_palimpsest` — **PALIMPSEST**.
-- `009_chorus_drift` — **CHORUS DRIFT**.
-- `010_fault_register` — **FAULT REGISTER**.
+### 011–015
 
-A generalized contour pass (`6c20a094...`) across 006–010 was host-rejected: some glyphs looked inverted/broken, the five pieces converged technically and the result was worse. The rollback beginning at `3a437fe...` restored the earlier behavior while keeping unwanted captions out of the canvas. Do not restore contour-everywhere.
+First raw collision batch:
 
-### 011–015 — collision-first raw laboratories
+- **SWARM RELAY** — agents + dynamic graph;
+- **CHEMICAL BLOCKS** — Gray-Scott reaction-diffusion;
+- **CUT CELL** — nearest-site territories + cut/healing graph;
+- **RIBBON MORPH** — raster morphology + ribbons;
+- **PHASE PACK** — packed bodies + phase rules + distance field.
 
-These are intentionally raw research prototypes, not approved final artworks.
+Host feedback: technically/creatively better than the earlier type-heavy direction, but still visually weak, under-parameterized (3 controls each) and not organic enough in how pixels/cells influence one another.
 
-- `011_swarm_relay` — **SWARM RELAY**: autonomous agents + dynamic neighbour topology; touch damages local communication and repels the swarm; links reform as damage decays.
-- `012_chemical_blocks` — **CHEMICAL BLOCKS**: coarse Gray-Scott reaction-diffusion; touch injects reagent and chemistry keeps evolving after release.
-- `013_cut_cell` — **CUT CELL**: moving nearest-site territories + dynamic graph; touch cuts real graph links, which heal over time.
-- `014_ribbon_morph` — **RIBBON MORPH**: binary raster morphology + regime switching + ribbon reconstruction; touch deposits material and dwell changes the regime.
-- `015_phase_pack` — **PHASE PACK**: colliding packed bodies + discrete neighbour phase rules + distance-field rendering; touch converts local phase and perturbs motion.
+Telemetry confirmed 15 Gallery previews loaded on runtime head `6dd4b307...`; treat that feedback as primarily creative/systemic.
 
-All 011–015 extend the shared design/runtime contract and carry custom live-sync state for PREVIEW/PROGRAM.
+### 016–020 — current batch
 
-Implementation root commit: `230ef4ff...`; five generated script UID files were then tracked. Resolve current HEAD from GitHub rather than relying on that historical implementation SHA.
+Blind draw seed: `202609242031`.
 
-## Current creative method — collision-first
+- `016_predator_vein` / **PREDATOR VEIN** — nutrient nodes + dynamic graph + neighbour field cohesion + persistent predators/scars; 8 controls.
+- `017_edge_bloom` / **EDGE BLOOM** — 64×36 edge-fed excitable tissue + refractory state + spores that follow/deposit/split; 9 controls.
+- `018_current_memory` / **CURRENT MEMORY** — 52×30 wave membrane + delayed field memory + particle current + dynamic reconnection + asymmetric void; 9 controls.
+- `019_soft_flock` / **SOFT FLOCK** — boid population + Verlet constraint membrane + link erosion/repair + persistent obstacle; 9 controls; two colors only.
+- `020_echo_tissue` / **ECHO TISSUE** — 72×40 eight-neighbour excitable tissue + density morphology + refractory memory + delayed feedback + autonomous reseeding; 9 controls.
 
-The user explicitly wants more technical and conceptual diversity before assigning final artistic meaning.
+Implementation commit: `e2ff8328532a4eab057c63b8bd1d361bc706ba15`.
+CI #221 passed Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness for that runtime commit.
 
-Current exploration pipeline:
+All 016–020 use the shared live-sync contract so linked PREVIEW/PROGRAM should represent the same generative state.
+
+## Durable creative rules from host feedback
+
+Read `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`.
+
+Key rules:
+
+1. substantial collision labs normally expose **6–9 meaningful independent controls** when the mechanism supports them;
+2. controls describe real system dimensions, not aliases for `more effect`;
+3. at least half the controls should alter future evolution, not only the current frame;
+4. cellular/raster work claiming organic behavior must exchange state through neighbours/resources/pressure/phase/delay/constraints;
+5. prefer several time scales: immediate response + slower memory/repair/transport/fatigue;
+6. raw collision-first work can be exploratory, but Gallery promotion still requires a coherent default palette/composition and respectable frozen frames;
+7. interaction should perturb a living system and leave consequences the system redistributes.
+
+## Creative research method
+
+Preferred current exploration mode remains collision-first:
 
 `blind technical collision -> coupled raw prototype -> observe -> interpret -> art-direct -> mutate`
 
-Read first for substantial exploration:
+Read in priority order:
 
 1. `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
 2. `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
 3. `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
-4. relevant creative-coding/design atlases
-5. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` when a successful accident deserves an identity pass
+4. `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
+5. relevant design/creative-coding atlases
+6. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` when a successful mechanism deserves a real identity pass.
 
-No technique is the default house style. Contours, direct type, raster, SDF, fragment shaders, feedback, agents, vector fields, physical systems, CA/reaction-diffusion, geometry, topology and data systems are separate options.
+No technique is the default house style. Random stacking without state coupling is rejected.
 
-Do not over-art-direct a raw collision before its mechanism proves interesting. Random effect stacking without state coupling is rejected.
+## Next host validation
 
-## 011–015 validation contract
+Expected Gallery count after current batch: **20 sketches**.
 
-Repository evidence already observed on the first runtime commit:
+For 016–020:
 
-- Godot 4.7.1 import passed;
-- main-scene smoke test passed;
-- first CI cleanliness failed only because five new `.gd.uid` files were generated;
-- those UIDs are now tracked.
+1. inspect default visual state before moving sliders;
+2. watch 20–30 seconds hands-off;
+3. interact once, remove input and watch propagation/repair/migration;
+4. then explore the 8–9 controls and verify they create different regimes;
+5. test strongest candidates in PROGRAM/touch;
+6. inspect fresh `telemetry/runtime` immediately after the test.
 
-The exact **final HEAD** validation must always be resolved from GitHub CI after all docs/code commits. Do not use an older green run.
-
-Host state for 011–015: **HOST_NOT_VALIDATED**.
-
-Next host test:
-
-1. confirm Gallery shows 15 sketches and 011–015 cards render;
-2. watch each 011–015 hands-off before moving sliders;
-3. interact once, then remove input and watch propagation/recovery;
-4. test promising mechanisms in PROGRAM/touch;
-5. decide which raw mechanisms contain accidents worth an artistic-impact pass;
-6. inspect fresh `telemetry/runtime` immediately after the test before requesting manual logs.
+The next decision is not automatically another batch. First decide which 016–020 mechanisms are visually/behaviorally worth promoting, mutating or killing.
 
 ## PROGRAM / LIVE OUT architecture
 
-Expected workflow:
+Navigation is not transport. PROGRAM must continue while browsing Gallery/Settings or opening another PREVIEW. `TAKE LIVE` replaces PROGRAM. Linked output follows synchronized source state; detached PROGRAM continues autonomously from the last synchronized state.
 
-1. Open a project in PREVIEW/editor.
-2. Send it to PROGRAM / LIVE OUT.
-3. Browse Gallery/Settings while PROGRAM keeps running.
-4. Open another PREVIEW.
-5. `TAKE LIVE` replaces PROGRAM.
-
-Navigation is not transport.
-
-When linked, editor simulation is authoritative and PROGRAM follows synchronized state. When navigating away, PROGRAM detaches and continues from the last synchronized state.
-
-Inspect `res://app/main/main_runtime.tscn` and its actual `extends` chain before touching Gallery/PROGRAM/window/telemetry behavior.
+Inspect `res://app/main/main_runtime.tscn` and its actual `extends` chain before changing host architecture.
 
 ## Telemetry-first debugging
 
@@ -137,8 +122,6 @@ After any host runtime test:
 4. only ask for manual logs/screenshots if telemetry genuinely lacks the evidence.
 
 ## Mandatory AI completion protocol
-
-The user must not need to remind the AI to update continuity, wait for CI or provide the launcher.
 
 After every material repository change, before final response:
 
@@ -152,16 +135,6 @@ After every material repository change, before final response:
 
 ## Rejected regressions
 
-Do not casually reintroduce:
+Do not casually reintroduce root-window fullscreen as normal PROGRAM output, the failed cross-window texture path, synchronous telemetry network work, independent linked PREVIEW/PROGRAM simulations, Gallery overlays over cards, fake Spout/NDI, Pressure Lattice, project metadata inside artwork, or glyph contours as the default creative representation.
 
-- root-window fullscreen as normal PROGRAM output;
-- the failed cross-window texture sampling path;
-- synchronous telemetry Git/network work on Godot UI thread;
-- independent linked PREVIEW/PROGRAM simulations;
-- Gallery overlays that cover cards;
-- fake Spout/NDI;
-- Pressure Lattice;
-- project metadata inside artwork;
-- glyph contours as the default creative representation.
-
-See `docs/handoff/CURRENT_WORK.md` for detailed current work, `docs/handoff/OPERATIONS.md` for the canonical exact-CI PowerShell, and `docs/handoff/NEXT_AI_PROMPT.md` for fresh-session bootstrap.
+See `docs/handoff/CURRENT_WORK.md` for detailed current work and `docs/handoff/OPERATIONS.md` for the canonical exact-CI PowerShell.

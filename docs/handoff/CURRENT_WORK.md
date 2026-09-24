@@ -22,149 +22,156 @@ Last refreshed: 2026-09-24.
 - Sanitized asynchronous telemetry on `telemetry/runtime`.
 - PROGRAM canvas is artwork-only: no sketch title/index/tags/debug/project chrome unless artistically intentional.
 
-## Existing creative content
+## Existing sketches
 
-- `001_signal_field` — technical/regression reference.
-- `002_liquid_type` — elastic typography.
-- `003_chroma_lens` — typographic optical system.
-- `004_gommage_type` — directional erosion/reconstruction.
-- `005_pressure_lattice` — visible artwork **REGISTER TYPE**; original Pressure Lattice is rejected and must not be restored.
-- `006_breath_score` — **BREATH SCORE**, pre-contour-overuse version.
-- `007_redaction_field` — **REDACTION FIELD**, pre-contour-overuse runtime with canvas chrome suppressed.
-- `008_palimpsest` — **PALIMPSEST**, pre-contour-overuse runtime with archive chrome suppressed.
-- `009_chorus_drift` — **CHORUS DRIFT**, pre-contour-overuse runtime with explanatory chrome suppressed.
-- `010_fault_register` — **FAULT REGISTER**, pre-contour-overuse runtime with label-free grid.
+001–010 remain the established earlier body of work. `005_pressure_lattice` visibly remains **REGISTER TYPE**; never restore the rejected Pressure Lattice concept. The rejected generalized contour pass `6c20a094...` across 006–010 must not be restored.
 
-The generalized glyph-contour pass `6c20a094...` was host-rejected because it looked worse, some contours rendered inverted/broken and the series converged around one technique. Do not restore it.
+## Host feedback on collision-first batch 011–015
 
-## New collision-first Gallery laboratories — 011–015
+The first collision-first batch improved the technical/creative diversity, but the host test established three important shortcomings:
 
-These are intentionally **raw mechanisms**, not polished artworks. Their job is to reveal behavior worth art-directing later.
+1. **visual quality is still too weak** — mechanisms are more interesting, but default compositions/palettes are not yet studio-grade;
+2. **three exposed parameters are insufficient** for substantial Gallery laboratories;
+3. cellular/raster systems still need deeper organic coupling — pixels/cells should exchange state, resources, pressure, phase or memory rather than behave as independent tiles.
 
-### 011 — SWARM RELAY
+Telemetry from the test showed 15 Gallery previews loaded on runtime head `6dd4b307...`; the feedback is therefore primarily creative/systemic, not evidence that the batch failed to load.
 
-Path: `sketches/011_swarm_relay/`
+These lessons are now versioned in `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`.
 
-Primary mechanism:
+## Durable new creative rules
 
-`autonomous agents -> cohesion/separation -> dynamic neighbour graph -> local communication damage/recovery`
+For a substantial collision-first Gallery lab:
 
-- 72 moving agents;
-- each agent continuously rebuilds links to nearby neighbours;
-- touch repels local agents and increases damage, causing communication links to disappear;
-- damage decays, so topology reforms after interaction;
-- parameters: `COHESION`, `SEPARATION`, `LINK RANGE`;
-- tags: `AGENTS`, `TOPOLOGY`, `INTERACTIVE`.
+- normally expose **6–9 meaningful independent controls** when the mechanism supports them;
+- parameter vocabulary should describe the system itself (`APPETITE`, `SCAR MEMORY`, `REFRACTORY TIME`, `MESH TENSION`, etc.), not generic aliases for more effect;
+- at least half the controls should influence future evolution, not only current rendering;
+- organic/cellular claims require real local coupling between neighbours or subsystems;
+- prefer multiple time scales: fast response + slower repair/memory/transport/fatigue;
+- raw research does **not** excuse ugly defaults — coherent palette, composition and frozen-frame quality are required before Gallery promotion;
+- interaction should perturb state the system then redistributes.
 
-### 012 — CHEMICAL BLOCKS
+## New batch 016–020 — organic collision laboratories
 
-Path: `sketches/012_chemical_blocks/`
+Blind draw seed: `202609242031`.
 
-Primary mechanism:
+These are new raw Gallery labs, not approved final artworks.
 
-`coarse raster chemistry -> Gray-Scott reaction-diffusion -> autonomous pattern growth -> touch injects reagent`
+### 016 — PREDATOR VEIN
 
-- 48×27 two-field reaction-diffusion simulation;
-- autonomous feed/kill chemistry continues with no input;
-- touch injects B reagent and locally restarts the reaction;
-- parameters: `FEED`, `KILL`, `DIFFUSION`;
-- tags: `CHEMISTRY`, `DIFFUSION`, `INTERACTIVE`.
+Path: `sketches/016_predator_vein/`
 
-### 013 — CUT CELL
+Mechanism:
 
-Path: `sketches/013_cut_cell/`
+`nutrient nodes -> dynamic graph -> neighbour resource diffusion -> hysteresis -> raster field cohesion -> persistent predators -> scars / recovery`
 
-Primary mechanism:
+- 30 drifting resource nodes;
+- network activation uses hysteresis;
+- node energy regrows and diffuses through neighbours;
+- coarse field cells also smooth with neighbouring cells;
+- touch injects persistent predators rather than a temporary visual mask;
+- predators seek rich nodes, consume energy and leave scars;
+- 8 parameters: `REGROWTH`, `RESOURCE FLOW`, `APPETITE`, `PREDATOR SPEED`, `NETWORK RANGE`, `HYSTERESIS`, `SCAR MEMORY`, `FIELD COHESION`;
+- tags: `ECOSYSTEM`, `NETWORK`, `INTERACTIVE`.
 
-`moving sites -> nearest-site territories -> dynamic communication graph -> interaction cuts links -> healing`
+### 017 — EDGE BLOOM
 
-- 18 autonomous sites;
-- coarse nearest-site field produces moving cellular territories;
-- graph uses nearest/second-nearest relationships within a range;
-- touch can cut actual graph links around the gesture region;
-- severed links heal over time while sites keep moving;
-- parameters: `DRIFT`, `HEAL`, `NETWORK RANGE`;
-- tags: `NETWORK`, `VORONOI`, `INTERACTIVE`.
+Path: `sketches/017_edge_bloom/`
 
-### 014 — RIBBON MORPH
+Mechanism:
 
-Path: `sketches/014_ribbon_morph/`
+`edge-fed cellular tissue -> neighbour excitation -> refractory waves -> mobile spores -> gradient following -> deposit / split`
 
-Primary mechanism:
+- 64×36 excitable cell field;
+- each cell reads eight neighbours;
+- cells enter a refractory period after strong excitation;
+- screen edges feed the system continuously;
+- spores follow local gradients, deposit activity and can split in rich zones;
+- touch seeds a local excitable wave;
+- 9 parameters: `CELL COUPLING`, `EXCITATION THRESHOLD`, `REFRACTORY TIME`, `EDGE FEED`, `DECAY`, `SPORE SPEED`, `SPORE SPLIT`, `SPORE DEPOSIT`, `SEED RADIUS`;
+- tags: `CELLULAR`, `GROWTH`, `INTERACTIVE`.
 
-`binary raster material -> neighbourhood morphology -> regime switching -> raster reconstructed as ribbons`
+### 018 — CURRENT MEMORY
 
-- 64×36 binary material field;
-- autonomous morphology alternates between growth-like and erosion-like regimes;
-- touch deposits material;
-- dwell flips the material regime rather than directly dragging geometry;
-- row structure is reconstructed into long quad ribbons;
-- parameters: `MORPH RATE`, `PERSISTENCE`, `RIBBON MASS`;
-- tags: `MORPHOLOGY`, `RASTER`, `INTERACTIVE`.
+Path: `sketches/018_current_memory/`
 
-### 015 — PHASE PACK
+Mechanism:
 
-Path: `sketches/015_phase_pack/`
+`wave-equation lattice -> delayed field memory -> particle current -> dynamic proximity reconnection -> reciprocal particle injection`
 
-Primary mechanism:
+- 52×30 wave membrane with neighbour Laplacian exchange;
+- field memory pulls current state toward its recent history;
+- 76 particles sample the wave gradient/tangent and can reconnect visually in coherent regions;
+- particles inject small impulses back into the membrane;
+- asymmetric void shapes the composition;
+- pointer movement redirects current and injects wave energy rather than directly moving particles;
+- 9 parameters: `WAVE TENSION`, `WAVE DAMPING`, `FLOW GAIN`, `PARTICLE INERTIA`, `RECONNECT RANGE`, `REGIME RATE`, `VOID RADIUS`, `FIELD MEMORY`, `CURRENT SPEED`;
+- tags: `FLOW`, `WAVE`, `INTERACTIVE`.
 
-`packed colliding bodies -> neighbour phase rules -> local phase transitions -> signed-distance-like field`
+### 019 — SOFT FLOCK
 
-- 24 moving bodies with radii, collisions and two material phases;
-- same/opposite phases affect neighbour forces;
-- discrete neighbourhood rules can flip phase autonomously;
-- touch changes local phase and injects repulsion;
-- coarse field rendering derives from distance to the packed bodies;
-- parameters: `MOTION`, `PHASE RATE`, `FIELD`;
-- tags: `PHASE`, `PACKING`, `INTERACTIVE`.
+Path: `sketches/019_soft_flock/`
 
-All five use the shared design/runtime contract and include custom live-sync state for linked PREVIEW/PROGRAM.
+Mechanism:
 
-Implementation root commit: `230ef4ff587db604f264e8cf0522fadfcdbeae52`.
-Five generated Godot script UIDs were subsequently tracked; resolve the current final HEAD from GitHub rather than trusting this recorded commit.
+`boid population -> Verlet constraint membrane -> agent pressure -> link abrasion -> repair -> persistent obstacle`
 
-## Why this batch exists
+- two-color composition only;
+- 13×8 soft mesh with horizontal/vertical/diagonal constraints;
+- 42 flocking agents push against the membrane;
+- agent traffic erodes actual link health;
+- damaged links repair over time;
+- touch creates a temporary obstacle that continues to redirect agents and mesh after release;
+- 9 parameters: `MESH TENSION`, `MESH DAMPING`, `FLOCK COHESION`, `FLOCK ALIGNMENT`, `FLOCK SEPARATION`, `AGENT PRESSURE`, `LINK EROSION`, `LINK REPAIR`, `OBSTACLE RADIUS`;
+- tags: `PHYSICS`, `FLOCK`, `INTERACTIVE`.
 
-The user identified that 001–010 varied surface styling more than underlying mechanism. Collision-first work deliberately spreads into different state representations before assigning artistic meaning.
+### 020 — ECHO TISSUE
 
-Current rule:
+Path: `sketches/020_echo_tissue/`
 
-`blind technical collision -> coupled raw prototype -> observe -> interpret -> art-direct -> mutate`
+Mechanism:
 
-Mandatory references:
+`excitable cells -> eight-neighbour coupling -> density morphology -> refractory state -> delayed feedback -> autonomous reseeding`
 
-- `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
-- `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
-- `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
+- 72×40 tissue grid;
+- every cell reads eight neighbours;
+- local density can merge growth or consume over-dense regions;
+- cells carry refractory memory;
+- two-stage delayed history can re-trigger regions after visible activity fades;
+- autonomous reseeding prevents the work from waiting for input;
+- touch seeds activity that then migrates through the tissue;
+- 9 parameters: `NEIGHBOUR COUPLING`, `FIRE THRESHOLD`, `EXCITATION`, `TISSUE DECAY`, `REFRACTORY TIME`, `DELAYED FEEDBACK`, `MEMORY DECAY`, `MERGE / CONSUME`, `SEED RADIUS`;
+- tags: `TISSUE`, `MEMORY`, `INTERACTIVE`.
 
-Do not prematurely turn 011–015 into five polished poster designs. First identify which mechanisms produce genuinely interesting accidents.
+All five extend the shared design/runtime contract and include custom live-sync state.
 
-## Validation state
+Implementation commit: `e2ff8328532a4eab057c63b8bd1d361bc706ba15`.
+Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness all passed on CI #221 for that runtime commit.
 
-- The initial 011–015 runtime commit successfully passed Godot 4.7.1 import and the main-scene smoke test.
-- Its first CI failed only because Godot generated five untracked `.gd.uid` files for the new scripts.
-- Those UIDs are now tracked.
-- Repository validation of the **final HEAD** must be taken from GitHub CI, never inferred from this file.
-- Host visual/tactile state for 011–015: **HOST_NOT_VALIDATED**.
+## Knowledge priority
 
-## Required host test for 011–015
+For current creative work read:
 
-Do not start by tuning sliders.
+1. `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
+2. `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
+3. `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
+4. `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
+5. relevant creative-coding/design atlases
+6. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` when promoting a mechanism into a real artwork.
 
-1. Sync the exact final HEAD only after its CI is green.
-2. Confirm Gallery now contains **15 sketches** and cards 011–015 render real previews.
-3. Open each of 011–015 and watch it for ~15–30 seconds without touching.
-4. Then interact once and remove your hand; observe whether the consequence persists/propagates/reorganizes.
-5. Specifically test:
-   - 011: damage and network reformation;
-   - 012: reagent injection and continuing chemistry;
-   - 013: cut links and healing;
-   - 014: material deposition + dwell regime switch;
-   - 015: local phase conversion and later propagation/collisions.
-6. Try the most promising one or two on physical PROGRAM/touch.
-7. After the test, inspect `telemetry/runtime` before asking the user for logs.
+## Required host test for 016–020
 
-The artistic evaluation question is not “is it finished?” It is: **which mechanism contains an accident worth developing into a real DC//LAB piece?**
+1. Gallery should contain **20 sketches**.
+2. Open 016–020 at default values first; evaluate composition/palette before touching controls.
+3. Watch each for 20–30 seconds hands-off.
+4. Interact once, release, then observe whether state migrates/repairs/propagates.
+5. Only then explore the 8–9 controls and check whether they create materially different regimes.
+6. Test the strongest mechanisms on PROGRAM/touch.
+7. After the test, inspect fresh `telemetry/runtime` before requesting manual logs.
+
+Evaluation is now two-dimensional:
+
+- **mechanism** — does the system genuinely negotiate state internally?
+- **art direction** — is the default visual already compelling enough to deserve further development?
 
 ## Mandatory AI operational completion
 

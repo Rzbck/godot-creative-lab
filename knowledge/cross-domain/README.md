@@ -8,8 +8,6 @@ A source is not a look to imitate. A technique is not a style to repeat.
 
 ## Two valid starting modes
 
-DC//LAB now supports two deliberately different creative modes.
-
 ### Intent-first
 
 Use when there is already a strong artistic question or material premise.
@@ -26,7 +24,7 @@ Use when the goal is to escape our habits and discover behavior we would not hav
 
 Use `RANDOM_COLLISION_ENGINE.md` and `COLLISION_SOURCE_CATALOG.md`.
 
-The collision-first mode is intentionally allowed to choose technique **before** meaning. This is not a contradiction with the intent-first method; it is a separate research procedure.
+The collision-first mode is intentionally allowed to choose technique before meaning. This is a separate research procedure, not a universal house method.
 
 ## Read order
 
@@ -35,11 +33,12 @@ For general creative work:
 1. `TECHNIQUE_PALETTE.md` — available representation/mechanism families.
 2. `RANDOM_COLLISION_ENGINE.md` — stochastic collision-first exploration method.
 3. `COLLISION_SOURCE_CATALOG.md` — specialist references for hybrid systems and emergent behavior.
-4. `CROSS_DOMAIN_ATLAS.md` — reusable bridges between typography, design, shaders, simulation, geometry, interaction and realtime systems.
-5. `IDEA_ENGINE.md` — concept-first multiplication/mutation method.
-6. `LIVING_SYSTEMS.md` — optional research brick for autonomy, coupling and internal state.
-7. `SOURCE_CATALOG.md` — broader cross-domain references.
-8. `sources.json` — machine-readable index.
+4. `ORGANIC_COUPLING_AND_CONTROLS.md` — host-derived rules for neighbour coupling, organic state exchange, 6–9 meaningful controls and minimum visual quality.
+5. `CROSS_DOMAIN_ATLAS.md` — reusable bridges between typography, design, shaders, simulation, geometry, interaction and realtime systems.
+6. `IDEA_ENGINE.md` — concept-first multiplication/mutation method.
+7. `LIVING_SYSTEMS.md` — optional research brick for autonomy, coupling and internal state.
+8. `SOURCE_CATALOG.md` — broader cross-domain references.
+9. `sources.json` — machine-readable index.
 
 Use these together with:
 
@@ -55,16 +54,7 @@ Use these together with:
 
 When an artistic intention already exists, do not jump directly to the most recently used technique.
 
-Compare at least three plausible chains, for example:
-
-```text
-same intention
-A -> direct / variable typography + layout state machine
-B -> raster mask + feedback buffer + shader
-C -> particles / agents + vector field + reconstruction
-```
-
-Choose the mechanism that makes the artistic idea more specific.
+Compare at least three plausible chains and choose the mechanism that makes the idea more specific.
 
 Contours, SDFs, feedback, particles, shaders, grids, meshes, graph systems, raster masks, simulations, variable fonts and whole-glyph typography are all separate options. None is the default.
 
@@ -83,9 +73,22 @@ For each seed draw:
 + 1 severe design constraint
 ```
 
-Then build a deliberately raw coupled prototype before assigning a theme, title, typography system or polished palette.
+Then build a coupled prototype before assigning final meaning.
 
-Random systems must **exchange state**. Randomly stacking visible effects is not enough.
+Random systems must exchange state. Randomly stacking visible effects is not enough.
+
+## Current host-derived quality rules
+
+A raw collision may be experimental, but Gallery inclusion now has stronger gates:
+
+- substantial labs normally expose **6–9 independent systemic/artistic controls** when the mechanism supports them;
+- controls must alter different axes of the system, not duplicate `amount/chaos/speed`;
+- at least half of exposed controls should affect future evolution rather than only rendering the current frame;
+- cellular/raster work claiming organic behavior must propagate state through neighbours, resources, pressure, delay, phase, constraints or another local relationship;
+- raw does not mean visually careless: default palette, mass/void distribution and frozen-frame quality still matter;
+- interaction should modify a living system's future, not merely paint a temporary cursor effect.
+
+See `ORGANIC_COUPLING_AND_CONTROLS.md` for the detailed rules.
 
 ## Core vocabulary
 
@@ -96,8 +99,6 @@ The thing carrying the work's identity: glyph, word, grid, line, image, particle
 ### Representation
 
 The computational form of the carrier: direct type, raster mask, vector path, sampled points, SDF/MSDF, scalar/vector field, graph, particles, texture history, mesh, parameter vector, etc.
-
-Representation depth should match the claim once the artistic direction is known.
 
 ### Operator
 
@@ -124,6 +125,7 @@ Several works should differ in more than wording and color.
 - interaction consequences materially differ;
 - at most two use typography as the primary carrier in a five-work collision batch;
 - include persistent feedback/state, population behavior, discrete rules and spatial/geometry systems across the batch when feasible;
+- parameter vocabularies should reveal different mechanisms rather than repeat the same generic controls;
 - palette/composition differences alone do not count as technical diversity.
 
 If five pieces could be produced by one renderer with changed text, colors and cursor mapping, the series has failed.
@@ -143,6 +145,7 @@ Reject directions that are mainly:
 - interaction reduced to a radial cursor mask;
 - typography added automatically;
 - simulation with no relationship to composition;
+- independently animated pixels presented as an organic system;
 - randomly stacked effects without coupling;
 - complexity visible only in code rather than behavior.
 

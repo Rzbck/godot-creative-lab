@@ -29,72 +29,75 @@
     "gallery_search": true,
     "logical_design_size": [1280, 720],
     "artwork_canvas_excludes_project_metadata": true,
-    "expected_gallery_sketch_count_after_011_015": 15
+    "expected_gallery_sketch_count": 20
   },
-  "sketches": [
-    {"id": "001_signal_field", "role": "technical-foundation"},
-    {"id": "002_liquid_type", "role": "gallery-sketch", "tags": ["TYPOGRAPHY", "ELASTIC", "INTERACTIVE"]},
-    {"id": "003_chroma_lens", "role": "gallery-sketch", "tags": ["TYPOGRAPHY", "OPTICAL", "INTERACTIVE"]},
-    {"id": "004_gommage_type", "role": "gallery-sketch", "tags": ["TYPOGRAPHY", "EROSION", "INTERACTIVE"]},
-    {"id": "005_pressure_lattice", "visible_title": "REGISTER TYPE", "role": "gallery-sketch", "rejected_previous_concept": "Pressure Lattice", "tags": ["TYPOGRAPHY", "PRINT", "INTERACTIVE"]},
-    {"id": "006_breath_score", "visible_title": "BREATH SCORE", "role": "gallery-sketch", "current_refinement": "rolled_back_to_pre_contour_overuse_version", "tags": ["TYPOGRAPHY", "RHYTHM", "INTERACTIVE"]},
-    {"id": "007_redaction_field", "visible_title": "REDACTION FIELD", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "REDACTION", "INTERACTIVE"]},
-    {"id": "008_palimpsest", "visible_title": "PALIMPSEST", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "MEMORY", "INTERACTIVE"]},
-    {"id": "009_chorus_drift", "visible_title": "CHORUS DRIFT", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "CHORUS", "INTERACTIVE"]},
-    {"id": "010_fault_register", "visible_title": "FAULT REGISTER", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_label_free_grid_wrapper", "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"]},
-    {"id": "011_swarm_relay", "visible_title": "SWARM RELAY", "role": "collision-first-lab", "primary_representation": "agents_plus_dynamic_graph", "interaction_consequence": "local_link_damage_and_repulsion", "tags": ["AGENTS", "TOPOLOGY", "INTERACTIVE"]},
-    {"id": "012_chemical_blocks", "visible_title": "CHEMICAL BLOCKS", "role": "collision-first-lab", "primary_representation": "reaction_diffusion_raster", "interaction_consequence": "reagent_injection", "tags": ["CHEMISTRY", "DIFFUSION", "INTERACTIVE"]},
-    {"id": "013_cut_cell", "visible_title": "CUT CELL", "role": "collision-first-lab", "primary_representation": "nearest_site_field_plus_graph", "interaction_consequence": "cut_graph_links_then_heal", "tags": ["NETWORK", "VORONOI", "INTERACTIVE"]},
-    {"id": "014_ribbon_morph", "visible_title": "RIBBON MORPH", "role": "collision-first-lab", "primary_representation": "binary_raster_morphology_plus_ribbons", "interaction_consequence": "deposit_material_and_flip_regime_on_dwell", "tags": ["MORPHOLOGY", "RASTER", "INTERACTIVE"]},
-    {"id": "015_phase_pack", "visible_title": "PHASE PACK", "role": "collision-first-lab", "primary_representation": "packed_bodies_plus_distance_field_plus_phase_rules", "interaction_consequence": "convert_local_phase_and_repulse", "tags": ["PHASE", "PACKING", "INTERACTIVE"]}
-  ],
-  "rejected_creative_passes": [
-    {
-      "commit": "6c20a0948a512809ad16014c7fef67e0ffaf4ae9",
-      "name": "generalized structural contour pass for 006-010",
-      "reason": "host rejected: visually worse, some glyph contour rendering appeared inverted/broken, one representation was overused across the series, and technique diversity collapsed",
-      "do_not_restore_as_default": true
-    }
-  ],
-  "creative_exploration": {
-    "preferred_mode": "collision-first",
+  "creative_rules": {
+    "preferred_exploration_mode": "collision-first",
     "pipeline": ["blind_random_technical_draw", "coupled_raw_prototype", "observe", "interpret", "art_direct", "mutate"],
-    "current_batch": ["011_swarm_relay", "012_chemical_blocks", "013_cut_cell", "014_ribbon_morph", "015_phase_pack"],
-    "batch_status": "IMPLEMENTED_HOST_NOT_VALIDATED",
-    "do_not_assign_final_message_before_prototype_observation": true,
-    "random_stacking_without_state_coupling_is_rejected": true
-  },
-  "telemetry": {
-    "remote_branch": "telemetry/runtime",
-    "latest": "latest.jsonl",
-    "sessions_directory": "sessions/",
-    "local_runtime_directory": "res://.telemetry_runtime/",
-    "publication": "asynchronous_queued_sanitized",
-    "last_observed_remote_runtime_head": "729c3a2c5133",
-    "last_observed_gallery_preview_count": 10,
-    "last_observed_error_entry_found": false,
-    "telemetry_first_after_host_test": true
+    "substantial_lab_parameter_target": [6, 9],
+    "parameter_controls_must_be_independent": true,
+    "at_least_half_controls_should_change_future_evolution": true,
+    "organic_cellular_work_requires_local_state_exchange": true,
+    "prefer_multiple_time_scales": true,
+    "raw_does_not_excuse_weak_default_visuals": true,
+    "random_stacking_without_state_coupling_is_rejected": true,
+    "no_sketch_metadata_inside_artwork_canvas": true
   },
   "knowledge": {
     "technique_palette": "knowledge/cross-domain/TECHNIQUE_PALETTE.md",
     "random_collision_engine": "knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md",
     "collision_source_catalog": "knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md",
+    "organic_coupling_and_controls": "knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md",
     "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
     "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
-    "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md",
-    "creative_work_rule": "For the current exploration phase, observe coupled raw mechanisms before imposing final artistic meaning; no technique is a default house style."
+    "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md"
+  },
+  "sketches": [
+    {"id":"001_signal_field","role":"technical-foundation"},
+    {"id":"002_liquid_type","role":"gallery-sketch"},
+    {"id":"003_chroma_lens","role":"gallery-sketch"},
+    {"id":"004_gommage_type","role":"gallery-sketch"},
+    {"id":"005_pressure_lattice","visible_title":"REGISTER TYPE","role":"gallery-sketch","rejected_previous_concept":"Pressure Lattice"},
+    {"id":"006_breath_score","visible_title":"BREATH SCORE","role":"gallery-sketch"},
+    {"id":"007_redaction_field","visible_title":"REDACTION FIELD","role":"gallery-sketch"},
+    {"id":"008_palimpsest","visible_title":"PALIMPSEST","role":"gallery-sketch"},
+    {"id":"009_chorus_drift","visible_title":"CHORUS DRIFT","role":"gallery-sketch"},
+    {"id":"010_fault_register","visible_title":"FAULT REGISTER","role":"gallery-sketch"},
+    {"id":"011_swarm_relay","visible_title":"SWARM RELAY","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
+    {"id":"012_chemical_blocks","visible_title":"CHEMICAL BLOCKS","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
+    {"id":"013_cut_cell","visible_title":"CUT CELL","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
+    {"id":"014_ribbon_morph","visible_title":"RIBBON MORPH","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
+    {"id":"015_phase_pack","visible_title":"PHASE PACK","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
+    {"id":"016_predator_vein","visible_title":"PREDATOR VEIN","role":"organic-collision-lab","primary_representation":"nutrient_graph_plus_cell_field","parameter_count":8,"interaction_consequence":"inject_persistent_predator","tags":["ECOSYSTEM","NETWORK","INTERACTIVE"]},
+    {"id":"017_edge_bloom","visible_title":"EDGE BLOOM","role":"organic-collision-lab","primary_representation":"excitable_cellular_tissue_plus_spores","parameter_count":9,"interaction_consequence":"seed_excitation","tags":["CELLULAR","GROWTH","INTERACTIVE"]},
+    {"id":"018_current_memory","visible_title":"CURRENT MEMORY","role":"organic-collision-lab","primary_representation":"wave_lattice_plus_particle_current","parameter_count":9,"interaction_consequence":"redirect_flow_and_inject_wave","tags":["FLOW","WAVE","INTERACTIVE"]},
+    {"id":"019_soft_flock","visible_title":"SOFT FLOCK","role":"organic-collision-lab","primary_representation":"boids_plus_verlet_constraint_mesh","parameter_count":9,"interaction_consequence":"create_persistent_obstacle","tags":["PHYSICS","FLOCK","INTERACTIVE"]},
+    {"id":"020_echo_tissue","visible_title":"ECHO TISSUE","role":"organic-collision-lab","primary_representation":"excitable_cells_plus_delayed_feedback","parameter_count":9,"interaction_consequence":"seed_activity","tags":["TISSUE","MEMORY","INTERACTIVE"]}
+  ],
+  "current_batch": {
+    "ids": ["016_predator_vein","017_edge_bloom","018_current_memory","019_soft_flock","020_echo_tissue"],
+    "random_seed": "202609242031",
+    "status": "IMPLEMENTED_HOST_NOT_VALIDATED",
+    "implementation_commit": "e2ff8328532a4eab057c63b8bd1d361bc706ba15",
+    "runtime_ci_run": 221,
+    "runtime_ci_passed": true
+  },
+  "telemetry": {
+    "remote_branch": "telemetry/runtime",
+    "latest": "latest.jsonl",
+    "sessions_directory": "sessions/",
+    "publication": "asynchronous_queued_sanitized",
+    "last_observed_runtime_head": "6dd4b307724d",
+    "last_observed_gallery_preview_count": 15,
+    "last_host_feedback_source": "011_015_test",
+    "telemetry_first_after_host_test": true
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
-    "required_for_runtime_code": ["repository_policy", "godot_4_7_1_headless_import", "main_scene_smoke_test", "tracked_file_cleanliness"],
-    "collision_first_implementation_root_commit": "230ef4ff587db604f264e8cf0522fadfcdbeae52",
-    "first_runtime_import_passed": true,
-    "first_runtime_smoke_passed": true,
-    "initial_cleanliness_failure_cause": "five newly generated Godot script uid files were untracked",
-    "uid_files_now_tracked": true,
+    "required_for_runtime_code": ["repository_policy","godot_4_7_1_headless_import","main_scene_smoke_test","tracked_file_cleanliness"],
     "final_exact_head_ci_must_be_resolved_from_github": true,
-    "current_host_state": "011_015_HOST_NOT_VALIDATED"
+    "current_host_state": "016_020_HOST_NOT_VALIDATED"
   },
   "ai_completion_protocol": {
     "mandatory": true,
@@ -104,7 +107,6 @@
     "wait_for_exact_final_head_ci": true,
     "report_exact_short_head_and_ci": true,
     "auto_supply_ci_waiting_powershell_when_host_test_relevant": true,
-    "powershell_must_not_launch_godot_before_ci_success": true,
     "telemetry_first_after_host_test": true
   },
   "constraints": {
@@ -114,9 +116,7 @@
     "do_not_stop_program_on_navigation": true,
     "do_not_create_independent_linked_output_timeline": true,
     "do_not_restore_pressure_lattice_visual_concept": true,
-    "no_sketch_metadata_inside_artwork_canvas": true,
     "do_not_make_glyph_contours_default": true,
-    "raw_collision_labs_are_not_final_artworks": true,
     "canonical_host_test_uses_exact_head_ci_wait": true
   }
 }

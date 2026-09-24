@@ -15,53 +15,76 @@ Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924
 5. `docs/handoff/project_state.json`
 6. `docs/ARCHITECTURE.md`
 
-Inspecte la PR #7, `app/main/main_runtime.tscn` et sa vraie chaîne `extends` avant de toucher à l'architecture runtime.
+Inspecte la PR #7 et l'architecture runtime avant toute modification du host. Pour un retour après test, consulte d'abord `telemetry/runtime`.
 
-Pour un retour après test, consulte d'abord `telemetry/runtime` avant de demander des logs.
+## Direction créative actuelle
 
-## État créatif important
+Le labo utilise en priorité la méthode **collision-first** :
 
-001–010 existent déjà. Une ancienne passe (`6c20a094...`) a appliqué des contours de glyphes presque partout sur 006–010 et a été rejetée après test hôte : rendu parfois inversé/cassé, cinq œuvres trop similaires et surutilisation d'une seule représentation. Le rollback commence à `3a437fe...`. **Ne restaure pas la passe contours généralisée.**
+`tirage technique aveugle -> prototype couplé -> observation -> interprétation -> direction artistique -> mutation`
 
-Le laboratoire est maintenant en méthode **collision-first** :
-
-`tirage technique aveugle -> prototype brut couplé -> observation -> interprétation -> direction artistique -> mutation`
-
-Lis en priorité :
+Lis d'abord :
 
 - `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
 - `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
 - `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
+- `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
 - les atlases design/creative-coding pertinents
 - `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`
 - `knowledge/cross-domain/IDEA_ENGINE.md`
 
-## Nouvelle batch 011–015
+Une ancienne passe contours généralisée (`6c20a094...`) sur 006–010 a été rejetée. Ne la restaure pas. `005_pressure_lattice` doit rester visuellement **REGISTER TYPE**, pas Pressure Lattice.
 
-Cinq **prototypes de laboratoire bruts** sont maintenant implémentés dans la Gallery. Ils ne doivent pas être traités comme des œuvres finales avant test hôte :
+## Retour hôte important sur 011–015
 
-- `011_swarm_relay` / **SWARM RELAY** — agents + graphe dynamique; touch = dommage local des liens + répulsion, puis reformation.
-- `012_chemical_blocks` / **CHEMICAL BLOCKS** — réaction-diffusion Gray-Scott; touch = injection de réactif.
-- `013_cut_cell` / **CUT CELL** — territoires nearest-site + graphe; touch = coupe réelle de liens, puis cicatrisation.
-- `014_ribbon_morph` / **RIBBON MORPH** — raster binaire + morphologie + reconstruction en rubans; touch = dépôt de matière, dwell = changement de régime.
-- `015_phase_pack` / **PHASE PACK** — packing/collisions + règles de phase + champ de distance; touch = conversion de phase + répulsion.
+La première batch collision-first était techniquement/creativement plus intéressante, mais :
 
-Le commit racine d'implémentation est `230ef4ff...`; les cinq `.gd.uid` générés ensuite sont maintenant suivis. **Résous toujours le HEAD final réel**, ne teste pas uniquement ce SHA historique.
+- visuellement encore trop faible ;
+- 3 paramètres par sketch ne suffisent pas ;
+- les systèmes raster/cellulaires ne faisaient pas assez réellement travailler les pixels/cellules entre eux.
 
-Premier résultat CI connu du commit runtime initial : import Godot 4.7.1 et smoke main-scene passaient; l'échec était uniquement la propreté Git due aux cinq UID non suivis. Le HEAD final doit tout de même avoir sa propre CI verte.
+La télémétrie du test montrait 15 previews chargées sur le runtime correspondant, donc le retour est principalement créatif/systemique.
 
-### Prochaine opération
+### Nouvelles règles durables
 
-Le prochain vrai travail est le **test hôte 011–015**, pas une nouvelle génération d'œuvres :
+Pour un lab substantiel :
 
-1. Gallery doit montrer 15 sketches et de vraies previews pour 011–015.
-2. Regarder chaque nouveau système 15–30 secondes sans toucher et sans régler les sliders.
-3. Faire un geste, retirer la main et observer la conséquence.
-4. Tester les meilleurs candidats sur PROGRAM/touch.
-5. Après le test, lire la nouvelle télémétrie.
-6. Ensuite seulement choisir les accidents/mécanismes qui méritent une passe artistique studio; tuer ou muter les autres.
+- viser **6–9 contrôles indépendants** quand le mécanisme le permet ;
+- au moins la moitié des contrôles doivent modifier l'évolution future, pas seulement le rendu courant ;
+- un système dit organique/cellulaire doit avoir de vrais échanges locaux : diffusion, excitation/réfractaire, ressources, pression, phase, délai, contraintes, réparation, etc. ;
+- préférer plusieurs échelles de temps ;
+- collision-first n'excuse pas un default visuellement négligé : palette, masse/vides et frozen frames doivent déjà être cohérents ;
+- pas de titre/index/tag/debug dans le canvas PROGRAM.
 
-PROGRAM canvas reste artwork-only : pas de titre/index/tag/debug/faux caption de projet dans l'œuvre.
+## Batch actuelle 016–020
+
+Graine du tirage : `202609242031`.
+
+Cinq nouveaux labs sont implémentés :
+
+- `016_predator_vein` / **PREDATOR VEIN** — réseau de nutriments + diffusion + hystérésis + champ cellulaire + prédateurs persistants/scars; 8 paramètres.
+- `017_edge_bloom` / **EDGE BLOOM** — tissu excitable 64×36 + huit voisins + réfractaire + edge feed + spores gradient/deposit/split; 9 paramètres.
+- `018_current_memory` / **CURRENT MEMORY** — membrane d'onde 52×30 + mémoire retardée + courant de particules + reconnexion + void asymétrique; 9 paramètres.
+- `019_soft_flock` / **SOFT FLOCK** — boids + membrane Verlet + abrasion/réparation des liens + obstacle persistant; 9 paramètres; deux couleurs seulement.
+- `020_echo_tissue` / **ECHO TISSUE** — tissu excitable 72×40 + voisinage + morphologie densité + réfractaire + feedback retardé + reseeding autonome; 9 paramètres.
+
+Commit runtime : `e2ff8328532a4eab057c63b8bd1d361bc706ba15`.
+CI #221 a validé import Godot 4.7.1, smoke main-scene et propreté Git pour ce commit runtime.
+
+**Toujours résoudre le HEAD final réel après les commits de docs.**
+
+## Prochaine opération
+
+Le prochain travail est le **test hôte 016–020**, pas la génération automatique d'une nouvelle batch.
+
+1. Gallery doit montrer 20 sketches.
+2. Juger d'abord le default visuel sans toucher aux paramètres.
+3. Laisser chaque sketch vivre 20–30 secondes.
+4. Faire une interaction, retirer la main et regarder propagation/réparation/migration.
+5. Ensuite explorer les 8–9 contrôles et vérifier qu'ils créent vraiment des régimes différents.
+6. Tester les meilleurs sur PROGRAM/touch.
+7. Lire la télémétrie juste après le test.
+8. Décider lesquels pousser, muter ou tuer.
 
 Préserve Gallery/PREVIEW/PROGRAM, TAKE LIVE, persistence, touch, live-sync et telemetry. Ne merge jamais `main` sans accord explicite.
 
