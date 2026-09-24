@@ -35,7 +35,7 @@ PROGRAM can keep running while the workstation browses the Gallery or edits a di
 app/                     application UI + runtime host
 sketches/                isolated creative works
 shared/                  genuinely reusable project resources
-knowledge/               external research memory / design references
+knowledge/               external research memory / design references / cross-domain idea system
 scripts/                 validation and telemetry publishing utilities
 .telemetry_runtime/      local runtime telemetry (ignored)
 ```
@@ -190,12 +190,25 @@ Important rules:
 
 ## Knowledge / creative research
 
-Before substantial new creative work, consult:
+Before substantial new creative work, consult all relevant layers:
 
-- `knowledge/creative-coding/`
-- `knowledge/design/`
+- `knowledge/creative-coding/` — technical vocabulary: shaders, simulation, feedback, particles, fields, geometry and GPU methods;
+- `knowledge/design/` — typography, layout, grid, hierarchy, color, identity and professional composition rules;
+- `knowledge/cross-domain/` — representation bridges and the mutation/idea engine that turns the two libraries above into original visual systems.
 
-The goal is to combine reputable creative-coding methods with professional typography, layout, grid, hierarchy, color and graphic-design principles.
+For a new artwork, the intended flow is:
+
+```text
+research several independent sources
+-> extract principles / carriers / representations
+-> build genuine cross-domain bridges
+-> mutate the first coherent combination
+-> define persistent identity rules and constraints
+-> choose the cheapest Godot-native representation that preserves the concept
+-> implement within the sketch/PREVIEW/PROGRAM contract
+```
+
+The goal is not to reproduce the surface appearance of a reference or stack generic effects. The cross-domain layer should make the research library generative: typography can become geometry/SDF/data, grids can become coordinate systems, interaction can become forces, simulations can become graphic language, and feedback can become temporal memory.
 
 The library stores links/summaries/tags and project notes by default, not copied third-party source code.
 
@@ -218,7 +231,3 @@ Runtime changes require:
 - host validation when behavior depends on Windows/display/touch/runtime presentation.
 
 CI: `.github/workflows/ci.yml`
-
-Local check: `scripts/check.ps1`
-
-Use telemetry as the first source of evidence after host tests.
