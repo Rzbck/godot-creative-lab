@@ -7,8 +7,8 @@ Last refreshed: 2026-09-24.
 - branch: `feat/creative-sketches-002-004-20260924`
 - draft PR: `#7`
 - PR base: `feat/gallery-project-workflow-20260923`
-- resolve current HEAD + CI from GitHub at session start
-- never merge `main` without explicit user approval
+- always resolve current remote HEAD + exact-head CI from GitHub
+- never merge/change `main` without explicit user approval
 
 ## Stable product areas to preserve
 
@@ -20,197 +20,163 @@ Last refreshed: 2026-09-24.
 - Physical display selection and PROGRAM touch/mouse forwarding.
 - Linked PREVIEW/PROGRAM state synchronization.
 - Sanitized asynchronous telemetry on `telemetry/runtime`.
+- PROGRAM canvas is artwork-only: no sketch title/index/tags/debug/project chrome unless artistically intentional.
 
-## Current creative content
+## Existing creative content
 
 - `001_signal_field` — technical/regression reference.
-- `002_liquid_type` — typography; gesture velocity affects spacing, phase, tangency, smear and chromatic direction.
-- `003_chroma_lens` — typography; safe margins + stable hierarchy + quantized optical states.
-- `004_gommage_type` — typography; directional erosion/dust/gesture memory and reconstruction.
-- `005_pressure_lattice` — internal path retained, visible artwork **REGISTER TYPE**. Original Pressure Lattice concept is rejected and must not be restored.
-- `006_breath_score` — **BREATH SCORE**, restored to pre-contour-overuse implementation.
-- `007_redaction_field` — **REDACTION FIELD**, restored; project caption/number suppressed by wrapper.
-- `008_palimpsest` — **PALIMPSEST**, restored; archive caption/frame chrome suppressed.
-- `009_chorus_drift` — **CHORUS DRIFT**, restored; explanatory frame/caption suppressed.
-- `010_fault_register` — **FAULT REGISTER**, restored; editorial grid remains but project label/number removed.
+- `002_liquid_type` — elastic typography.
+- `003_chroma_lens` — typographic optical system.
+- `004_gommage_type` — directional erosion/reconstruction.
+- `005_pressure_lattice` — visible artwork **REGISTER TYPE**; original Pressure Lattice is rejected and must not be restored.
+- `006_breath_score` — **BREATH SCORE**, pre-contour-overuse version.
+- `007_redaction_field` — **REDACTION FIELD**, pre-contour-overuse runtime with canvas chrome suppressed.
+- `008_palimpsest` — **PALIMPSEST**, pre-contour-overuse runtime with archive chrome suppressed.
+- `009_chorus_drift` — **CHORUS DRIFT**, pre-contour-overuse runtime with explanatory chrome suppressed.
+- `010_fault_register` — **FAULT REGISTER**, pre-contour-overuse runtime with label-free grid.
 
-## Rejected creative pass
+The generalized glyph-contour pass `6c20a094...` was host-rejected because it looked worse, some contours rendered inverted/broken and the series converged around one technique. Do not restore it.
 
-Host test rejected commit `6c20a094` because glyph contours became a near-universal answer, several glyphs rendered inverted/broken, and the five works converged technically/aesthetically.
+## New collision-first Gallery laboratories — 011–015
 
-Commit `3a437fe2621c00c11c808b909cb6a30a5936e80a` rolled 006–010 back without restoring unwanted captions.
+These are intentionally **raw mechanisms**, not polished artworks. Their job is to reveal behavior worth art-directing later.
 
-Do not resurrect contour-everywhere versions.
+### 011 — SWARM RELAY
 
-## Current diagnosis of 001–010
+Path: `sketches/011_swarm_relay/`
 
-The Gallery is still creatively too concentrated.
+Primary mechanism:
 
-Overrepresented:
+`autonomous agents -> cohesion/separation -> dynamic neighbour graph -> local communication damage/recovery`
 
-- typography as primary carrier;
-- direct 2D drawing / per-glyph layout;
-- pointer/drag as primary interaction;
-- local deformation;
-- springs/oscillation;
-- simple local memory/recovery;
-- parameter sliders as visible creative controls.
+- 72 moving agents;
+- each agent continuously rebuilds links to nearby neighbours;
+- touch repels local agents and increases damage, causing communication links to disappear;
+- damage decays, so topology reforms after interaction;
+- parameters: `COHESION`, `SEPARATION`, `LINK RANGE`;
+- tags: `AGENTS`, `TOPOLOGY`, `INTERACTIVE`.
 
-Underused or absent:
+### 012 — CHEMICAL BLOCKS
 
-- persistent framebuffer feedback;
-- reaction-diffusion / excitable media;
-- cellular automata;
-- particle/agent populations as the artwork itself;
-- topology/graph mutation;
-- physical constraint networks / soft-body logic;
-- Voronoi/Delaunay and recursive spatial partitioning;
-- slitscan / temporal slicing;
-- raymarching / volumetric SDF;
-- procedural mesh/ribbon systems;
-- 3D/spatial composition;
-- birth/death and population ecology;
-- discrete phase transitions / regime switching;
-- non-pointer drivers such as audio, data or sensing when intentionally supported.
+Path: `sketches/012_chemical_blocks/`
 
-The problem is not lack of effects. It is lack of **different underlying mechanisms**.
+Primary mechanism:
 
-## New exploration direction — collision-first
+`coarse raster chemistry -> Gray-Scott reaction-diffusion -> autonomous pattern growth -> touch injects reagent`
 
-The user explicitly wants a more stochastic process before assigning artistic meaning.
+- 48×27 two-field reaction-diffusion simulation;
+- autonomous feed/kill chemistry continues with no input;
+- touch injects B reagent and locally restarts the reaction;
+- parameters: `FEED`, `KILL`, `DIFFUSION`;
+- tags: `CHEMISTRY`, `DIFFUSION`, `INTERACTIVE`.
 
-Two modes are valid:
+### 013 — CUT CELL
 
-### Intent-first
+Path: `sketches/013_cut_cell/`
 
-`artistic question -> compare representations -> prototype -> refine`
+Primary mechanism:
 
-### Collision-first
+`moving sites -> nearest-site territories -> dynamic communication graph -> interaction cuts links -> healing`
 
-`blind random technical draw -> coupled raw prototype -> observe -> interpret -> art-direct -> mutate`
+- 18 autonomous sites;
+- coarse nearest-site field produces moving cellular territories;
+- graph uses nearest/second-nearest relationships within a range;
+- touch can cut actual graph links around the gesture region;
+- severed links heal over time while sites keep moving;
+- parameters: `DRIFT`, `HEAL`, `NETWORK RANGE`;
+- tags: `NETWORK`, `VORONOI`, `INTERACTIVE`.
 
-For the next exploration batch, collision-first is preferred.
+### 014 — RIBBON MORPH
 
-Mandatory files:
+Path: `sketches/014_ribbon_morph/`
+
+Primary mechanism:
+
+`binary raster material -> neighbourhood morphology -> regime switching -> raster reconstructed as ribbons`
+
+- 64×36 binary material field;
+- autonomous morphology alternates between growth-like and erosion-like regimes;
+- touch deposits material;
+- dwell flips the material regime rather than directly dragging geometry;
+- row structure is reconstructed into long quad ribbons;
+- parameters: `MORPH RATE`, `PERSISTENCE`, `RIBBON MASS`;
+- tags: `MORPHOLOGY`, `RASTER`, `INTERACTIVE`.
+
+### 015 — PHASE PACK
+
+Path: `sketches/015_phase_pack/`
+
+Primary mechanism:
+
+`packed colliding bodies -> neighbour phase rules -> local phase transitions -> signed-distance-like field`
+
+- 24 moving bodies with radii, collisions and two material phases;
+- same/opposite phases affect neighbour forces;
+- discrete neighbourhood rules can flip phase autonomously;
+- touch changes local phase and injects repulsion;
+- coarse field rendering derives from distance to the packed bodies;
+- parameters: `MOTION`, `PHASE RATE`, `FIELD`;
+- tags: `PHASE`, `PACKING`, `INTERACTIVE`.
+
+All five use the shared design/runtime contract and include custom live-sync state for linked PREVIEW/PROGRAM.
+
+Implementation root commit: `230ef4ff587db604f264e8cf0522fadfcdbeae52`.
+Five generated Godot script UIDs were subsequently tracked; resolve the current final HEAD from GitHub rather than trusting this recorded commit.
+
+## Why this batch exists
+
+The user identified that 001–010 varied surface styling more than underlying mechanism. Collision-first work deliberately spreads into different state representations before assigning artistic meaning.
+
+Current rule:
+
+`blind technical collision -> coupled raw prototype -> observe -> interpret -> art-direct -> mutate`
+
+Mandatory references:
 
 - `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
 - `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
 - `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
 
-Broader references:
+Do not prematurely turn 011–015 into five polished poster designs. First identify which mechanisms produce genuinely interesting accidents.
 
-- `CROSS_DOMAIN_ATLAS.md`
-- `IDEA_ENGINE.md`
-- `LIVING_SYSTEMS.md`
-- creative-coding and design atlases.
+## Validation state
 
-## Collision-first rules
+- The initial 011–015 runtime commit successfully passed Godot 4.7.1 import and the main-scene smoke test.
+- Its first CI failed only because Godot generated five untracked `.gd.uid` files for the new scripts.
+- Those UIDs are now tracked.
+- Repository validation of the **final HEAD** must be taken from GitHub CI, never inferred from this file.
+- Host visual/tactile state for 011–015: **HOST_NOT_VALIDATED**.
 
-For each seed randomly choose:
+## Required host test for 011–015
 
-```text
-1 carrier/material
-+ 2 technically distant representations
-+ 2 operators
-+ 1 temporal model
-+ 1 interaction consequence
-+ 1 severe design constraint
-```
+Do not start by tuning sliders.
 
-Then:
+1. Sync the exact final HEAD only after its CI is green.
+2. Confirm Gallery now contains **15 sketches** and cards 011–015 render real previews.
+3. Open each of 011–015 and watch it for ~15–30 seconds without touching.
+4. Then interact once and remove your hand; observe whether the consequence persists/propagates/reorganizes.
+5. Specifically test:
+   - 011: damage and network reformation;
+   - 012: reagent injection and continuing chemistry;
+   - 013: cut links and healing;
+   - 014: material deposition + dwell regime switch;
+   - 015: local phase conversion and later propagation/collisions.
+6. Try the most promising one or two on physical PROGRAM/touch.
+7. After the test, inspect `telemetry/runtime` before asking the user for logs.
 
-1. couple the systems so they exchange state;
-2. build an intentionally raw prototype before choosing a message/title/final palette;
-3. observe autonomous and interacted behavior;
-4. harvest the most interesting accidents;
-5. only then assign artistic meaning and graphic direction;
-6. mutate one card at a time if the result is weak;
-7. kill the seed after three unsuccessful mutations.
-
-Random stacking without coupling is technical soup and must be rejected.
-
-## First blind draw — research seeds
-
-These are not approved artworks and should not be art-directed before raw prototypes exist.
-
-### A
-
-`typography + GPU particles/agents + instanced geometry + sort/reorder + morphology + feedback memory + touch toggles topology + no noise`
-
-### B
-
-`architectural cells + vector-field advection + reaction-diffusion + grow/decay + phase shift + coupled oscillators + touch seeds population + no smooth interpolation`
-
-### C
-
-`line network + Voronoi/Delaunay + velocity field + fold/mirror + feedback sharpen/blur + birth/death + touch cuts links + horizontal attractor`
-
-### D
-
-`data-like symbols + raster morphology + procedural mesh/ribbons + recursive transform + domain warp + stochastic regime switching + dwell changes material + no smooth interpolation`
-
-### E
-
-`abstract symbols + raymarched SDF geometry + cellular automaton + collision/packing + phase transition + dwell changes local phase + two colors only`
-
-Any artistic interpretation attached to these before a prototype is only a hypothesis.
-
-## Internet research added
-
-`COLLISION_SOURCE_CATALOG.md` now includes specialized references for:
-
-- Nature of Code — agents, forces, CA, complexity;
-- Book of Shaders — coordinate systems, image processing, ping-pong simulation, reaction-diffusion;
-- LYGIA — broad shader/operator taxonomy;
-- TouchDesigner official feedback/particle state loops;
-- Simon Alexander-Adams — reaction-diffusion + CA driving particles/geometry;
-- Derivative community — SDF geometry + particles, feedback + reaction-diffusion, text as simulation boundary;
-- elekktronaut — feedback, instancing, slitscan, particle paths, generative blueprints;
-- Codrops — WebGL/WebGPU particles, typography, physics, masks, material effects;
-- Entagma — SDF, packing, advection, procedural geometry;
-- Generative Hut — code + physical/plotter/material approaches;
-- Raven Kwok — quadtree→Voronoi, particles→soft-body→Kinect, KD-tree recursion;
-- Universal Everything — Living Motion Systems;
-- onformative — research-driven generative/data installations;
-- FIELD.IO — visual-library decomposition into generative identity systems.
-
-## Creative rules that remain
-
-1. PROGRAM canvas is artwork-only; project title/index/tags/debug labels stay in UI.
-2. No single technique becomes house style accidentally.
-3. Structural typography is optional.
-4. Series diversity is structural, not cosmetic.
-5. Parameters should bias a strong system, not rescue a weak default.
-6. Interaction should exploit the mechanism actually discovered, not automatically use a radial cursor effect.
-7. A collision should exchange state across systems rather than stack independent effects.
+The artistic evaluation question is not “is it finished?” It is: **which mechanism contains an accident worth developing into a real DC//LAB piece?**
 
 ## Mandatory AI operational completion
 
-The user should not need to ask for repository hygiene, CI waiting or the test launcher after each change.
-
 After every material repository change, every AI must automatically:
 
-1. update the durable handoff/state documents affected by the change;
-2. resolve the final remote HEAD after all code + documentation commits;
-3. wait for CI on that exact final SHA and inspect required jobs;
-4. report exact short HEAD + CI result;
-5. when host validation is relevant, include the canonical `sync + exact-head CI wait + launch Godot` PowerShell block from `docs/handoff/OPERATIONS.md`;
-6. never launch/recommend launch before CI success in that block;
-7. after host testing, read `telemetry/runtime` before requesting manual logs.
-
-This is part of task completion, not optional cleanup. See `AGENTS.md` for the full protocol.
-
-## Telemetry state
-
-Latest host run published runtime head `729c3a2...` with all 10 previews loaded and no error entry found. The recent complaints are primarily visual/creative, not runtime crashes.
-
-After further host tests, inspect `telemetry/runtime` before requesting manual logs.
-
-## Next creative step
-
-Do not redesign 006–010 again immediately.
-
-Build raw prototypes from several blind collision seeds with minimal art direction. The purpose is to discover genuinely new behavior first. After observing them, select only the collisions whose emergent behavior has real visual/interactive potential, then perform the artistic-impact pass.
+1. finish intended feature-branch commits;
+2. update durable handoff/state docs when state/NEXT/validation changes;
+3. resolve the final remote HEAD after all commits;
+4. wait for CI on that exact final SHA;
+5. report exact short HEAD + CI result;
+6. when host validation is relevant, include the canonical `sync + exact-head CI wait + launch Godot` PowerShell from `docs/handoff/OPERATIONS.md` without waiting to be asked;
+7. after host testing, inspect telemetry before requesting manual logs.
 
 ## Non-regressions
 

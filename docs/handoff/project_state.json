@@ -5,7 +5,7 @@
   "active_branch": "feat/creative-sketches-002-004-20260924",
   "draft_pr": 7,
   "pr_base": "feat/gallery-project-workflow-20260923",
-  "head_policy": "Resolve current remote branch HEAD from GitHub at session start and again after all material code/documentation commits before reporting validation.",
+  "head_policy": "Resolve current remote branch HEAD at session start and again after all material code/documentation commits; exact-head CI is authoritative.",
   "engine": {
     "name": "Godot",
     "version": "4.7.1.stable.official.a13da4feb",
@@ -28,7 +28,8 @@
     "gallery_tag_filter": true,
     "gallery_search": true,
     "logical_design_size": [1280, 720],
-    "artwork_canvas_excludes_project_metadata": true
+    "artwork_canvas_excludes_project_metadata": true,
+    "expected_gallery_sketch_count_after_011_015": 15
   },
   "sketches": [
     {"id": "001_signal_field", "role": "technical-foundation"},
@@ -40,27 +41,28 @@
     {"id": "007_redaction_field", "visible_title": "REDACTION FIELD", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "REDACTION", "INTERACTIVE"]},
     {"id": "008_palimpsest", "visible_title": "PALIMPSEST", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "MEMORY", "INTERACTIVE"]},
     {"id": "009_chorus_drift", "visible_title": "CHORUS DRIFT", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_canvas_chrome_suppression", "tags": ["TYPOGRAPHY", "CHORUS", "INTERACTIVE"]},
-    {"id": "010_fault_register", "visible_title": "FAULT REGISTER", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_label_free_grid_wrapper", "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"]}
+    {"id": "010_fault_register", "visible_title": "FAULT REGISTER", "role": "gallery-sketch", "current_refinement": "pre_contour_overuse_runtime_plus_label_free_grid_wrapper", "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"]},
+    {"id": "011_swarm_relay", "visible_title": "SWARM RELAY", "role": "collision-first-lab", "primary_representation": "agents_plus_dynamic_graph", "interaction_consequence": "local_link_damage_and_repulsion", "tags": ["AGENTS", "TOPOLOGY", "INTERACTIVE"]},
+    {"id": "012_chemical_blocks", "visible_title": "CHEMICAL BLOCKS", "role": "collision-first-lab", "primary_representation": "reaction_diffusion_raster", "interaction_consequence": "reagent_injection", "tags": ["CHEMISTRY", "DIFFUSION", "INTERACTIVE"]},
+    {"id": "013_cut_cell", "visible_title": "CUT CELL", "role": "collision-first-lab", "primary_representation": "nearest_site_field_plus_graph", "interaction_consequence": "cut_graph_links_then_heal", "tags": ["NETWORK", "VORONOI", "INTERACTIVE"]},
+    {"id": "014_ribbon_morph", "visible_title": "RIBBON MORPH", "role": "collision-first-lab", "primary_representation": "binary_raster_morphology_plus_ribbons", "interaction_consequence": "deposit_material_and_flip_regime_on_dwell", "tags": ["MORPHOLOGY", "RASTER", "INTERACTIVE"]},
+    {"id": "015_phase_pack", "visible_title": "PHASE PACK", "role": "collision-first-lab", "primary_representation": "packed_bodies_plus_distance_field_plus_phase_rules", "interaction_consequence": "convert_local_phase_and_repulse", "tags": ["PHASE", "PACKING", "INTERACTIVE"]}
   ],
   "rejected_creative_passes": [
     {
       "commit": "6c20a0948a512809ad16014c7fef67e0ffaf4ae9",
       "name": "generalized structural contour pass for 006-010",
-      "reason": "host rejected: visually worse, some glyph contour rendering appeared inverted/broken, one representation was overused across the entire series, and technique diversity collapsed",
+      "reason": "host rejected: visually worse, some glyph contour rendering appeared inverted/broken, one representation was overused across the series, and technique diversity collapsed",
       "do_not_restore_as_default": true
     }
   ],
   "creative_exploration": {
     "preferred_mode": "collision-first",
     "pipeline": ["blind_random_technical_draw", "coupled_raw_prototype", "observe", "interpret", "art_direct", "mutate"],
-    "raw_seeds_documented_in": "docs/handoff/CURRENT_WORK.md",
-    "do_not_assign_final_message_before_prototype": true,
+    "current_batch": ["011_swarm_relay", "012_chemical_blocks", "013_cut_cell", "014_ribbon_morph", "015_phase_pack"],
+    "batch_status": "IMPLEMENTED_HOST_NOT_VALIDATED",
+    "do_not_assign_final_message_before_prototype_observation": true,
     "random_stacking_without_state_coupling_is_rejected": true
-  },
-  "shared_creative_infrastructure": {
-    "glyph_contour_tools": "sketches/_shared/glyph_contour_tools.gd",
-    "glyph_contours_are_optional": true,
-    "design_base": "sketches/_shared/design_sketch_base.gd"
   },
   "telemetry": {
     "remote_branch": "telemetry/runtime",
@@ -74,41 +76,30 @@
     "telemetry_first_after_host_test": true
   },
   "knowledge": {
-    "creative_coding": "knowledge/creative-coding/",
-    "design": "knowledge/design/",
-    "cross_domain": "knowledge/cross-domain/",
     "technique_palette": "knowledge/cross-domain/TECHNIQUE_PALETTE.md",
     "random_collision_engine": "knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md",
     "collision_source_catalog": "knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md",
     "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
     "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
-    "living_systems": "knowledge/cross-domain/LIVING_SYSTEMS.md",
-    "structural_typography": "knowledge/design/STRUCTURAL_TYPOGRAPHY.md",
     "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md",
-    "creative_work_rule": "For the current exploration phase, blind technical collisions may precede artistic meaning. Require coupled state exchange, observe raw behavior first, then art-direct successful accidents. No technique is a default house style.",
-    "series_diversity_rules": {
-      "max_same_primary_representation": 2,
-      "max_same_primary_temporal_model": 2,
-      "interaction_consequence_must_materially_differ": true,
-      "palette_or_text_changes_alone_do_not_count_as_diversity": true
-    }
+    "creative_work_rule": "For the current exploration phase, observe coupled raw mechanisms before imposing final artistic meaning; no technique is a default house style."
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
     "required_for_runtime_code": ["repository_policy", "godot_4_7_1_headless_import", "main_scene_smoke_test", "tracked_file_cleanliness"],
-    "rollback_commit": "3a437fe2621c00c11c808b909cb6a30a5936e80a",
-    "current_host_state": "ROLLBACK_HOST_CONFIRMED",
-    "final_head_ci_must_be_checked_after_documentation_commits": true
+    "collision_first_implementation_root_commit": "230ef4ff587db604f264e8cf0522fadfcdbeae52",
+    "first_runtime_import_passed": true,
+    "first_runtime_smoke_passed": true,
+    "initial_cleanliness_failure_cause": "five newly generated Godot script uid files were untracked",
+    "uid_files_now_tracked": true,
+    "final_exact_head_ci_must_be_resolved_from_github": true,
+    "current_host_state": "011_015_HOST_NOT_VALIDATED"
   },
   "ai_completion_protocol": {
     "mandatory": true,
     "source": "AGENTS.md",
     "canonical_operations": "docs/handoff/OPERATIONS.md",
-    "update_current_work_when_durable_state_changes": true,
-    "update_handoff_when_future_session_state_changes": true,
-    "update_project_state_when_machine_state_changes": true,
-    "update_next_ai_prompt_when_startup_or_next_changes": true,
     "resolve_final_remote_head_after_all_commits": true,
     "wait_for_exact_final_head_ci": true,
     "report_exact_short_head_and_ci": true,
@@ -119,14 +110,13 @@
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
     "do_not_fake_spout_ndi": true,
-    "do_not_create_new_sketch_without_user_request": true,
     "do_not_block_godot_ui_with_telemetry_publish": true,
     "do_not_stop_program_on_navigation": true,
     "do_not_create_independent_linked_output_timeline": true,
     "do_not_restore_pressure_lattice_visual_concept": true,
-    "keep_gallery_taxonomy_small_and_semantic": true,
     "no_sketch_metadata_inside_artwork_canvas": true,
     "do_not_make_glyph_contours_default": true,
+    "raw_collision_labs_are_not_final_artworks": true,
     "canonical_host_test_uses_exact_head_ci_wait": true
   }
 }
