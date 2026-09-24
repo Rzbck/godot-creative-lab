@@ -126,8 +126,11 @@ External research memory is versioned in the repo:
 
 - `knowledge/creative-coding/` — shaders, simulation, generative systems, GPU techniques, references.
 - `knowledge/design/` — typography, graphic design, grids, hierarchy, color, poster/layout systems, realtime-design translation and review checklist.
+- `knowledge/cross-domain/` — bridges between those domains plus the idea/mutation engine used to generate original identities from representation changes, coupled systems and design constraints.
 
-Use these sources as research starting points. Do not vendor/copy third-party code blindly; check license/provenance first.
+For substantial new creative work, do not stop at one domain. Start from the relevant technical/design atlases, then use `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md` and `knowledge/cross-domain/IDEA_ENGINE.md` to translate and mutate the research into an original system before implementation.
+
+Use sources as research starting points. Do not vendor/copy third-party code blindly; check license/provenance first.
 
 ## Handoff maintenance
 
