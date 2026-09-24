@@ -28,98 +28,174 @@ Last refreshed: 2026-09-24.
 - `003_chroma_lens` — typography; safe margins + stable hierarchy + quantized optical states.
 - `004_gommage_type` — typography; directional erosion/dust/gesture memory and reconstruction.
 - `005_pressure_lattice` — internal path retained, visible artwork **REGISTER TYPE**. Original Pressure Lattice concept is rejected and must not be restored.
-- `006_breath_score` — **BREATH SCORE**, restored to the pre-contour-overuse implementation.
-- `007_redaction_field` — **REDACTION FIELD**, restored to the pre-contour-overuse implementation; project caption/number are suppressed by a thin wrapper.
-- `008_palimpsest` — **PALIMPSEST**, restored to the pre-contour-overuse implementation; archive caption/frame chrome is suppressed by a thin wrapper.
-- `009_chorus_drift` — **CHORUS DRIFT**, restored to the pre-contour-overuse implementation; explanatory frame/caption is suppressed by a thin wrapper.
-- `010_fault_register` — **FAULT REGISTER**, restored to the pre-contour-overuse implementation; the editorial grid remains but project label/number are removed by a thin wrapper.
+- `006_breath_score` — **BREATH SCORE**, restored to pre-contour-overuse implementation.
+- `007_redaction_field` — **REDACTION FIELD**, restored; project caption/number suppressed by wrapper.
+- `008_palimpsest` — **PALIMPSEST**, restored; archive caption/frame chrome suppressed.
+- `009_chorus_drift` — **CHORUS DRIFT**, restored; explanatory frame/caption suppressed.
+- `010_fault_register` — **FAULT REGISTER**, restored; editorial grid remains but project label/number removed.
 
 ## Rejected creative pass
 
-The host test of the `6c20a094` structural/autonomous pass was rejected.
+Host test rejected commit `6c20a094` because glyph contours became a near-universal answer, several glyphs rendered inverted/broken, and the five works converged technically/aesthetically.
 
-Why it failed:
+Commit `3a437fe2621c00c11c808b909cb6a30a5936e80a` rolled 006–010 back without restoring unwanted captions.
 
-- glyph contours were applied as a near-universal answer instead of one technique among many;
-- several glyph-contour renderings appeared vertically inverted / visually broken;
-- the five works converged technically and aesthetically instead of becoming more diverse;
-- the correction overfit one piece of feedback (`work inside letter structure`) and ignored the much larger available palette of shaders, fields, feedback, particles, SDFs, simulations, geometry, typography metrics, variable fonts, graphs, raster systems, etc.;
-- the result became worse than the previous host-tested pass.
+Do not resurrect contour-everywhere versions.
 
-Commit `3a437fe2621c00c11c808b909cb6a30a5936e80a` rolls the five runtimes back without restoring the unwanted presentation captions.
+## Current diagnosis of 001–010
 
-Do not resurrect the rejected contour-everywhere versions.
+The Gallery is still creatively too concentrated.
 
-## Creative rules established from host feedback
+Overrepresented:
 
-1. **PROGRAM canvas is artwork-only.** Sketch title, index, tags, debug/project metadata and explanatory pseudo-curatorial labels stay in the Gallery/editor UI.
-2. **No single technique becomes house style by accident.** Vector contours, SDF, shaders, particles, feedback, simulation, direct type, mesh/geometry, fields, raster/masks, graphs and variable-font systems are all separate options.
-3. **Concept chooses representation.** For substantial new work, compare at least three plausible technical representations before implementation.
-4. **Structural typography is optional.** Only use contour/anatomy-level techniques when the artistic idea genuinely depends on internal glyph structure.
-5. **Series diversity is structural.** Five works must not be five variants of one renderer with changed text/color/input mapping.
-6. **Interaction and autonomy still need deeper research**, but do not solve that by blindly adding contour deformation or generic ambient oscillation.
-7. **Parameters should express artistic/systemic choices**, not rescue a weak default composition.
+- typography as primary carrier;
+- direct 2D drawing / per-glyph layout;
+- pointer/drag as primary interaction;
+- local deformation;
+- springs/oscillation;
+- simple local memory/recovery;
+- parameter sliders as visible creative controls.
 
-## Knowledge system
+Underused or absent:
 
-Before substantial creative work use:
+- persistent framebuffer feedback;
+- reaction-diffusion / excitable media;
+- cellular automata;
+- particle/agent populations as the artwork itself;
+- topology/graph mutation;
+- physical constraint networks / soft-body logic;
+- Voronoi/Delaunay and recursive spatial partitioning;
+- slitscan / temporal slicing;
+- raymarching / volumetric SDF;
+- procedural mesh/ribbon systems;
+- 3D/spatial composition;
+- birth/death and population ecology;
+- discrete phase transitions / regime switching;
+- non-pointer drivers such as audio, data or sensing when intentionally supported.
 
-- `knowledge/creative-coding/`
-- `knowledge/design/`
-- `knowledge/cross-domain/`
+The problem is not lack of effects. It is lack of **different underlying mechanisms**.
 
-Most important current files:
+## New exploration direction — collision-first
 
-- `knowledge/cross-domain/TECHNIQUE_PALETTE.md` — mandatory selection/diversity guide;
-- `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`;
-- `knowledge/cross-domain/IDEA_ENGINE.md`;
-- `knowledge/cross-domain/LIVING_SYSTEMS.md` — useful as one behavior research brick, not a mandate that every artwork must be autonomous;
-- `knowledge/design/TYPOGRAPHY_ATLAS.md`;
-- `knowledge/design/STRUCTURAL_TYPOGRAPHY.md` — optional technique-specific reference, not the default typography strategy;
-- `knowledge/design/DESIGN_REVIEW_CHECKLIST.md`.
+The user explicitly wants a more stochastic process before assigning artistic meaning.
 
-### Mandatory technique-selection protocol
+Two modes are now valid:
 
-For a substantial new sketch, write at least three candidate implementation chains before choosing one.
+### Intent-first
 
-Example:
+`artistic question -> compare representations -> prototype -> refine`
+
+### Collision-first
+
+`blind random technical draw -> coupled raw prototype -> observe -> interpret -> art-direct -> mutate`
+
+For the next exploration batch, collision-first is preferred.
+
+Mandatory files:
+
+- `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
+- `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
+- `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
+
+Broader references:
+
+- `CROSS_DOMAIN_ATLAS.md`
+- `IDEA_ENGINE.md`
+- `LIVING_SYSTEMS.md`
+- creative-coding and design atlases.
+
+## Collision-first rules
+
+For each seed randomly choose:
 
 ```text
-same intention
-A -> direct/variable typography + layout state machine
-B -> raster mask + temporal feedback + shader
-C -> particles/agents + field + reconstruction
+1 carrier/material
++ 2 technically distant representations
++ 2 operators
++ 1 temporal model
++ 1 interaction consequence
++ 1 severe design constraint
 ```
 
-Choose by artistic fit, not by recency/convenience.
+Then:
 
-For a multi-sketch series:
+1. couple the systems so they exchange state;
+2. build an intentionally raw prototype before choosing a message/title/final palette;
+3. observe autonomous and interacted behavior;
+4. harvest the most interesting accidents;
+5. only then assign artistic meaning and graphic direction;
+6. mutate one card at a time if the result is weak;
+7. kill the seed after three unsuccessful mutations.
 
-- no more than two works should share the same primary representation;
-- no more than two should share the same primary temporal model;
-- interaction consequence must materially differ;
-- palette/composition changes alone do not count as technical/conceptual diversity.
+Random stacking without coupling is technical soup and must be rejected.
+
+## First blind draw — research seeds
+
+These are not approved artworks and should not be art-directed before raw prototypes exist.
+
+### A
+
+`typography + GPU particles/agents + instanced geometry + sort/reorder + morphology + feedback memory + touch toggles topology + no noise`
+
+### B
+
+`architectural cells + vector-field advection + reaction-diffusion + grow/decay + phase shift + coupled oscillators + touch seeds population + no smooth interpolation`
+
+### C
+
+`line network + Voronoi/Delaunay + velocity field + fold/mirror + feedback sharpen/blur + birth/death + touch cuts links + horizontal attractor`
+
+### D
+
+`data-like symbols + raster morphology + procedural mesh/ribbons + recursive transform + domain warp + stochastic regime switching + dwell changes material + no smooth interpolation`
+
+### E
+
+`abstract symbols + raymarched SDF geometry + cellular automaton + collision/packing + phase transition + dwell changes local phase + two colors only`
+
+Any artistic interpretation attached to these before a prototype is only a hypothesis.
+
+## Internet research added
+
+`COLLISION_SOURCE_CATALOG.md` now includes specialized references for:
+
+- Nature of Code — agents, forces, CA, complexity;
+- Book of Shaders — coordinate systems, image processing, ping-pong simulation, reaction-diffusion;
+- LYGIA — broad shader/operator taxonomy;
+- TouchDesigner official feedback/particle state loops;
+- Simon Alexander-Adams — reaction-diffusion + CA driving particles/geometry;
+- Derivative community — SDF geometry + particles, feedback + reaction-diffusion, text as simulation boundary;
+- elekktronaut — feedback, instancing, slitscan, particle paths, generative blueprints;
+- Codrops — WebGL/WebGPU particles, typography, physics, masks, material effects;
+- Entagma — SDF, packing, advection, procedural geometry;
+- Generative Hut — code + physical/plotter/material approaches;
+- Raven Kwok — quadtree→Voronoi, particles→soft-body→Kinect, KD-tree recursion;
+- Universal Everything — Living Motion Systems;
+- onformative — research-driven generative/data installations;
+- FIELD.IO — visual-library decomposition into generative identity systems.
+
+## Creative rules that remain
+
+1. PROGRAM canvas is artwork-only; project title/index/tags/debug labels stay in UI.
+2. No single technique becomes house style accidentally.
+3. Structural typography is optional.
+4. Series diversity is structural, not cosmetic.
+5. Parameters should bias a strong system, not rescue a weak default.
+6. Interaction should exploit the mechanism actually discovered, not automatically use a radial cursor effect.
+7. A collision should exchange state across systems rather than stack independent effects.
 
 ## Telemetry state
 
-The latest host run published runtime head `729c3a2...` with all 10 previews loaded and no error entry found in the rolling telemetry. The user's complaint is therefore primarily a visual/creative failure, not evidence of a runtime crash.
+Latest host run published runtime head `729c3a2...` with all 10 previews loaded and no error entry found. The recent complaints are primarily visual/creative, not runtime crashes.
 
-After any further host test, inspect `telemetry/runtime` before requesting manual logs.
+After further host tests, inspect `telemetry/runtime` before requesting manual logs.
 
-## Validation / next step
+## Next creative step
 
-The runtime rollback itself must pass exact-head CI before being presented as stable.
+Do not redesign 006–010 again immediately.
 
-Do **not** immediately generate another batch of five artworks.
-
-Next creative task is a real gap analysis of the research library and technique palette:
-
-1. classify current sketches 001–010 by primary representation, temporal model, interaction consequence, composition system and visual material;
-2. identify overrepresented mechanisms and missing families;
-3. research studio-grade references for the missing families;
-4. expand the library with concrete implementation bridges;
-5. only then design the next major artwork/series.
+Build raw prototypes from several blind collision seeds with minimal art direction. The purpose is to discover genuinely new behavior first. After observing them, select only the collisions whose emergent behavior has real visual/interactive potential, then perform the artistic-impact pass.
 
 ## Non-regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, move the workstation as the normal output mechanism, block the UI with telemetry Git work, resurrect the failed cross-window texture path, add card-covering overlays, fake Spout/NDI, restore Pressure Lattice, reintroduce artwork metadata captions, or make glyph contours the default creative representation.
+Do not stop PROGRAM on navigation, create independent linked timelines, move the workstation as normal output, block UI with telemetry Git work, resurrect the failed cross-window texture path, add card-covering overlays, fake Spout/NDI, restore Pressure Lattice, reintroduce artwork metadata captions, or make glyph contours the default representation.
