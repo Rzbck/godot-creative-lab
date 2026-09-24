@@ -1,0 +1,9 @@
+{
+  "id": "005_pressure_lattice",
+  "index": "005",
+  "title": "PRESSURE LATTICE",
+  "scene": "res://sketches/005_pressure_lattice/runtime/pressure_lattice.tscn",
+  "engine": "GODOT SHADER / FIELD SYSTEM",
+  "tags": ["SHADER", "GRID", "FIELD", "MEMORY", "INTERACTIVE", "LIVE"],
+  "description": "A duotone editorial lattice whose procedural field stores gesture energy, bends local signal structure and decays through synchronized live memory."
+}
