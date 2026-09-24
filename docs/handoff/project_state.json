@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "project": "DC//LAB / Godot Creative Lab",
+  "repository": "Rzbck/godot-creative-lab",
+  "active_branch": "feat/creative-sketches-002-004-20260924",
+  "draft_pr": 7,
+  "pr_base": "feat/gallery-project-workflow-20260923",
+  "baseline_before_handoff_refresh": "eef780c02ddc1535f1c252bf50ffbec7b1813ee0",
+  "head_policy": "Resolve current remote branch HEAD from GitHub at session start; do not treat this file as the authoritative latest SHA.",
+  "engine": {
+    "name": "Godot",
+    "version": "4.7.1.stable.official.a13da4feb",
+    "renderer": "Vulkan / Forward+"
+  },
+  "workstation": {
+    "local_root": "E:\\_Project\\GodotCreativeLab",
+    "godot_gui": "C:\\Godot\\Godot_v4.7.1-stable_win64.exe",
+    "godot_console": "C:\\Godot\\Godot_v4.7.1-stable_win64_console.exe"
+  },
+  "runtime": {
+    "main_scene": "res://app/main/main_runtime.tscn",
+    "program_output_persistent_across_navigation": true,
+    "take_live_supported": true,
+    "touch_program_input": true,
+    "per_sketch_parameter_persistence": true,
+    "gallery_real_thumbnails": true,
+    "gallery_hover_animation": true,
+    "gallery_auto_groups_from_tags": true,
+    "gallery_tag_filter": true,
+    "gallery_search": true
+  },
+  "sketches": [
+    {"id": "001_signal_field", "role": "technical-foundation"},
+    {"id": "002_liquid_type", "role": "gallery-sketch"},
+    {"id": "003_chroma_lens", "role": "gallery-sketch"},
+    {"id": "004_gommage_type", "role": "gallery-sketch"}
+  ],
+  "telemetry": {
+    "remote_branch": "telemetry/runtime",
+    "latest": "latest.jsonl",
+    "sessions_directory": "sessions/",
+    "local_runtime_directory": "res://.telemetry_runtime/",
+    "publication": "asynchronous_queued_sanitized"
+  },
+  "knowledge": {
+    "creative_coding": "knowledge/creative-coding/",
+    "design": "knowledge/design/"
+  },
+  "validation": {
+    "workflow": ".github/workflows/ci.yml",
+    "local_script": "scripts/check.ps1",
+    "required_for_runtime_code": [
+      "repository_policy",
+      "godot_4_7_1_headless_import",
+      "main_scene_smoke_test",
+      "tracked_file_cleanliness"
+    ]
+  },
+  "constraints": {
+    "merge_main_requires_explicit_user_approval": true,
+    "do_not_fake_spout_ndi": true,
+    "do_not_create_new_sketch_without_user_request": true,
+    "do_not_block_godot_ui_with_telemetry_publish": true,
+    "do_not_stop_program_on_navigation": true,
+    "do_not_create_independent_linked_output_timeline": true
+  }
+}
