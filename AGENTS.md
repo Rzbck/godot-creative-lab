@@ -12,9 +12,10 @@ Before modifying anything:
 2. Read this file.
 3. Read `HANDOFF.md`.
 4. Read `docs/handoff/CURRENT_WORK.md` and `docs/handoff/OPERATIONS.md`.
-5. Read `docs/ARCHITECTURE.md` for the implemented runtime model.
-6. Inspect the exact scene/script/shader involved before proposing changes.
-7. For creative/design work, consult the relevant material under `knowledge/` before inventing from model memory alone.
+5. Read `docs/handoff/project_state.json`.
+6. Read `docs/ARCHITECTURE.md` for the implemented runtime model.
+7. Inspect the exact scene/script/shader involved before proposing changes.
+8. For creative/design work, consult the relevant material under `knowledge/` before inventing from model memory alone.
 
 If documentation disagrees with current code or telemetry, investigate. Git HEAD + runtime evidence win.
 
@@ -51,10 +52,12 @@ Preferred loop:
 
 1. AI inspects GitHub/telemetry.
 2. AI edits the feature branch directly.
-3. AI waits for CI and verifies it.
-4. AI gives one compact PowerShell sync/run block only when a host test is required.
-5. User tests behavior.
-6. AI reads online telemetry before asking for copied logs.
+3. AI updates durable handoff/state documentation in the same work session.
+4. AI resolves the exact final remote HEAD.
+5. AI waits for CI on that exact HEAD and verifies every required job.
+6. If host validation is useful, AI automatically gives the canonical PowerShell **sync + wait-for-CI + launch** block from `docs/handoff/OPERATIONS.md`; the user should not have to ask for it.
+7. User tests behavior.
+8. AI reads online telemetry before asking for copied logs.
 
 PowerShell blocks supplied to the user must be complete copy/paste blocks wrapped in:
 
@@ -65,6 +68,26 @@ PowerShell blocks supplied to the user must be complete copy/paste blocks wrappe
 ```
 
 The known workstation paths and canonical block are documented in `docs/handoff/OPERATIONS.md`.
+
+## Mandatory AI completion protocol
+
+This protocol applies after any **material repository change**: runtime/code, sketch content, architecture, creative direction, validation procedure, knowledge-system rules, branch/PR state, or NEXT action.
+
+Before giving the final user response, the AI must, without waiting to be reminded:
+
+1. Commit/push all intended work to the active feature branch.
+2. Update `docs/handoff/CURRENT_WORK.md` whenever current durable state, rejected direction, validation status, or NEXT changed.
+3. Update `HANDOFF.md` when a future session would otherwise reconstruct the wrong product/creative state.
+4. Update `docs/handoff/project_state.json` when machine-readable state/constraints/knowledge pointers changed.
+5. Update `docs/handoff/NEXT_AI_PROMPT.md` when startup rules, creative method, or immediate next task changed.
+6. Update `docs/handoff/OPERATIONS.md` when the canonical test/sync/launch workflow changed.
+7. Resolve the final remote branch HEAD **after all documentation commits**.
+8. Wait for and inspect CI for that exact final SHA. Never report an older green run as validation of a newer HEAD.
+9. Report the exact short HEAD and CI result.
+10. If the work needs or benefits from Windows host validation, include the canonical PowerShell block that syncs, waits for CI success for the exact SHA, and only then launches Godot.
+11. After the user's host test, inspect `telemetry/runtime` before asking for logs or screenshots that telemetry can answer.
+
+Do not leave continuity/documentation as an optional cleanup step. It is part of task completion.
 
 ## Automated validation
 
@@ -126,14 +149,20 @@ External research memory is versioned in the repo:
 
 - `knowledge/creative-coding/` — shaders, simulation, generative systems, GPU techniques, references.
 - `knowledge/design/` — typography, graphic design, grids, hierarchy, color, poster/layout systems, realtime-design translation and review checklist.
-- `knowledge/cross-domain/` — bridges between those domains plus the idea/mutation engine used to generate original identities from representation changes, coupled systems and design constraints.
+- `knowledge/cross-domain/` — technique palette, collision-first exploration, bridges, mutation and living-system research.
 
-For substantial new creative work, do not stop at one domain. Start from the relevant technical/design atlases, then use `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md` and `knowledge/cross-domain/IDEA_ENGINE.md` to translate and mutate the research into an original system before implementation.
+For substantial creative exploration, current priority is:
+
+1. `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
+2. `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
+3. `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
+4. relevant creative-coding/design atlases
+5. `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` when shaping a promising collision into an artwork.
 
 Use sources as research starting points. Do not vendor/copy third-party code blindly; check license/provenance first.
 
 ## Handoff maintenance
 
-After a material validated change, update `HANDOFF.md` and `docs/handoff/CURRENT_WORK.md` when the durable project state or NEXT changes.
+Handoff maintenance is mandatory under the completion protocol above, not an optional later task.
 
 Do not store conversation transcripts. Store concise state, evidence, decisions, branch/PR references, known failures, validation results and next actions.
