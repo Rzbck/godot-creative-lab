@@ -1,0 +1,246 @@
+{
+  "schema": 1,
+  "updated": "2026-09-24",
+  "policy": {
+    "tiers": {
+      "A": "primary or canonical reference",
+      "B": "curated technical library or focused open-source reference",
+      "C": "community or inspiration source; verify provenance and rights per work"
+    },
+    "reuse_rule": "Links and summaries are safe to catalogue. Before copying source code, verify the exact upstream license and attribution requirements."
+  },
+  "sources": [
+    {
+      "id": "godot-shading-reference",
+      "name": "Godot Shading Reference",
+      "tier": "A",
+      "url": "https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/",
+      "kind": "official-docs",
+      "tags": ["godot", "shader-math", "canvas-item", "spatial", "particles"],
+      "reuse": "reference"
+    },
+    {
+      "id": "godot-glsl-conversion",
+      "name": "Converting GLSL to Godot shaders",
+      "tier": "A",
+      "url": "https://docs.godotengine.org/en/stable/tutorials/shaders/converting_glsl_to_godot_shaders.html",
+      "kind": "official-docs",
+      "tags": ["godot", "glsl", "porting", "shadertoy"],
+      "reuse": "reference"
+    },
+    {
+      "id": "godot-compute-shaders",
+      "name": "Godot compute shaders",
+      "tier": "A",
+      "url": "https://docs.godotengine.org/en/stable/tutorials/shaders/compute_shaders.html",
+      "kind": "official-docs",
+      "tags": ["godot", "compute", "simulation", "particles", "gpu"],
+      "reuse": "reference"
+    },
+    {
+      "id": "godot-screen-reading",
+      "name": "Godot screen-reading shaders",
+      "tier": "A",
+      "url": "https://docs.godotengine.org/en/stable/tutorials/shaders/screen-reading_shaders.html",
+      "kind": "official-docs",
+      "tags": ["godot", "feedback", "post", "screen-texture"],
+      "reuse": "reference"
+    },
+    {
+      "id": "godot-shaders-community",
+      "name": "Godot Shaders",
+      "tier": "C",
+      "url": "https://godotshaders.com/",
+      "kind": "community-library",
+      "tags": ["godot", "shader-gallery", "effects"],
+      "reuse": "verify-per-item"
+    },
+    {
+      "id": "book-of-shaders",
+      "name": "The Book of Shaders",
+      "tier": "A",
+      "url": "https://thebookofshaders.com/",
+      "repo": "https://github.com/patriciogonzalezvivo/thebookofshaders",
+      "kind": "book-and-code",
+      "tags": ["glsl", "shaping", "noise", "patterns", "fbm", "simulation"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "lygia",
+      "name": "LYGIA Shader Library",
+      "tier": "B",
+      "url": "https://github.com/patriciogonzalezvivo/lygia",
+      "kind": "shader-library",
+      "tags": ["glsl", "hlsl", "wgsl", "sdf", "color", "noise", "filters", "generative"],
+      "reuse": "restricted-license-review-required",
+      "license_note": "Prosperity/Patron licensing at research time; do not vendor without explicit review."
+    },
+    {
+      "id": "glslify",
+      "name": "glslify",
+      "tier": "B",
+      "url": "https://github.com/glslify/glslify",
+      "kind": "shader-module-system",
+      "tags": ["glsl", "modules", "noise", "easing", "raymarching"],
+      "reuse": "MIT-for-core-verify-modules"
+    },
+    {
+      "id": "ashima-webgl-noise",
+      "name": "Ashima WebGL Noise",
+      "tier": "B",
+      "url": "https://github.com/ashima/webgl-noise",
+      "kind": "shader-library",
+      "tags": ["glsl", "simplex", "noise", "procedural"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "inigo-quilez",
+      "name": "Inigo Quilez Articles",
+      "tier": "A",
+      "url": "https://iquilezles.org/articles/",
+      "kind": "author-technical-articles",
+      "tags": ["sdf", "raymarching", "procedural", "fractal", "math"],
+      "reuse": "reference"
+    },
+    {
+      "id": "three-tsl",
+      "name": "Three.js TSL Guide",
+      "tier": "A",
+      "url": "https://threejs.org/tsl/",
+      "kind": "official-docs",
+      "tags": ["webgpu", "tsl", "wgsl", "nodes", "compute"],
+      "reuse": "reference"
+    },
+    {
+      "id": "three-webgpu-examples",
+      "name": "Three.js WebGPU examples",
+      "tier": "A",
+      "url": "https://threejs.org/examples/?q=webgpu",
+      "kind": "official-examples",
+      "tags": ["webgpu", "instancing", "particles", "compute", "rendering"],
+      "reuse": "verify-threejs-license-and-example-context"
+    },
+    {
+      "id": "gpu-gems-fluid-2d",
+      "name": "GPU Gems - Fast Fluid Dynamics Simulation on the GPU",
+      "tier": "A",
+      "url": "https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-38-fast-fluid-dynamics-simulation-gpu",
+      "kind": "technical-book-chapter",
+      "tags": ["fluids", "simulation", "gpu", "advection", "pressure"],
+      "reuse": "reference"
+    },
+    {
+      "id": "gpu-gems-fluid-3d",
+      "name": "GPU Gems 3 - Real-Time Simulation and Rendering of 3D Fluids",
+      "tier": "A",
+      "url": "https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-30-real-time-simulation-and-rendering-3d-fluids",
+      "kind": "technical-book-chapter",
+      "tags": ["fluids", "volume", "raymarching", "simulation"],
+      "reuse": "reference"
+    },
+    {
+      "id": "nature-of-code",
+      "name": "The Nature of Code",
+      "tier": "A",
+      "url": "https://natureofcode.com/",
+      "repo": "https://github.com/shiffman/NatureOfCode",
+      "kind": "book-and-code",
+      "tags": ["particles", "forces", "agents", "cellular-automata", "fractals", "evolution"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "generative-design",
+      "name": "Generative Design Code Package for p5.js",
+      "tier": "A",
+      "url": "https://github.com/generative-design/Code-Package-p5.js",
+      "kind": "book-code-package",
+      "tags": ["generative-design", "typography", "grids", "patterns", "interaction"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "redblob-noise",
+      "name": "Red Blob Games - Noise Functions and Map Generation",
+      "tier": "A",
+      "url": "https://www.redblobgames.com/articles/noise/introduction.html",
+      "kind": "interactive-technical-article",
+      "tags": ["noise", "procedural", "signal-processing", "fbm"],
+      "reuse": "reference"
+    },
+    {
+      "id": "redblob-terrain",
+      "name": "Red Blob Games - Making maps with noise functions",
+      "tier": "A",
+      "url": "https://www.redblobgames.com/maps/terrain-from-noise/",
+      "kind": "interactive-technical-article",
+      "tags": ["noise", "terrain", "procedural-geometry", "maps"],
+      "reuse": "reference"
+    },
+    {
+      "id": "radiant",
+      "name": "Radiant",
+      "tier": "B",
+      "url": "https://github.com/pbakaus/radiant",
+      "site": "https://radiant-shaders.com/",
+      "kind": "curated-open-shader-collection",
+      "tags": ["particles", "physics", "noise", "organic", "geometric", "interactive"],
+      "reuse": "MIT-at-research-time-reverify"
+    },
+    {
+      "id": "twigl",
+      "name": "Twigl",
+      "tier": "B",
+      "url": "https://github.com/doxas/twigl",
+      "site": "https://twigl.app/",
+      "kind": "live-shader-editor",
+      "tags": ["glsl", "live-coding", "feedback", "sound-shader", "code-golf"],
+      "reuse": "MIT-for-app-verify-shared-work"
+    },
+    {
+      "id": "vertexshaderart",
+      "name": "VertexShaderArt",
+      "tier": "B",
+      "url": "https://github.com/greggman/vertexshaderart",
+      "site": "https://vertexshaderart.com/",
+      "kind": "vertex-shader-gallery",
+      "tags": ["vertex-shader", "procedural-geometry", "particles", "gpu-art"],
+      "reuse": "verify-per-work"
+    },
+    {
+      "id": "shadertoy",
+      "name": "Shadertoy",
+      "tier": "C",
+      "url": "https://www.shadertoy.com/",
+      "kind": "community-shader-gallery",
+      "tags": ["glsl", "raymarching", "sdf", "feedback", "procedural"],
+      "reuse": "reference-unless-explicit-license"
+    },
+    {
+      "id": "glsl-sandbox",
+      "name": "GLSL Sandbox",
+      "tier": "C",
+      "url": "https://glslsandbox.com/",
+      "kind": "community-shader-gallery",
+      "tags": ["glsl", "fragment-shader", "archive"],
+      "reuse": "reference-unless-explicit-license"
+    },
+    {
+      "id": "openprocessing",
+      "name": "OpenProcessing",
+      "tier": "C",
+      "url": "https://openprocessing.org/",
+      "kind": "creative-coding-community",
+      "tags": ["p5js", "generative-art", "particles", "interactive"],
+      "reuse": "verify-per-work"
+    },
+    {
+      "id": "p5-shaders",
+      "name": "p5.js Introduction to Shaders",
+      "tier": "A",
+      "url": "https://p5js.org/tutorials/intro-to-shaders/",
+      "examples": "https://p5js.org/examples/",
+      "kind": "official-tutorial-and-examples",
+      "tags": ["p5js", "glsl", "shader-learning", "interaction"],
+      "reuse": "verify-upstream-example-license"
+    }
+  ]
+}
