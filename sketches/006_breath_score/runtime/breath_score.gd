@@ -1,71 +1,65 @@
 extends "res://sketches/_shared/design_sketch_base.gd"
 
-const BG: Color = Color(0.018, 0.019, 0.024, 1.0)
-const PAPER: Color = Color(0.96, 0.94, 0.86, 1.0)
-const ACCENT: Color = Color(0.96, 0.24, 0.11, 1.0)
-const COOL: Color = Color(0.30, 0.58, 0.72, 1.0)
+const BG: Color = Color(0.025, 0.026, 0.03, 1.0)
+const PAPER: Color = Color(0.95, 0.93, 0.86, 1.0)
+const ACCENT: Color = Color(0.93, 0.28, 0.14, 1.0)
+const MUTED: Color = Color(0.55, 0.58, 0.62, 1.0)
 const LINES: Array[String] = ["BREATHE", "BETWEEN", "WORDS"]
-const BASELINES: Array[float] = [235.0, 402.0, 574.0]
+const BASELINES: Array[float] = [245.0, 390.0, 535.0]
 
-@export_range(2.8, 12.0, 0.1) var cycle_seconds: float = 6.6
-@export_range(0.0, 1.0, 0.01) var autonomy: float = 0.78
-@export_range(0.2, 2.4, 0.01) var elasticity: float = 1.15
-@export_range(0.0, 2.0, 0.01) var touch_pressure: float = 1.0
-@export_range(0.0, 1.0, 0.01) var contour_separation: float = 0.42
-@export_range(0.2, 1.0, 0.01) var ink_density: float = 0.82
+@export_range(0.6, 1.8, 0.01) var breath_range: float = 1.18
+@export_range(0.4, 2.4, 0.01) var hold_threshold: float = 1.05
+@export_range(0.5, 5.0, 0.01) var recovery: float = 2.2
+@export_range(4.0, 24.0, 0.1) var tracking: float = 11.0
+@export_range(0.0, 1.0, 0.01) var accent_amount: float = 0.72
+@export_range(0.0, 1.0, 0.01) var ambient_motion: float = 0.22
 
 var _breath: float = 0.0
 var _breath_velocity: float = 0.0
-var _gesture_velocity: Vector2 = Vector2.ZERO
+var _press_age: float = 0.0
+var _release_energy: float = 0.0
+var _active_line: int = 0
+var _was_down: bool = false
 var _last_pointer: Vector2 = Vector2.ZERO
 var _pointer_ready: bool = false
-var _press_age: float = 0.0
-var _impulse_energy: float = 0.0
-var _impulse_center: Vector2 = DESIGN_SIZE * 0.5
-var _active_line: int = 1
+var _gesture_velocity: Vector2 = Vector2.ZERO
 
 
 func get_parameter_schema() -> Array[Dictionary]:
     return [
-        {"id": "cycle_seconds", "label": "BREATH TEMPO", "type": "float", "min": 2.8, "max": 12.0, "step": 0.1},
-        {"id": "autonomy", "label": "AUTONOMY", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01},
-        {"id": "elasticity", "label": "ELASTICITY", "type": "float", "min": 0.2, "max": 2.4, "step": 0.01},
-        {"id": "touch_pressure", "label": "TOUCH PRESSURE", "type": "float", "min": 0.0, "max": 2.0, "step": 0.01},
-        {"id": "contour_separation", "label": "COUNTER TENSION", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01},
-        {"id": "ink_density", "label": "INK DENSITY", "type": "float", "min": 0.2, "max": 1.0, "step": 0.01}
+        {"id": "breath_range", "label": "BREATH RANGE", "type": "float", "min": 0.6, "max": 1.8, "step": 0.01},
+        {"id": "hold_threshold", "label": "HOLD TIME", "type": "float", "min": 0.4, "max": 2.4, "step": 0.01},
+        {"id": "recovery", "label": "RECOVERY", "type": "float", "min": 0.5, "max": 5.0, "step": 0.01},
+        {"id": "tracking", "label": "TRACKING", "type": "float", "min": 4.0, "max": 24.0, "step": 0.1},
+        {"id": "accent_amount", "label": "ACCENT", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01},
+        {"id": "ambient_motion", "label": "AMBIENT", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01}
     ]
 
 
 func get_parameter_value(parameter_id: String) -> Variant:
     match parameter_id:
-        "cycle_seconds": return cycle_seconds
-        "autonomy": return autonomy
-        "elasticity": return elasticity
-        "touch_pressure": return touch_pressure
-        "contour_separation": return contour_separation
-        "ink_density": return ink_density
+        "breath_range": return breath_range
+        "hold_threshold": return hold_threshold
+        "recovery": return recovery
+        "tracking": return tracking
+        "accent_amount": return accent_amount
+        "ambient_motion": return ambient_motion
         _: return null
 
 
 func set_parameter_value(parameter_id: String, value: Variant) -> void:
     match parameter_id:
-        "cycle_seconds": cycle_seconds = clampf(float(value), 2.8, 12.0)
-        "autonomy": autonomy = clampf(float(value), 0.0, 1.0)
-        "elasticity": elasticity = clampf(float(value), 0.2, 2.4)
-        "touch_pressure": touch_pressure = clampf(float(value), 0.0, 2.0)
-        "contour_separation": contour_separation = clampf(float(value), 0.0, 1.0)
-        "ink_density": ink_density = clampf(float(value), 0.2, 1.0)
+        "breath_range": breath_range = clampf(float(value), 0.6, 1.8)
+        "hold_threshold": hold_threshold = clampf(float(value), 0.4, 2.4)
+        "recovery": recovery = clampf(float(value), 0.5, 5.0)
+        "tracking": tracking = clampf(float(value), 4.0, 24.0)
+        "accent_amount": accent_amount = clampf(float(value), 0.0, 1.0)
+        "ambient_motion": ambient_motion = clampf(float(value), 0.0, 1.0)
         _: return
     queue_redraw()
 
 
 func _update_source_simulation(delta: float) -> void:
-    var phase: float = sketch_time / maxf(0.1, cycle_seconds) * TAU
-    var inhale_wave: float = 0.5 + 0.5 * sin(phase - PI * 0.5)
-    inhale_wave = smoothstep(0.04, 0.96, inhale_wave)
-    var second_lung: float = 0.5 + 0.5 * sin(phase * 0.5 + 1.7)
-    var autonomous_target: float = (inhale_wave * 0.82 + second_lung * 0.18) * autonomy
-
     var target_velocity: Vector2 = Vector2.ZERO
     if pointer_active:
         if _pointer_ready and delta > 0.0001:
@@ -74,203 +68,167 @@ func _update_source_simulation(delta: float) -> void:
         _pointer_ready = true
     else:
         _pointer_ready = false
+
     _gesture_velocity = _gesture_velocity.lerp(target_velocity, clampf(delta * 8.0, 0.0, 1.0))
 
-    var interaction_target: float = 0.0
+    if pointer_down and not _was_down:
+        _active_line = clampi(roundi((pointer_position.y - 245.0) / 145.0), 0, 2)
+        _press_age = 0.0
+
     if pointer_down:
         _press_age += delta
-        _impulse_center = pointer_position
-        _active_line = clampi(roundi((pointer_position.y - BASELINES[0]) / (BASELINES[1] - BASELINES[0])), 0, 2)
-        var dwell: float = 1.0 - exp(-_press_age * 1.4)
-        var speed: float = clampf(_gesture_velocity.length() / 1300.0, 0.0, 1.0)
-        interaction_target = (0.34 + dwell * 0.58 + speed * 0.34) * touch_pressure
-        _impulse_energy = maxf(_impulse_energy, interaction_target)
+        var inhale_target: float = clampf(0.18 + _press_age / maxf(0.01, hold_threshold), 0.0, 1.0)
+        var speed_boost: float = clampf(_gesture_velocity.length() / 1200.0, 0.0, 0.28)
+        var spring_force: float = (inhale_target + speed_boost - _breath) * (4.2 + breath_range * 1.6)
+        _breath_velocity += spring_force * delta
+        _breath_velocity *= pow(0.12, delta)
     else:
+        if _was_down:
+            _release_energy = clampf(_breath + _press_age / maxf(0.01, hold_threshold) * 0.24, 0.0, 1.45)
         _press_age = 0.0
-        _impulse_energy = maxf(0.0, _impulse_energy - delta * (0.32 + elasticity * 0.36))
+        _breath_velocity += (-_breath * recovery * 3.4) * delta
+        _breath_velocity *= pow(0.06, delta)
 
-    var target: float = autonomous_target + interaction_target * 0.62
-    var spring: float = (target - _breath) * (2.6 + elasticity * 2.1)
-    _breath_velocity += spring * delta
-    _breath_velocity *= pow(0.18, delta)
     _breath += _breath_velocity * delta
-    _breath = clampf(_breath, -0.12, 1.65)
+    _breath = clampf(_breath, -0.18, 1.3)
+    _release_energy = maxf(0.0, _release_energy - delta * recovery * 0.35)
+    _was_down = pointer_down
 
 
 func _get_custom_live_sync_state() -> Dictionary:
     return {
         "breath": _breath,
         "breath_velocity": _breath_velocity,
-        "gesture_velocity": _gesture_velocity,
+        "press_age": _press_age,
+        "release_energy": _release_energy,
+        "active_line": _active_line,
+        "was_down": _was_down,
         "last_pointer": _last_pointer,
         "pointer_ready": _pointer_ready,
-        "press_age": _press_age,
-        "impulse_energy": _impulse_energy,
-        "impulse_center": _impulse_center,
-        "active_line": _active_line,
+        "gesture_velocity": _gesture_velocity,
     }
 
 
 func _apply_custom_live_sync_state(state: Dictionary) -> void:
     _breath = float(state.get("breath", _breath))
     _breath_velocity = float(state.get("breath_velocity", _breath_velocity))
-    var velocity_variant: Variant = state.get("gesture_velocity", _gesture_velocity)
-    if velocity_variant is Vector2:
-        _gesture_velocity = velocity_variant as Vector2
+    _press_age = float(state.get("press_age", _press_age))
+    _release_energy = float(state.get("release_energy", _release_energy))
+    _active_line = int(state.get("active_line", _active_line))
+    _was_down = bool(state.get("was_down", _was_down))
     var pointer_variant: Variant = state.get("last_pointer", _last_pointer)
     if pointer_variant is Vector2:
         _last_pointer = pointer_variant as Vector2
     _pointer_ready = bool(state.get("pointer_ready", _pointer_ready))
-    _press_age = float(state.get("press_age", _press_age))
-    _impulse_energy = float(state.get("impulse_energy", _impulse_energy))
-    var impulse_variant: Variant = state.get("impulse_center", _impulse_center)
-    if impulse_variant is Vector2:
-        _impulse_center = impulse_variant as Vector2
-    _active_line = int(state.get("active_line", _active_line))
+    var velocity_variant: Variant = state.get("gesture_velocity", _gesture_velocity)
+    if velocity_variant is Vector2:
+        _gesture_velocity = velocity_variant as Vector2
 
 
 func _get_custom_live_debug_state() -> Dictionary:
     return {
         "breath": _breath,
-        "impulse_energy": _impulse_energy,
+        "press_age": _press_age,
+        "release_energy": _release_energy,
         "active_line": _active_line,
-        "gesture_speed": _gesture_velocity.length(),
     }
 
 
 func _draw() -> void:
     begin_design_draw(BG)
     var font: Font = ThemeDB.fallback_font
-    _draw_air_field()
+
+    _draw_structure()
+
     for line_index: int in range(LINES.size()):
-        _draw_living_word(font, line_index)
+        var active_weight: float = 1.0 if line_index == _active_line else 0.32
+        var inhale: float = maxf(0.0, _breath) * active_weight
+        var ambient: float = sin(sketch_time * 0.42 + float(line_index) * 1.7) * ambient_motion * 0.18
+        var release_wave: float = sin(sketch_time * 4.8 - float(line_index) * 0.9) * _release_energy * (1.0 - float(line_index) * 0.13)
+        var expansion: float = inhale * breath_range + ambient
+        var local_tracking: float = tracking * (1.0 + expansion * 1.8)
+        var font_size: int = [112, 88, 112][line_index]
+        var y_offset: float = release_wave * 14.0 + expansion * (float(line_index) - 1.0) * 15.0
+        var scale_hint: float = 1.0 + expansion * (0.05 if line_index == 1 else 0.09)
+
+        _draw_tracked_word(
+            font,
+            LINES[line_index],
+            BASELINES[line_index] + y_offset,
+            font_size,
+            local_tracking,
+            scale_hint,
+            line_index,
+            inhale
+        )
+
+    _draw_breath_meter()
     end_design_draw()
 
 
-func _draw_air_field() -> void:
-    # Full-canvas atmospheric field. It is part of the artwork, not a frame.
-    for band: int in range(15):
-        var y0: float = 34.0 + float(band) * 48.0
-        var points: PackedVector2Array = PackedVector2Array()
-        for step: int in range(33):
-            var x: float = float(step) / 32.0 * DESIGN_SIZE.x
-            var wave: float = sin(x * 0.008 + sketch_time * 0.34 + float(band) * 0.73)
-            wave += sin(x * 0.0027 - sketch_time * 0.19 + float(band)) * 0.6
-            var breathing: float = (_breath - 0.45) * 13.0 * sin(float(band) * 0.8 + x * 0.004)
-            points.append(Vector2(x, y0 + wave * 5.0 + breathing))
-        var c: Color = COOL.lerp(ACCENT, float(band % 5) / 5.0)
-        c.a = 0.018 + autonomy * 0.018
-        draw_polyline(points, c, 1.0, true)
+func _draw_structure() -> void:
+    var guide: Color = Color(0.95, 0.93, 0.86, 0.09)
+    draw_line(Vector2(92.0, 128.0), Vector2(1188.0, 128.0), guide, 1.0)
+    draw_line(Vector2(92.0, 592.0), Vector2(1188.0, 592.0), guide, 1.0)
+    for column: int in range(7):
+        var x: float = 92.0 + float(column) * (1096.0 / 6.0)
+        var c: Color = guide
+        c.a *= 0.42
+        draw_line(Vector2(x, 128.0), Vector2(x, 592.0), c, 1.0)
 
 
-func _draw_living_word(font: Font, line_index: int) -> void:
-    var text: String = LINES[line_index]
-    var font_size: int = [132, 96, 132][line_index]
-    var tracking: float = [18.0, 22.0, 20.0][line_index]
+func _draw_tracked_word(
+    font: Font,
+    text: String,
+    baseline: float,
+    font_size: int,
+    local_tracking: float,
+    scale_hint: float,
+    line_index: int,
+    inhale: float
+) -> void:
     var widths: Array[float] = []
     var total_width: float = 0.0
-
-    for char_index: int in range(text.length()):
-        var glyph: String = text.substr(char_index, 1)
-        var width: float = font.get_string_size(glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
+    for index: int in range(text.length()):
+        var glyph: String = text.substr(index, 1)
+        var width: float = font.get_string_size(glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x * scale_hint
         widths.append(width)
         total_width += width
-        if char_index < text.length() - 1:
-            total_width += tracking
+        if index < text.length() - 1:
+            total_width += local_tracking
 
     var cursor_x: float = (DESIGN_SIZE.x - total_width) * 0.5
-    var line_phase: float = sketch_time * (0.42 + float(line_index) * 0.035) + float(line_index) * 1.8
-    var line_breath: float = clampf(_breath * (0.78 + 0.12 * sin(line_phase)), 0.0, 1.5)
+    var gesture_dir: float = clampf(_gesture_velocity.x / 1400.0, -1.0, 1.0)
 
-    for char_index: int in range(text.length()):
-        var glyph: String = text.substr(char_index, 1)
-        var baseline: Vector2 = Vector2(cursor_x, BASELINES[line_index])
-        var contours: Array[PackedVector2Array] = get_glyph_outline_contours(font, glyph, font_size, baseline, 7)
+    for index: int in range(text.length()):
+        var glyph: String = text.substr(index, 1)
+        var phase: float = float(index) / maxf(1.0, float(text.length() - 1))
+        var local_lift: float = sin(phase * PI) * inhale * 12.0
+        var directional: float = gesture_dir * inhale * (phase - 0.5) * 34.0
+        var position: Vector2 = Vector2(cursor_x + directional, baseline - local_lift)
 
-        if contours.is_empty():
-            var fallback_color: Color = PAPER
-            fallback_color.a = ink_density
-            draw_string(font, baseline, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, fallback_color)
-            cursor_x += widths[char_index] + tracking
-            continue
+        if inhale > 0.08:
+            var ghost: Color = ACCENT
+            ghost.a = accent_amount * inhale * 0.28
+            draw_string(font, position + Vector2(gesture_dir * 10.0, 2.0), glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, ghost)
 
-        var bounds: Rect2 = outline_bounds(contours)
-        var center: Vector2 = bounds.get_center()
-        var glyph_phase: float = line_phase + float(char_index) * 0.61
-        var active_bias: float = 1.0 if line_index == _active_line else 0.52
-        var local_impulse: float = 0.0
-        var glyph_center: Vector2 = Vector2(cursor_x + widths[char_index] * 0.5, BASELINES[line_index] - float(font_size) * 0.35)
-        if _impulse_energy > 0.001:
-            var distance: float = glyph_center.distance_to(_impulse_center)
-            local_impulse = exp(-distance * distance / 72000.0) * _impulse_energy * active_bias
-
-        var main_contours: Array[PackedVector2Array] = _deform_breath_contours(
-            contours,
-            center,
-            line_breath,
-            local_impulse,
-            glyph_phase,
-            1.0
-        )
-        var ghost_contours: Array[PackedVector2Array] = _deform_breath_contours(
-            contours,
-            center,
-            line_breath,
-            local_impulse,
-            glyph_phase + 0.8,
-            1.0 + contour_separation * 0.22
-        )
-
-        var ghost: Color = ACCENT.lerp(COOL, float(line_index) / 2.0)
-        ghost.a = (0.10 + local_impulse * 0.20) * contour_separation
-        draw_outline_contours(ghost_contours, ghost, 1.2 + contour_separation * 1.4, true)
-
-        var ink: Color = PAPER.lerp(ACCENT, local_impulse * 0.24)
-        ink.a = ink_density
-        draw_outline_contours(main_contours, ink, 2.0 + ink_density * 1.2, true)
-
-        # A restrained fill keeps the word readable while the actual contour
-        # carries the deformation.
-        var fill: Color = PAPER
-        fill.a = 0.08 + ink_density * 0.08
-        draw_string(font, baseline, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, fill)
-        cursor_x += widths[char_index] + tracking
+        var color: Color = PAPER
+        color = color.lerp(ACCENT, inhale * accent_amount * (0.28 + float(line_index == 1) * 0.2))
+        draw_string(font, position, glyph, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size, color)
+        cursor_x += widths[index] + local_tracking
 
 
-func _deform_breath_contours(
-    contours: Array[PackedVector2Array],
-    center: Vector2,
-    breath_amount: float,
-    impulse: float,
-    phase: float,
-    layer_scale: float
-) -> Array[PackedVector2Array]:
-    var result: Array[PackedVector2Array] = []
-    var velocity_dir: Vector2 = _gesture_velocity.normalized() if _gesture_velocity.length() > 2.0 else Vector2.RIGHT
-
-    for contour_index: int in range(contours.size()):
-        var source: PackedVector2Array = contours[contour_index]
-        var mapped: PackedVector2Array = PackedVector2Array()
-        for point_index: int in range(source.size()):
-            var point: Vector2 = source[point_index]
-            var relative: Vector2 = point - center
-            var radial_scale: float = 1.0 + breath_amount * 0.035 * layer_scale
-            var q: Vector2 = center + relative * radial_scale
-
-            # Different parts of one glyph breathe at slightly different
-            # phases. This changes the outline itself instead of moving a whole
-            # character as a rigid sprite.
-            var anatomy_wave: float = sin(relative.y * 0.045 + phase + relative.x * 0.012)
-            q.x += anatomy_wave * (2.2 + breath_amount * 5.8) * layer_scale
-            q.y += sin(relative.x * 0.032 - phase * 0.83) * breath_amount * 3.8
-
-            if impulse > 0.001:
-                var to_point: Vector2 = q - _impulse_center
-                var influence: float = exp(-to_point.length_squared() / 36000.0) * impulse
-                var radial: Vector2 = to_point.normalized() if to_point.length() > 0.001 else Vector2.UP
-                q += radial * influence * 18.0 * touch_pressure
-                q += velocity_dir * influence * 9.0 * touch_pressure
-
-            mapped.append(q)
-        result.append(mapped)
-    return result
+func _draw_breath_meter() -> void:
+    var x: float = 1128.0
+    var top: float = 170.0
+    var height: float = 360.0
+    var level: float = clampf(maxf(_breath, _release_energy * 0.65), 0.0, 1.0)
+    var rail: Color = MUTED
+    rail.a = 0.28
+    draw_line(Vector2(x, top), Vector2(x, top + height), rail, 1.0)
+    var fill: Color = ACCENT
+    fill.a = 0.65
+    draw_line(Vector2(x, top + height), Vector2(x, top + height * (1.0 - level)), fill, 3.0)
+    for index: int in range(6):
+        var y: float = top + float(index) * height / 5.0
+        draw_line(Vector2(x - 9.0, y), Vector2(x + 9.0, y), rail, 1.0)
