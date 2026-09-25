@@ -2,9 +2,9 @@
 
 Canonical restart point for a new human or AI session.
 
-**Always resolve the current remote branch HEAD and exact-head CI before trusting recorded SHAs.** Repository state is authoritative; chat history is secondary.
+**Always resolve current remote branch HEAD and exact-head CI before trusting recorded SHAs.** Repository state is authoritative; chat history is secondary.
 
-Last material refresh: **2026-09-24**.
+Last material refresh: **2026-09-25**.
 
 ## Repository / active work
 
@@ -19,122 +19,125 @@ Last material refresh: **2026-09-24**.
 
 ## Product state to preserve
 
-DC//LAB is a Godot creative-coding workstation with data-driven Gallery discovery, real thumbnails, hover previews, generated parameter inspector/persistence, PREVIEW / PROGRAM separation, persistent PROGRAM while navigating, `TAKE LIVE`, physical display selection, PROGRAM touch/mouse forwarding, linked PREVIEW/PROGRAM state synchronization, async telemetry and versioned creative research.
+DC//LAB is a Godot creative-coding workstation with data-driven Gallery discovery, real thumbnails, hover-only animated previews, generated parameter inspector/persistence, PREVIEW / PROGRAM separation, persistent PROGRAM while navigating, TAKE LIVE, physical display selection, PROGRAM touch/mouse forwarding, linked PREVIEW/PROGRAM state synchronization, async telemetry and versioned creative research.
 
-Normal logical artwork space: `1280×720`.
+Logical artwork space is `1280×720`.
 
-PROGRAM canvas is artwork-only: no sketch title/index/tags/debug/project metadata unless the text is genuinely part of the artwork.
+PROGRAM canvas is artwork-only: no sketch title/index/tags/debug/project metadata unless genuinely part of the artwork.
 
-## Historical creative state
+## Historical creative constraints
 
-001–010 remain available. `005_pressure_lattice` visibly remains **REGISTER TYPE**; original Pressure Lattice is rejected. A generalized contour pass (`6c20a094...`) across 006–010 was host-rejected because several glyphs looked broken/inverted and the series converged around one technique. Do not restore it.
+001–010 remain available. `005_pressure_lattice` visibly remains **REGISTER TYPE**; original Pressure Lattice is rejected. Generalized contour pass `6c20a094...` across 006–010 was host-rejected; do not restore contour-everywhere.
 
-## Collision-first batches
+011–015 improved underlying technique diversity but were visually weak, under-parameterized and not organically coupled enough.
 
-### 011–015
+016–020 improved again: 8–9 controls, actual neighbour/state coupling, more autonomous life. Host feedback on 2026-09-25 says this direction is **clearly better / starting to be good**, but still lacks real-world physical/chemical matter and some sketches appear performance-heavy.
 
-First raw collision batch:
+## Performance finding / telemetry limitation
 
-- **SWARM RELAY** — agents + dynamic graph;
-- **CHEMICAL BLOCKS** — Gray-Scott reaction-diffusion;
-- **CUT CELL** — nearest-site territories + cut/healing graph;
-- **RIBBON MORPH** — raster morphology + ribbons;
-- **PHASE PACK** — packed bodies + phase rules + distance field.
+Telemetry-first inspection was done immediately after the newest host feedback.
 
-Host feedback: technically/creatively better than the earlier type-heavy direction, but still visually weak, under-parameterized (3 controls each) and not organic enough in how pixels/cells influence one another.
+Remote `telemetry/runtime` is stale for the 016–020 test. Latest remote telemetry commit is `82114646068521140f1727b7d323803f7de51e58` and its session still reports runtime `6dd4b307...` with 15 Gallery previews, i.e. the 011–015 era.
 
-Telemetry confirmed 15 Gallery previews loaded on runtime head `6dd4b307...`; treat that feedback as primarily creative/systemic.
+Therefore never claim exact FPS attribution for 016–020 from current remote telemetry.
 
-### 016–020 — current batch
+The user observed some sketches falling below roughly 330 FPS on their host. Code audit found obvious rendering hotspots:
 
-Blind draw seed: `202609242031`.
+- 017 rendered up to ~2304 cell circles per render frame;
+- 020 rendered up to ~2880 cells and recomputed neighbour stats during draw.
 
-- `016_predator_vein` / **PREDATOR VEIN** — nutrient nodes + dynamic graph + neighbour field cohesion + persistent predators/scars; 8 controls.
-- `017_edge_bloom` / **EDGE BLOOM** — 64×36 edge-fed excitable tissue + refractory state + spores that follow/deposit/split; 9 controls.
-- `018_current_memory` / **CURRENT MEMORY** — 52×30 wave membrane + delayed field memory + particle current + dynamic reconnection + asymmetric void; 9 controls.
-- `019_soft_flock` / **SOFT FLOCK** — boid population + Verlet constraint membrane + link erosion/repair + persistent obstacle; 9 controls; two colors only.
-- `020_echo_tissue` / **ECHO TISSUE** — 72×40 eight-neighbour excitable tissue + density morphology + refractory memory + delayed feedback + autonomous reseeding; 9 controls.
+Both are now optimized:
 
-Implementation commit: `e2ff8328532a4eab057c63b8bd1d361bc706ba15`.
-CI #221 passed Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness for that runtime commit.
+- cell simulations still run at fixed cadence;
+- dense fields render through one low-resolution `ImageTexture` draw;
+- 020 caches density in simulation instead of rescanning neighbours in `_draw()`;
+- sparse spores/agents remain direct geometry.
 
-All 016–020 use the shared live-sync contract so linked PREVIEW/PROGRAM should represent the same generative state.
+See `knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md`.
 
-## Durable creative rules from host feedback
+## New real-world knowledge bank
 
-Read `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`.
+Read `knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`.
 
-Key rules:
+It adds mechanism cards for:
 
-1. substantial collision labs normally expose **6–9 meaningful independent controls** when the mechanism supports them;
-2. controls describe real system dimensions, not aliases for `more effect`;
-3. at least half the controls should alter future evolution, not only the current frame;
-4. cellular/raster work claiming organic behavior must exchange state through neighbours/resources/pressure/phase/delay/constraints;
-5. prefer several time scales: immediate response + slower memory/repair/transport/fatigue;
-6. raw collision-first work can be exploratory, but Gallery promotion still requires a coherent default palette/composition and respectable frozen frames;
-7. interaction should perturb a living system and leave consequences the system redistributes.
+- Belousov–Zhabotinsky excitable chemistry;
+- Liesegang precipitation/dissolution;
+- spinodal/Cahn–Hilliard phase separation;
+- Bénard–Marangoni surface-tension convection;
+- Faraday parametric waves;
+- Rosensweig ferrofluid instability;
+- diffusion-limited aggregation;
+- granular jamming / force chains;
+- Rayleigh–Taylor, Kelvin–Helmholtz and Saffman–Taylor instabilities.
 
-## Creative research method
+It also adds physical-condition drivers such as concentration, temperature, pressure, surface tension, viscosity, magnetic field, gravity, forcing frequency, supersaturation, friction, confinement and catalyst/inhibitor.
 
-Preferred current exploration mode remains collision-first:
+Rule: preserve at least one causal relationship/threshold from the real phenomenon; do not use science only as an aesthetic label.
 
-`blind technical collision -> coupled raw prototype -> observe -> interpret -> art-direct -> mutate`
+## Current batch 021–025 — physical / chemical collision labs
 
-Read in priority order:
+Blind draw seed: `202609250742`.
+
+- `021_rosensweig_field` / **ROSENSWEIG FIELD** — magnetic threshold -> coupled peak modes -> viscosity/hysteresis/relaxation; movable magnet interaction; 8 controls; single fullscreen shader pass.
+- `022_liesegang_front` / **LIESEGANG FRONT** — reagent reservoirs -> diffusing front -> supersaturation -> precipitation bands -> depletion spacing -> dissolution; 8 controls; historical bands retain their own centres.
+- `023_spinodal_marangoni` / **SPINODAL MARANGONI** — conserved-ish Cahn–Hilliard phase field + thermal quench + surface-tension advection; 9 controls; 56×32 simulation -> one texture draw.
+- `024_granular_jam` / **GRANULAR JAM** — packed grains + friction/load + cached collision graph + force chains + creep + delayed avalanche; 9 controls; touch applies load rather than position.
+- `025_faraday_quasi` / **FARADAY QUASI** — small CPU modal state + parametric resonance/mode competition -> fullscreen standing-wave shader; 8 controls; touch injects decaying local phase/impulse.
+
+Runtime implementation commit: `50e7d9f9296768a09a56c7a8f7ac421a4d823389`.
+CI #224 passed repository policy, Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness for that runtime commit.
+
+Resolve the **final docs HEAD** and its own CI before host testing; do not use the runtime commit's green run as proof for a newer docs HEAD.
+
+## Durable creative rules
+
+For substantial collision labs:
+
+1. normally expose **6–9 meaningful independent controls** when the mechanism supports them;
+2. at least half of controls should affect future evolution;
+3. organic/cellular work requires real neighbour/subsystem coupling;
+4. prefer multiple time scales: response + memory/repair/transport/fatigue;
+5. raw does not excuse a weak default image;
+6. interaction perturbs a living system and changes its future;
+7. real-world cards must retain causal structure, not just surface resemblance;
+8. performance architecture is part of the artwork: dense fields should use suitable texture/shader/batched representations instead of thousands of render-frame CanvasItem primitives.
+
+## Knowledge priority
 
 1. `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
 2. `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
 3. `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
-4. `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
-5. relevant design/creative-coding atlases
-6. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` when a successful mechanism deserves a real identity pass.
-
-No technique is the default house style. Random stacking without state coupling is rejected.
+4. `knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
+5. `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
+6. `knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md`
+7. relevant design/creative-coding atlases
+8. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` when a mechanism deserves a final identity.
 
 ## Next host validation
 
-Expected Gallery count after current batch: **20 sketches**.
+Expected Gallery count: **25 sketches**.
 
-For 016–020:
-
-1. inspect default visual state before moving sliders;
-2. watch 20–30 seconds hands-off;
-3. interact once, remove input and watch propagation/repair/migration;
-4. then explore the 8–9 controls and verify they create different regimes;
-5. test strongest candidates in PROGRAM/touch;
-6. inspect fresh `telemetry/runtime` immediately after the test.
-
-The next decision is not automatically another batch. First decide which 016–020 mechanisms are visually/behaviorally worth promoting, mutating or killing.
+1. Test 017 and 020 first for the performance regression/fix.
+2. Watch 021–025 at default values for 20–30 seconds each.
+3. Interact once, release and watch delayed consequences.
+4. Explore the controls only after default-state observation.
+5. Test strongest candidates in PROGRAM/touch.
+6. Exit normally and immediately inspect fresh telemetry.
+7. Exact FPS attribution requires telemetry whose runtime HEAD/session matches the tested build.
 
 ## PROGRAM / LIVE OUT architecture
 
-Navigation is not transport. PROGRAM must continue while browsing Gallery/Settings or opening another PREVIEW. `TAKE LIVE` replaces PROGRAM. Linked output follows synchronized source state; detached PROGRAM continues autonomously from the last synchronized state.
+Navigation is not transport. PROGRAM continues while browsing Gallery/Settings or opening another PREVIEW. TAKE LIVE replaces PROGRAM. Linked output follows synchronized source state; detached PROGRAM continues autonomously from the last synchronized state.
 
-Inspect `res://app/main/main_runtime.tscn` and its actual `extends` chain before changing host architecture.
-
-## Telemetry-first debugging
-
-After any host runtime test:
-
-1. inspect branch `telemetry/runtime`;
-2. read `latest.jsonl` and relevant session data;
-3. verify telemetry corresponds to the tested HEAD/session;
-4. only ask for manual logs/screenshots if telemetry genuinely lacks the evidence.
+Inspect `res://app/main/main_runtime.tscn` and actual `extends` chain before changing host architecture.
 
 ## Mandatory AI completion protocol
 
-After every material repository change, before final response:
-
-1. finish intended feature-branch commits;
-2. update `CURRENT_WORK.md`, this handoff, `project_state.json`, `NEXT_AI_PROMPT.md` and `OPERATIONS.md` where durable state/workflow changed;
-3. resolve the final remote branch HEAD **after all code + docs commits**;
-4. wait for and inspect CI for that exact SHA;
-5. report exact short HEAD + CI result;
-6. when host validation is relevant, automatically include the canonical PowerShell from `OPERATIONS.md` that syncs, waits for exact-head CI success and only then launches Godot;
-7. after the user tests, inspect telemetry first.
+After every material repository change, before final response: finish intended commits, update durable handoff/state, resolve the final remote HEAD after all code/docs commits, wait for CI on that exact SHA, report exact short SHA + CI, automatically provide canonical exact-CI PowerShell when host testing is relevant, and inspect telemetry first after the user test.
 
 ## Rejected regressions
 
-Do not casually reintroduce root-window fullscreen as normal PROGRAM output, the failed cross-window texture path, synchronous telemetry network work, independent linked PREVIEW/PROGRAM simulations, Gallery overlays over cards, fake Spout/NDI, Pressure Lattice, project metadata inside artwork, or glyph contours as the default creative representation.
+Do not reintroduce root-window fullscreen as normal PROGRAM output, failed cross-window texture sampling, synchronous telemetry networking, independent linked simulations, Gallery overlays over cards, fake Spout/NDI, Pressure Lattice, project metadata inside artwork, or glyph contours as the default creative representation.
 
-See `docs/handoff/CURRENT_WORK.md` for detailed current work and `docs/handoff/OPERATIONS.md` for the canonical exact-CI PowerShell.
+See `docs/handoff/CURRENT_WORK.md` for detailed current work and `docs/handoff/OPERATIONS.md` for the canonical CI-gated PowerShell.
