@@ -30,15 +30,17 @@ The collision-first mode is intentionally allowed to choose technique before mea
 
 For general creative work:
 
-1. `TECHNIQUE_PALETTE.md` — available representation/mechanism families.
+1. `TECHNIQUE_PALETTE.md` — representation/mechanism families.
 2. `RANDOM_COLLISION_ENGINE.md` — stochastic collision-first exploration method.
 3. `COLLISION_SOURCE_CATALOG.md` — specialist references for hybrid systems and emergent behavior.
-4. `ORGANIC_COUPLING_AND_CONTROLS.md` — host-derived rules for neighbour coupling, organic state exchange, 6–9 meaningful controls and minimum visual quality.
-5. `CROSS_DOMAIN_ATLAS.md` — reusable bridges between typography, design, shaders, simulation, geometry, interaction and realtime systems.
-6. `IDEA_ENGINE.md` — concept-first multiplication/mutation method.
-7. `LIVING_SYSTEMS.md` — optional research brick for autonomy, coupling and internal state.
-8. `SOURCE_CATALOG.md` — broader cross-domain references.
-9. `sources.json` — machine-readable index.
+4. `PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md` — real-world instabilities, matter, chemistry, thresholds and physical-condition interaction cards.
+5. `ORGANIC_COUPLING_AND_CONTROLS.md` — host-derived rules for neighbour coupling, organic state exchange, 6–9 meaningful controls and minimum visual quality.
+6. `REALTIME_PERFORMANCE_BUDGET.md` — representation/cadence/rendering rules for keeping labs fast inside Gallery/PREVIEW/PROGRAM.
+7. `CROSS_DOMAIN_ATLAS.md` — reusable bridges between typography, design, shaders, simulation, geometry, interaction and realtime systems.
+8. `IDEA_ENGINE.md` — concept-first multiplication/mutation method.
+9. `LIVING_SYSTEMS.md` — optional research brick for autonomy, coupling and internal state.
+10. `SOURCE_CATALOG.md` — broader cross-domain references.
+11. `sources.json` — machine-readable index.
 
 Use these together with:
 
@@ -73,22 +75,37 @@ For each seed draw:
 + 1 severe design constraint
 ```
 
+The draw may also include a **real-world phenomenon / physical condition** from `PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`, for example:
+
+- excitable chemistry / BZ waves;
+- precipitation / Liesegang bands;
+- spinodal phase separation;
+- Marangoni convection;
+- Faraday resonance;
+- ferrofluid / Rosensweig instability;
+- DLA growth;
+- granular jamming / force chains;
+- interfacial instability.
+
+When a real-world card is selected, preserve at least one genuine causal relationship or threshold instead of copying only its surface appearance.
+
 Then build a coupled prototype before assigning final meaning.
 
 Random systems must exchange state. Randomly stacking visible effects is not enough.
 
 ## Current host-derived quality rules
 
-A raw collision may be experimental, but Gallery inclusion now has stronger gates:
+A raw collision may be experimental, but Gallery inclusion has stronger gates:
 
 - substantial labs normally expose **6–9 independent systemic/artistic controls** when the mechanism supports them;
 - controls must alter different axes of the system, not duplicate `amount/chaos/speed`;
 - at least half of exposed controls should affect future evolution rather than only rendering the current frame;
 - cellular/raster work claiming organic behavior must propagate state through neighbours, resources, pressure, delay, phase, constraints or another local relationship;
 - raw does not mean visually careless: default palette, mass/void distribution and frozen-frame quality still matter;
-- interaction should modify a living system's future, not merely paint a temporary cursor effect.
+- interaction should modify a living system's future, not merely paint a temporary cursor effect;
+- performance architecture is part of creative quality: dense fields should not become thousands of CanvasItem draw calls per render frame when a texture/shader representation preserves the idea better.
 
-See `ORGANIC_COUPLING_AND_CONTROLS.md` for the detailed rules.
+See `ORGANIC_COUPLING_AND_CONTROLS.md` and `REALTIME_PERFORMANCE_BUDGET.md` for the detailed rules.
 
 ## Core vocabulary
 
@@ -108,6 +125,8 @@ Sample, quantize, threshold, warp, fold, repeat, advect, diffuse, erode, dilate,
 
 Time, pointer, velocity, acceleration, touch count, audio, glyph metrics, text content, field state, simulation state, camera or external data.
 
+Physical/chemical drivers now also include concentration, temperature, pressure, surface tension, viscosity, magnetic field, gravity vector, forcing frequency, supersaturation, friction, confinement and catalyst/inhibitor state.
+
 ### Temporal model
 
 Stateless, loop, oscillator, spring, hysteresis, delay, accumulation, decay, feedback, autonomous agents, stochastic events, phase transition, repair, mutation, birth/death, regime switching, etc.
@@ -126,7 +145,8 @@ Several works should differ in more than wording and color.
 - at most two use typography as the primary carrier in a five-work collision batch;
 - include persistent feedback/state, population behavior, discrete rules and spatial/geometry systems across the batch when feasible;
 - parameter vocabularies should reveal different mechanisms rather than repeat the same generic controls;
-- palette/composition differences alone do not count as technical diversity.
+- palette/composition differences alone do not count as technical diversity;
+- do not use five CPU raster loops when one or more experiments could be analytic shaders, cached geometry, particles, MultiMesh or low-resolution field textures.
 
 If five pieces could be produced by one renderer with changed text, colors and cursor mapping, the series has failed.
 
@@ -147,7 +167,8 @@ Reject directions that are mainly:
 - simulation with no relationship to composition;
 - independently animated pixels presented as an organic system;
 - randomly stacked effects without coupling;
-- complexity visible only in code rather than behavior.
+- complexity visible only in code rather than behavior;
+- visual density bought with structurally wasteful rendering.
 
 ## Implementation boundary
 
