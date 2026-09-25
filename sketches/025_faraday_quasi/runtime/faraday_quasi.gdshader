@@ -1,11 +1,9 @@
 shader_type canvas_item;
 render_mode unshaded;
 
-uniform float u_time = 0.0;
 uniform vec4 u_amps = vec4(0.1);
 uniform vec4 u_phases = vec4(0.0);
 uniform float u_drive = 0.9;
-uniform float u_frequency = 1.0;
 uniform float u_damping = 0.3;
 uniform float u_capillarity = 0.7;
 uniform float u_depth = 0.8;
@@ -41,10 +39,12 @@ void fragment() {
     float cross = (w0 * w1 + w2 * w3) * u_mode_coupling * 0.75;
     h += cross;
 
+    // Touch injects a local pressure impulse into modal state. It does not add
+    // an unrelated clock-driven ripple on top of the physical surface.
     vec2 tp = (u_touch_pos - 0.5) * aspect;
     float td = length(p - tp);
     float touch = exp(-td * td / 0.035) * u_touch_impulse;
-    h += touch * sin(td * 42.0 - u_time * (3.2 + u_frequency * 2.4)) * 0.42;
+    h += touch * (0.34 + u_amps.x * 0.10);
 
     float eps = 0.004;
     float hx = 0.0;

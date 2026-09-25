@@ -14,12 +14,18 @@ var _phases := PackedFloat32Array([0.0, 1.1, 2.2, 0.4])
 var _touch_impulse := 0.0
 var _touch_pos := Vector2(640.0, 360.0)
 var _forcing_phase := 0.0
+var _chirp_offset := 0.0
+var _chirp_target := 0.0
+var _chirp_age := 0.0
+var _chirp_duration := 9.0
+var _chirp_index := 0
 
 @onready var _surface: ColorRect = $ShaderSurface
 
 
 func _ready() -> void:
     super._ready()
+    _select_next_chirp_target()
     _push_shader()
 
 
@@ -70,15 +76,27 @@ func _on_pointer_changed() -> void:
         _touch_impulse = minf(1.0, _touch_impulse + 0.16)
 
 
+func _select_next_chirp_target() -> void:
+    _chirp_index += 1
+    var key := float(_chirp_index)
+    _chirp_target = hash01(key * 19.37 + 5.1) * 2.0 - 1.0
+    _chirp_duration = lerpf(6.0, 17.0, hash01(key * 7.41 + 12.8))
+    _chirp_age = 0.0
+
+
 func _update_source_simulation(delta: float) -> void:
-    var swept_frequency := frequency + sin(sketch_time * 0.11) * chirp * 0.16
+    # TEMPORAL_INTENT: Faraday forcing is physically periodic. The periodic
+    # phase drives competing modal state; the visible surface is reconstructed
+    # from those modes rather than receiving decorative clock wobble.
+    _chirp_age += delta
+    if _chirp_age >= _chirp_duration:
+        _select_next_chirp_target()
+    _chirp_offset = lerpf(_chirp_offset, _chirp_target, clampf(delta * 0.22, 0.0, 1.0))
+    var swept_frequency := frequency + _chirp_offset * chirp * 0.16
     _forcing_phase = fposmod(_forcing_phase + delta * swept_frequency * TAU, TAU)
 
     var mode_frequency := PackedFloat32Array([0.72, 0.96, 1.18, 1.42])
     var old := _amplitudes.duplicate()
-    var total_energy := 0.0
-    for a: float in old:
-        total_energy += a * a
 
     for i: int in range(4):
         var detune := (swept_frequency - mode_frequency[i]) / maxf(0.02, resonance_width)
@@ -108,11 +126,9 @@ func _push_shader() -> void:
     var material := _surface.material as ShaderMaterial
     if material == null:
         return
-    material.set_shader_parameter("u_time", sketch_time)
     material.set_shader_parameter("u_amps", Vector4(_amplitudes[0], _amplitudes[1], _amplitudes[2], _amplitudes[3]))
     material.set_shader_parameter("u_phases", Vector4(_phases[0], _phases[1], _phases[2], _phases[3]))
     material.set_shader_parameter("u_drive", drive)
-    material.set_shader_parameter("u_frequency", frequency)
     material.set_shader_parameter("u_damping", damping)
     material.set_shader_parameter("u_capillarity", capillarity)
     material.set_shader_parameter("u_depth", depth)
@@ -129,6 +145,11 @@ func _get_custom_live_sync_state() -> Dictionary:
         "touch_impulse": _touch_impulse,
         "touch_pos": _touch_pos,
         "forcing_phase": _forcing_phase,
+        "chirp_offset": _chirp_offset,
+        "chirp_target": _chirp_target,
+        "chirp_age": _chirp_age,
+        "chirp_duration": _chirp_duration,
+        "chirp_index": _chirp_index,
     }
 
 
@@ -143,6 +164,11 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
     var tp: Variant = state.get("touch_pos", _touch_pos)
     if tp is Vector2: _touch_pos = tp as Vector2
     _forcing_phase = float(state.get("forcing_phase", _forcing_phase))
+    _chirp_offset = float(state.get("chirp_offset", _chirp_offset))
+    _chirp_target = float(state.get("chirp_target", _chirp_target))
+    _chirp_age = float(state.get("chirp_age", _chirp_age))
+    _chirp_duration = float(state.get("chirp_duration", _chirp_duration))
+    _chirp_index = int(state.get("chirp_index", _chirp_index))
     _push_shader()
 
 
@@ -150,6 +176,7 @@ func _get_custom_live_debug_state() -> Dictionary:
     return {
         "modal_energy": _amplitudes[0] + _amplitudes[1] + _amplitudes[2] + _amplitudes[3],
         "touch_impulse": _touch_impulse,
+        "chirp_offset": _chirp_offset,
         "render_mode":"single_shader_pass",
     }
 

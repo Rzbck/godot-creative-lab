@@ -1,7 +1,6 @@
 shader_type canvas_item;
 render_mode unshaded;
 
-uniform float u_time = 0.0;
 uniform float u_field_strength = 0.9;
 uniform vec2 u_magnet_pos = vec2(0.5);
 uniform float u_magnet_radius = 0.15;
@@ -25,20 +24,19 @@ void fragment() {
 
     float d = length(p - mp);
     float magnetic = gauss(d, max(0.025, u_magnet_radius * 1.9));
-
-    vec2 auto_a = vec2(cos(u_time * 0.19), sin(u_time * 0.137)) * vec2(0.32, 0.22);
-    vec2 auto_b = vec2(cos(u_time * 0.113 + 2.1), sin(u_time * 0.173 + 1.2)) * vec2(0.27, 0.18);
-    float ambient_field = gauss(length(p - auto_a), 0.24) * 0.28 + gauss(length(p - auto_b), 0.21) * 0.22;
-    float field = (magnetic * 0.92 + ambient_field) * u_field_strength;
+    float vessel_bias = gauss(length(p * vec2(0.82, 1.0)), 0.62) * 0.07;
+    float field = (magnetic * 0.96 + vessel_bias) * u_field_strength;
 
     float k = mix(22.0, 38.0, u_surface_tension);
     vec2 d0 = vec2(1.0, 0.0);
     vec2 d1 = vec2(0.5, 0.8660254);
     vec2 d2 = vec2(-0.5, 0.8660254);
 
-    float w0 = cos(dot(p, d0) * k + sin(u_time * 0.17) * 0.25);
-    float w1 = cos(dot(p, d1) * k + cos(u_time * 0.13) * 0.21);
-    float w2 = cos(dot(p, d2) * k - sin(u_time * 0.11) * 0.18);
+    // The lattice is spatial structure. Temporal behavior now comes from the
+    // moving magnetic source + hysteretic CPU state, not shader clock wobble.
+    float w0 = cos(dot(p, d0) * k);
+    float w1 = cos(dot(p, d1) * k + 0.73);
+    float w2 = cos(dot(p, d2) * k - 0.41);
     float lattice = (w0 + w1 + w2) / 3.0;
     float coupled = cos((w0 - w1) * 2.2 + (w2 * u_mode_coupling));
     float signal = lattice * (0.55 + u_mode_coupling * 0.12) + coupled * 0.12 * u_mode_coupling + field * 0.95;

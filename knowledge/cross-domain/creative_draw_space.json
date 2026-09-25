@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "exploration_probability": 0.24,
+  "recent_window": 5,
+  "carriers": [
+    "ink", "paper", "light", "glass", "smoke", "granular_matter", "living_tissue",
+    "magnetic_fluid", "language", "signal", "dust", "membrane", "metal", "liquid",
+    "data_swarm", "void", "projected_geometry", "crystal", "fiber", "foam"
+  ],
+  "representations": [
+    {"id":"framebuffer_feedback","family":"image_memory"},
+    {"id":"image_morphology","family":"image_memory"},
+    {"id":"cellular_field","family":"lattice_field"},
+    {"id":"reaction_diffusion","family":"lattice_field"},
+    {"id":"fluid_grid","family":"lattice_field"},
+    {"id":"phase_field_texture","family":"lattice_field"},
+    {"id":"agent_population","family":"agents"},
+    {"id":"particle_flow","family":"agents"},
+    {"id":"graph_topology","family":"network"},
+    {"id":"contact_graph","family":"network"},
+    {"id":"constraint_network","family":"network"},
+    {"id":"procedural_mesh","family":"geometry"},
+    {"id":"point_cloud_3d","family":"geometry"},
+    {"id":"voronoi_territory","family":"geometry"},
+    {"id":"sdf_field","family":"implicit"},
+    {"id":"analytic_shader_field","family":"implicit"},
+    {"id":"raymarch_volume","family":"implicit"},
+    {"id":"wave_field","family":"oscillatory_field"},
+    {"id":"modal_field","family":"oscillatory_field"},
+    {"id":"typography_layout","family":"symbolic"},
+    {"id":"data_structure","family":"symbolic"},
+    {"id":"mask_distance_field","family":"symbolic"}
+  ],
+  "operators": [
+    {"id":"advect","family":"transport"},
+    {"id":"diffuse","family":"transport"},
+    {"id":"erode","family":"material"},
+    {"id":"fracture","family":"material"},
+    {"id":"consume_regrow","family":"material"},
+    {"id":"quantize","family":"sampling"},
+    {"id":"threshold","family":"sampling"},
+    {"id":"fold","family":"geometry"},
+    {"id":"displace","family":"geometry"},
+    {"id":"mutate_topology","family":"topology"},
+    {"id":"constraint_relax","family":"topology"},
+    {"id":"couple_neighbours","family":"coupling"},
+    {"id":"feedback","family":"memory"},
+    {"id":"accumulate","family":"memory"},
+    {"id":"phase_switch","family":"state"},
+    {"id":"precipitate","family":"state"},
+    {"id":"jam_release","family":"state"}
+  ],
+  "temporal_models": [
+    "delayed_feedback", "hysteresis", "stochastic_events", "irreversible_mutation",
+    "spring_inertia", "birth_death", "state_dependent_regime", "fatigue_repair",
+    "autonomous_agents", "phase_transition", "conserved_coarsening", "accumulation_decay",
+    "excitable_refractory", "forced_oscillator"
+  ],
+  "interactions": [
+    "inject_energy", "cut_links", "seed_population", "change_material_property",
+    "write_memory", "alter_topology", "place_obstacle", "thermal_quench", "pressure_load",
+    "local_freeze", "move_source", "remove_mass", "change_boundary", "synchronize_local_phase"
+  ],
+  "constraints": [
+    "one_bit", "duotone", "asymmetric_safe_area", "six_column_grid", "no_text",
+    "limited_density", "large_negative_space", "edge_crop", "print_registration",
+    "single_material", "two_scale_hierarchy", "hard_safe_margin", "no_glow", "no_symmetry"
+  ],
+  "render_paths": [
+    "canvas_geometry", "image_texture_field", "fullscreen_shader", "multimesh",
+    "gpu_particles", "feedback_viewport", "mesh_3d"
+  ],
+  "history": [
+    {"id":"016_predator_vein","carrier":"living_tissue","representations":["graph_topology","agent_population"],"operators":["consume_regrow","couple_neighbours"],"temporal_model":"hysteresis","interaction":"seed_population","render_path":"canvas_geometry"},
+    {"id":"017_edge_bloom","carrier":"living_tissue","representations":["cellular_field","agent_population"],"operators":["couple_neighbours","accumulate"],"temporal_model":"excitable_refractory","interaction":"seed_population","render_path":"image_texture_field"},
+    {"id":"018_current_memory","carrier":"membrane","representations":["wave_field","particle_flow"],"operators":["feedback","advect"],"temporal_model":"delayed_feedback","interaction":"inject_energy","render_path":"canvas_geometry"},
+    {"id":"019_soft_flock","carrier":"membrane","representations":["agent_population","constraint_network"],"operators":["constraint_relax","erode"],"temporal_model":"fatigue_repair","interaction":"place_obstacle","render_path":"canvas_geometry"},
+    {"id":"020_echo_tissue","carrier":"living_tissue","representations":["cellular_field","framebuffer_feedback"],"operators":["couple_neighbours","feedback"],"temporal_model":"delayed_feedback","interaction":"seed_population","render_path":"image_texture_field"},
+    {"id":"021_rosensweig_field","carrier":"magnetic_fluid","representations":["analytic_shader_field","data_structure"],"operators":["threshold","couple_neighbours"],"temporal_model":"hysteresis","interaction":"move_source","render_path":"fullscreen_shader"},
+    {"id":"022_liesegang_front","carrier":"crystal","representations":["data_structure","mask_distance_field"],"operators":["precipitate","diffuse"],"temporal_model":"accumulation_decay","interaction":"move_source","render_path":"canvas_geometry"},
+    {"id":"023_spinodal_marangoni","carrier":"liquid","representations":["phase_field_texture","fluid_grid"],"operators":["diffuse","advect"],"temporal_model":"conserved_coarsening","interaction":"thermal_quench","render_path":"image_texture_field"},
+    {"id":"024_granular_jam","carrier":"granular_matter","representations":["agent_population","contact_graph"],"operators":["jam_release","constraint_relax"],"temporal_model":"fatigue_repair","interaction":"pressure_load","render_path":"canvas_geometry"},
+    {"id":"025_faraday_quasi","carrier":"liquid","representations":["modal_field","analytic_shader_field"],"operators":["phase_switch","couple_neighbours"],"temporal_model":"forced_oscillator","interaction":"inject_energy","render_path":"fullscreen_shader"}
+  ]
+}

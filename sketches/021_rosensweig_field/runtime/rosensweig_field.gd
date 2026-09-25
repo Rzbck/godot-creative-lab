@@ -13,12 +13,17 @@ var _magnet_pos := Vector2(640.0, 360.0)
 var _field_memory := 0.0
 var _instability := 0.0
 var _last_magnet_pos := Vector2(640.0, 360.0)
+var _auto_target := Vector2(870.0, 280.0)
+var _auto_target_age := 0.0
+var _auto_target_duration := 6.0
+var _auto_target_index := 0
 
 @onready var _surface: ColorRect = $ShaderSurface
 
 
 func _ready() -> void:
     super._ready()
+    _select_next_auto_target()
     _push_shader()
 
 
@@ -62,12 +67,24 @@ func set_parameter_value(id: String, value: Variant) -> void:
     _push_shader()
 
 
-func _update_source_simulation(delta: float) -> void:
-    var auto_target := Vector2(
-        640.0 + cos(sketch_time * 0.19) * 310.0,
-        360.0 + sin(sketch_time * 0.137) * 205.0
+func _select_next_auto_target() -> void:
+    _auto_target_index += 1
+    var key := float(_auto_target_index)
+    _auto_target = Vector2(
+        150.0 + hash01(key * 17.31 + 2.7) * 980.0,
+        105.0 + hash01(key * 31.73 + 9.1) * 510.0
     )
-    var target := pointer_position if pointer_down else auto_target
+    _auto_target_duration = lerpf(4.2, 11.8, hash01(key * 7.97 + 13.4))
+    _auto_target_age = 0.0
+
+
+func _update_source_simulation(delta: float) -> void:
+    if not pointer_down:
+        _auto_target_age += delta
+        if _auto_target_age >= _auto_target_duration or _magnet_pos.distance_to(_auto_target) < 42.0:
+            _select_next_auto_target()
+
+    var target := pointer_position if pointer_down else _auto_target
     var follow := lerpf(5.2, 1.0, viscosity)
     _magnet_pos = _magnet_pos.lerp(target, clampf(delta * follow, 0.0, 1.0))
 
@@ -81,7 +98,7 @@ func _update_source_simulation(delta: float) -> void:
     var relax_speed := lerpf(0.45, 3.2, relaxation / 2.0)
     _instability = lerpf(_instability, desired, clampf(delta * relax_speed, 0.0, 1.0))
 
-    var memory_target := 1.0 if pointer_down else 0.0
+    var memory_target := 1.0 if pointer_down else clampf(motion / 900.0, 0.0, 0.32)
     var memory_speed := lerpf(0.28, 1.4, 1.0 - viscosity)
     _field_memory = lerpf(_field_memory, memory_target, clampf(delta * memory_speed, 0.0, 1.0))
     _push_shader()
@@ -93,7 +110,6 @@ func _push_shader() -> void:
     var material := _surface.material as ShaderMaterial
     if material == null:
         return
-    material.set_shader_parameter("u_time", sketch_time)
     material.set_shader_parameter("u_field_strength", field_strength)
     material.set_shader_parameter("u_magnet_pos", _magnet_pos / DESIGN_SIZE)
     material.set_shader_parameter("u_magnet_radius", magnet_radius / DESIGN_SIZE.x)
@@ -112,6 +128,10 @@ func _get_custom_live_sync_state() -> Dictionary:
         "last_magnet_pos": _last_magnet_pos,
         "field_memory": _field_memory,
         "instability": _instability,
+        "auto_target": _auto_target,
+        "auto_target_age": _auto_target_age,
+        "auto_target_duration": _auto_target_duration,
+        "auto_target_index": _auto_target_index,
     }
 
 
@@ -120,13 +140,23 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
     if p is Vector2: _magnet_pos = p as Vector2
     var lp: Variant = state.get("last_magnet_pos", _last_magnet_pos)
     if lp is Vector2: _last_magnet_pos = lp as Vector2
+    var at: Variant = state.get("auto_target", _auto_target)
+    if at is Vector2: _auto_target = at as Vector2
     _field_memory = float(state.get("field_memory", _field_memory))
     _instability = float(state.get("instability", _instability))
+    _auto_target_age = float(state.get("auto_target_age", _auto_target_age))
+    _auto_target_duration = float(state.get("auto_target_duration", _auto_target_duration))
+    _auto_target_index = int(state.get("auto_target_index", _auto_target_index))
     _push_shader()
 
 
 func _get_custom_live_debug_state() -> Dictionary:
-    return {"instability": _instability, "field_memory": _field_memory, "render_mode":"single_shader_pass"}
+    return {
+        "instability": _instability,
+        "field_memory": _field_memory,
+        "auto_target_age": _auto_target_age,
+        "render_mode":"single_shader_pass",
+    }
 
 
 func _draw() -> void:
