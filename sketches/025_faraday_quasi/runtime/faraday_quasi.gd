@@ -10,8 +10,12 @@ extends "res://sketches/_shared/design_sketch_base.gd"
 @export_range(0.0, 1.2, 0.01) var chirp: float = 0.22
 
 var _amplitudes := PackedFloat32Array([0.12, 0.08, 0.04, 0.03])
+# Visual phases are deliberately unwrapped. The old implementation wrapped the
+# forcing phase and then multiplied that wrapped value by fractional factors in
+# the shader, producing a visible cut every cycle. Unwrapped modal phases keep
+# every rendered harmonic continuous indefinitely.
 var _phases := PackedFloat32Array([0.0, 1.1, 2.2, 0.4])
-var _touch_impulse := 0.0
+var _touch_energy := 0.0
 var _touch_pos := Vector2(640.0, 360.0)
 var _forcing_phase := 0.0
 var _chirp_offset := 0.0
@@ -73,7 +77,10 @@ func _on_pointer_changed() -> void:
     if pointer_active:
         _touch_pos = pointer_position
     if pointer_down:
-        _touch_impulse = minf(1.0, _touch_impulse + 0.16)
+        # Interaction now enters the physical modal state only. There is no
+        # direct click-shaped height patch in the shader, so press/release cannot
+        # reveal a compositing seam or pop an unrelated radial effect on screen.
+        _touch_energy = minf(1.0, _touch_energy + 0.12)
 
 
 func _select_next_chirp_target() -> void:
@@ -84,16 +91,31 @@ func _select_next_chirp_target() -> void:
     _chirp_age = 0.0
 
 
+func _touch_mode_weight(index: int) -> float:
+    var p := (_touch_pos / DESIGN_SIZE - Vector2(0.5, 0.5)) * 2.0
+    match index:
+        0:
+            return 0.42 + absf(p.x) * 0.58
+        1:
+            return 0.42 + absf(p.y) * 0.58
+        2:
+            return 0.42 + absf((p.x + p.y) * 0.7071) * 0.58
+        _:
+            return 0.42 + absf((p.x - p.y * 0.618) * 0.85) * 0.58
+
+
 func _update_source_simulation(delta: float) -> void:
-    # TEMPORAL_INTENT: Faraday forcing is physically periodic. The periodic
-    # phase drives competing modal state; the visible surface is reconstructed
-    # from those modes rather than receiving decorative clock wobble.
+    # TEMPORAL_INTENT: Faraday excitation is a genuinely periodic physical pump.
+    # The pump changes modal energy in this state integrator. The shader never
+    # receives the wrapped forcing phase, so no visible geometry can jump when
+    # this internal phase crosses 2π.
     _chirp_age += delta
     if _chirp_age >= _chirp_duration:
         _select_next_chirp_target()
     _chirp_offset = lerpf(_chirp_offset, _chirp_target, clampf(delta * 0.22, 0.0, 1.0))
     var swept_frequency := frequency + _chirp_offset * chirp * 0.16
     _forcing_phase = fposmod(_forcing_phase + delta * swept_frequency * TAU, TAU)
+    var pump := 0.5 + 0.5 * sin(_forcing_phase)
 
     var mode_frequency := PackedFloat32Array([0.72, 0.96, 1.18, 1.42])
     var old := _amplitudes.duplicate()
@@ -101,22 +123,32 @@ func _update_source_simulation(delta: float) -> void:
     for i: int in range(4):
         var detune := (swept_frequency - mode_frequency[i]) / maxf(0.02, resonance_width)
         var resonance := exp(-detune * detune)
-        var threshold := 0.28 + damping * 0.34 + float(i) * 0.035
-        var forcing := maxf(0.0, drive * resonance - threshold)
+        var threshold := 0.23 + damping * 0.30 + float(i) * 0.028
+        var physical_drive := drive * resonance * (0.22 + pump * 0.78)
+        var forcing := maxf(0.0, physical_drive - threshold)
+
         var neighbours := 0.0
         for j: int in range(4):
             if j != i:
                 neighbours += old[j]
         neighbours /= 3.0
+
         var coupling_force := (neighbours - old[i]) * mode_coupling * 0.17
         var saturation := old[i] * old[i] * (0.45 + capillarity * 0.24)
-        var da := forcing * 1.25 + coupling_force + _touch_impulse * (0.13 + float(i) * 0.025) - damping * old[i] * 0.88 - saturation
+        var touch_drive := _touch_energy * _touch_mode_weight(i) * (0.12 + float(i) * 0.018)
+        var da := forcing * 1.18 + coupling_force + touch_drive - damping * old[i] * 0.88 - saturation
         _amplitudes[i] = clampf(old[i] + da * delta, 0.0, 1.35)
-        _phases[i] = fposmod(_phases[i] + delta * mode_frequency[i] * TAU * 0.5 * (0.78 + depth * 0.22), TAU)
 
-    _touch_impulse *= pow(lerpf(0.90, 0.975, damping), delta * 60.0)
+        # Keep visual phase continuous; do not fposmod() this value. Multiple
+        # non-integer harmonics in the material can therefore remain continuous.
+        var modal_speed := mode_frequency[i] * TAU * 0.5 * (0.78 + depth * 0.22)
+        var touch_detune := _touch_energy * (_touch_mode_weight(i) - 0.68) * 0.24
+        _phases[i] += delta * (modal_speed + touch_detune)
+
+    var release_rate := lerpf(1.8, 0.48, clampf(damping / 0.95, 0.0, 1.0))
+    _touch_energy = maxf(0.0, _touch_energy - delta * release_rate)
     if pointer_down:
-        _touch_impulse = minf(1.0, _touch_impulse + delta * 1.8)
+        _touch_energy = minf(1.0, _touch_energy + delta * 1.35)
     _push_shader()
 
 
@@ -133,16 +165,14 @@ func _push_shader() -> void:
     material.set_shader_parameter("u_capillarity", capillarity)
     material.set_shader_parameter("u_depth", depth)
     material.set_shader_parameter("u_mode_coupling", mode_coupling)
-    material.set_shader_parameter("u_touch_pos", _touch_pos / DESIGN_SIZE)
-    material.set_shader_parameter("u_touch_impulse", _touch_impulse)
-    material.set_shader_parameter("u_forcing_phase", _forcing_phase)
+    material.set_shader_parameter("u_touch_energy", _touch_energy)
 
 
 func _get_custom_live_sync_state() -> Dictionary:
     return {
         "amplitudes": _amplitudes.duplicate(),
         "phases": _phases.duplicate(),
-        "touch_impulse": _touch_impulse,
+        "touch_energy": _touch_energy,
         "touch_pos": _touch_pos,
         "forcing_phase": _forcing_phase,
         "chirp_offset": _chirp_offset,
@@ -160,9 +190,10 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
     var pv: Variant = state.get("phases", PackedFloat32Array())
     if pv is PackedFloat32Array and (pv as PackedFloat32Array).size() == 4:
         _phases = (pv as PackedFloat32Array).duplicate()
-    _touch_impulse = float(state.get("touch_impulse", _touch_impulse))
+    _touch_energy = float(state.get("touch_energy", _touch_energy))
     var tp: Variant = state.get("touch_pos", _touch_pos)
-    if tp is Vector2: _touch_pos = tp as Vector2
+    if tp is Vector2:
+        _touch_pos = tp as Vector2
     _forcing_phase = float(state.get("forcing_phase", _forcing_phase))
     _chirp_offset = float(state.get("chirp_offset", _chirp_offset))
     _chirp_target = float(state.get("chirp_target", _chirp_target))
@@ -175,9 +206,9 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
 func _get_custom_live_debug_state() -> Dictionary:
     return {
         "modal_energy": _amplitudes[0] + _amplitudes[1] + _amplitudes[2] + _amplitudes[3],
-        "touch_impulse": _touch_impulse,
+        "touch_energy": _touch_energy,
         "chirp_offset": _chirp_offset,
-        "render_mode":"single_shader_pass",
+        "render_mode": "continuous_modal_surface",
     }
 
 
