@@ -160,124 +160,136 @@ Do not ask the user to manually edit files or enter long sequences of Git comman
 
 ## CI
 
-Repository workflow:
+Repository workflow: `.github/workflows/ci.yml`
 
-`.github/workflows/ci.yml`
+Local equivalent: `scripts/check.ps1`
 
-Local equivalent:
-
-`scripts/check.ps1`
-
-For runtime/code changes, wait for and inspect the CI jobs. Expected checks include:
+For runtime/code changes, expected checks include:
 
 - Repository policy
 - Godot 4.7.1 headless setup/import
 - main-scene smoke test
 - tracked-file cleanliness after import
 
-For documentation/knowledge changes, still resolve and verify CI for the final exact HEAD when a workflow run is produced. Never cite an older green run as proof for a newer commit.
+Repository policy now includes the full-canvas `ShaderSurface` rule documented in `docs/CI.md` and `docs/SKETCH_CONTRACT.md`.
 
-Do not claim success from parser confidence alone.
+For docs/knowledge changes, still resolve and verify CI for the final exact HEAD when a workflow run is produced. Never cite an older green run for a newer commit.
 
 ## Mandatory end-of-task repository hygiene
 
 After any material change, before final response:
 
-1. update durable handoff/state docs affected by the change;
-2. resolve the final remote HEAD after those documentation commits;
+1. update durable handoff/state docs affected by change;
+2. resolve final remote HEAD after docs commits;
 3. verify CI for that exact final HEAD;
-4. report the exact short HEAD + CI state;
-5. when a host test is relevant, include the canonical block above automatically.
-
-See `AGENTS.md` for the complete mandatory AI completion protocol.
+4. report exact short HEAD + CI;
+5. when host test relevant, include canonical block above automatically.
 
 ## Telemetry workflow
 
-### Runtime local path
+Local runtime path: `res://.telemetry_runtime/`
 
-`res://.telemetry_runtime/`
-
-Ignored by ordinary Git.
-
-### Public sanitized branch
-
-`telemetry/runtime`
+Public sanitized branch: `telemetry/runtime`
 
 Important files:
 
 - `latest.jsonl`
 - `sessions/session_<sanitized-id>.jsonl`
 
-Telemetry publication is asynchronous/queued. Console messages such as `CREATIVE_LAB_TELEMETRY_PUBLISH_START pid=...` mean a publisher started; they are not proof that the remote branch changed.
+Publication is asynchronous/queued. Publisher start messages are not proof remote branch changed.
 
-### Debugging procedure after a user test
+### Debugging procedure after user test
 
-1. Read `telemetry/runtime/latest.jsonl` from GitHub.
-2. Verify the telemetry branch commit actually advanced for the session.
-3. If `latest.jsonl` is stale/empty while console showed an active publisher, inspect telemetry branch history/session snapshots before asking the user for anything.
-4. Analyze exact event chronology before changing window/output/layout code.
-5. Only ask the user for screenshots/log text when the remote telemetry genuinely lacks the needed evidence.
+1. Read `telemetry/runtime/latest.jsonl`.
+2. Verify branch/session advanced and matches tested HEAD.
+3. Inspect session snapshots if rolling file stale/empty.
+4. Analyze event chronology before changing runtime.
+5. Only request screenshots/log text when telemetry lacks needed evidence.
 
-### What telemetry should help answer
+Telemetry can answer window/layout/SubViewport/output/linkage/input/resize/filter state plus:
 
-- root window mode/position/size/screen;
-- native PROGRAM output screen/size/state;
-- layout geometry/minimum-size overflow;
-- SubViewport size/update mode/texture assignment;
-- render probes (numeric metrics only, no raw image publication);
-- preview vs PROGRAM synchronization state/counts;
-- touch/mouse input received by PROGRAM and coordinate mapping;
-- Gallery/resize/output transitions;
-- adaptive Gallery filter rail/drawer state;
-- telemetry publisher state.
+- `sketch_surface_contract` viewport/coverage diagnostics;
+- `sketch_review_changed` numeric host ratings;
+- Trash/restore/purge/retention events.
 
-## PROGRAM / LIVE OUT host test
-
-The most important regression test is:
+## PROGRAM / LIVE OUT regression
 
 1. Open 004.
-2. Send 004 to LIVE OUT on the desired physical display.
-3. Touch/drag the physical output and confirm the artwork responds.
-4. Return to Gallery: PROGRAM must continue.
-5. Open 002 in PREVIEW: 004 must still run on PROGRAM.
-6. Change 002 parameters in PREVIEW.
-7. Press `TAKE LIVE`: 002 replaces 004 on PROGRAM.
-8. Continue using the workstation UI while PROGRAM remains active.
+2. Send 004 to LIVE OUT.
+3. Touch/drag physical output; art responds.
+4. Return Gallery: PROGRAM continues.
+5. Open 002 in PREVIEW: 004 still PROGRAM.
+6. Change 002 parameters.
+7. TAKE LIVE: 002 replaces 004.
+8. Keep using workstation while PROGRAM active.
 
 Navigation must not stop PROGRAM.
 
-## Gallery regression test
+## Gallery regression
 
-- Cards show real render thumbnails.
-- Only hovered card animates.
-- No giant tooltip overlay obscures the card.
-- Search filters title/id/index/tags/engine/description and still indexes every metadata tag.
-- Primary groups remain automatic from the first tag.
-- The permanent tag rail remains bounded: `ALL` plus at most six generated quick tags and optional `MORE`.
-- Universal tags that match the whole catalogue are not shown as useless filters.
-- Rare tags remain available through `MORE` and search.
-- Selecting a rare tag promotes it into the quick rail while active.
-- `MORE` is collapsed by default and can be reopened/closed cleanly.
-- Groups with no results disappear.
-- Resize keeps the layout clean.
+- real thumbnails;
+- only hovered card animates;
+- no giant tooltip overlay;
+- search indexes title/id/index/tags/engine/description and every metadata tag;
+- first tag still automatic primary group;
+- permanent tag rail bounded to ALL + at most six generated tags + optional MORE;
+- universal tags not shown as useless filters;
+- rare tags accessible through MORE/search;
+- active rare tag promoted while selected;
+- MORE collapsed by default;
+- empty groups disappear;
+- resize remains clean.
 
-## Persistence regression test
+## Full-canvas render regression
+
+1. Open 025 FARADAY QUASI in maximized workstation PREVIEW.
+2. Confirm artwork covers the whole PREVIEW (previous failing case was 1520×852) with no gray right/bottom gap.
+3. Resize workstation repeatedly; surface remains full-canvas.
+4. Repeat with 021 and 005, the other current named `ShaderSurface` scenes.
+5. Press F11 on a shader-backed sketch; surface remains full-canvas.
+6. After close, telemetry should include `sketch_surface_contract` with `pass=true` for tested surfaces.
+
+A gray region caused by a fixed sketch surface is a release blocker, not an acceptable aspect-ratio letterbox.
+
+## Review regression
 
 1. Open a sketch.
-2. Change multiple exposed parameters.
-3. Close the application normally.
+2. Set several REVIEW criteria from 1–5.
+3. Return Gallery; rated card shows `R x.x`.
+4. Reopen; scores persist.
+5. Close/relaunch normally; scores remain from `user://creative_lab_reviews.cfg`.
+6. Verify telemetry publishes `sketch_review_changed` with numeric ratings.
+
+Review scores are creative evidence for future AI work, not decorative UI.
+
+## Trash regression
+
+1. Choose a disposable/noncritical sketch.
+2. `MOVE TO TRASH`.
+3. Confirm it disappears from normal Gallery and `TRASH 1` appears.
+4. Open Trash and RESTORE; sketch returns.
+5. Test retention selector (7/14/30 days) if relevant.
+6. `PURGE` may be tested only with understanding that it retires the sketch from this workstation Gallery; source remains in Git.
+
+The runtime must never delete version-controlled `res://sketches/...` files.
+
+## Persistence regression
+
+1. Open a sketch.
+2. Change multiple creative parameters.
+3. Close normally.
 4. Relaunch.
-5. Reopen that sketch.
-6. Values should restore from `user://creative_lab_sketch_settings.cfg`.
-7. Gallery thumbnail should reflect persisted parameters.
+5. Reopen.
+6. Values restore from `user://creative_lab_sketch_settings.cfg`.
+7. Gallery thumbnail reflects persisted parameters.
 
 ## Git safety
 
-Allowed normal workflow: direct commits to the active feature branch through the GitHub connector.
+Allowed normal workflow: direct commits to active feature branch through GitHub connector.
 
 Not allowed without explicit user approval:
 
-- merging to `main`;
+- merging `main`;
 - force-pushing;
 - destructive reset/clean;
 - rewriting unrelated published history.
@@ -288,13 +300,4 @@ Never use blind `git add -A` in user-facing instructions.
 
 User language is French and often phonetic/fast. Respond to intent rather than correcting spelling.
 
-The user values:
-
-- concrete progress;
-- direct repo actions;
-- exact commit/branch when relevant;
-- CI verification;
-- minimal manual steps;
-- telemetry-first diagnosis;
-- canonical CI-waiting PowerShell supplied automatically after material repo changes;
-- no generic filler.
+User values concrete progress, direct repo actions, exact branch/SHA, CI verification, minimal manual steps, telemetry-first diagnosis, automatic canonical PowerShell after material changes, and no generic filler.
