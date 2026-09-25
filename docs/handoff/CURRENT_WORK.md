@@ -8,187 +8,145 @@ Last refreshed: 2026-09-25.
 - draft PR: `#7`
 - PR base: `feat/gallery-project-workflow-20260923`
 - never merge/change `main` without explicit user approval
-- always resolve final remote HEAD + exact-head CI after all material commits
+- final remote HEAD + exact-head CI are authoritative
 
 ## Stable product behavior to preserve
 
-- Gallery real previews; only hovered card animates.
-- Adaptive generated tag discovery + complete search.
-- Per-sketch creative parameter persistence.
-- PREVIEW / PROGRAM separation; navigation does not stop PROGRAM.
-- `TAKE LIVE`, physical display selection and PROGRAM touch/mouse forwarding.
-- Linked PREVIEW/PROGRAM state synchronization.
-- Async sanitized telemetry on `telemetry/runtime`.
-- logical artwork space usually `1280×720`, but render surfaces adapt to actual viewport.
-- PROGRAM is artwork-only.
-- local Trash never deletes Git source.
-- workstation native window state persists across launches.
+Gallery real previews/hover animation, generated search/filtering, persisted sketch parameters, PREVIEW/PROGRAM separation, persistent PROGRAM across navigation, TAKE LIVE, physical output selection/input, linked state sync, async telemetry, local reversible Trash, full-canvas artwork and artwork-only PROGRAM must not regress.
 
-## Current top runtime
+Current top runtime: `app/main/main_runtime_window_memory.gd`.
 
-`app/main/main_runtime_window_memory.gd`
+## Latest host feedback — treat as a creative reset
 
-It extends `main_runtime_gallery_compact_review.gd`, then feedback/trash, adaptive filters, organizer, PROGRAM/output/window/telemetry layers.
+The host explicitly rejected 026–030 as **globally visually weak / not beautiful enough**, despite their technical diversity. Do not use that batch as evidence that the adaptive-art direction succeeded.
 
-## Window-state startup contract
+The host also reported:
 
-Fresh host telemetry on runtime `9fa6d889...` proved startup was visibly wrong: the app appeared `1280×720` windowed and only about 730 ms later switched to fullscreen.
+- FARADAY QUASI still showed a loop/cut, especially around click interaction;
+- the general workstation window behaved incorrectly;
+- 026–030 were all rated, but the latest remote telemetry publication lost those numeric ratings;
+- future work must be high-resolution, detailed and visually ambitious, using the breadth of available techniques rather than small technical demos.
 
-New layer `main_runtime_window_memory.gd` persists:
+New durable gate: `knowledge/cross-domain/VISUAL_FINISH_GATE.md`.
 
-- native mode: windowed / maximized / fullscreen;
-- current screen;
-- window position and size;
-- restore rect used by custom window controls.
+Adaptive draw remains a collision generator, not a quality guarantee. Required pipeline:
 
-State path:
+`draw -> prototype -> mutate -> art-direct -> VISUAL_FINISH_GATE -> keep/reject`
 
-`user://creative_lab_window_state.cfg`
+## Telemetry evidence from the failed host pass
 
-Startup hides the root native window in `_enter_tree()`, applies the saved state before the normal `_ready()` chain, waits for layout to settle, then reveals the workstation. First run falls back to fullscreen. F11 artwork presentation must not overwrite workstation preference.
+`telemetry/runtime` advanced to commit `309bf4e93aa62ce01e472dfdb817f684c05cd1bd`, but its close publication wrote an empty `latest.jsonl` / empty session. Therefore **do not invent the user's new 026–030 scores**.
 
-Status: **IMPLEMENTED_NOT_HOST_VALIDATED**. Required evidence is a Windows close/reopen test showing no visible small-window -> fullscreen jump and correct restoration after leaving the app windowed/maximized/fullscreen.
+The previous non-empty telemetry commit `1dc917da35c61c1c7e112684c139dc9d14d528a5` does match tested app head `dba702d0...` and proves:
 
-## Explicit user-rating evidence
+- startup/restored workstation was `windowed` at `[1600,0]`, size `[1920,1078]`;
+- user triggered `window_toggle_maximize` around 8.8 s;
+- `window_maximize_requested` resulted in native `fullscreen` `[1920,1080]`;
+- the user toggled again roughly 650 ms later.
 
-Fresh telemetry session `session_5e0960d4c3e0c6a7.jsonl` contained a consolidated `creative_preference_snapshot` with **16 reviewed sketches**.
+So the old custom Maximize path was genuinely collapsing into fullscreen on this Windows/Godot setup.
 
-Axis averages:
+The old usable rating snapshot remains only the earlier 16-review dataset. Direct qualitative host rejection of 026–030 is valid evidence; numeric values are unavailable because of the empty close publication.
 
-- visual: 2.25
-- interaction: 2.125
-- originality: 2.125
-- aliveness: 1.8125
-- controls: 2.0
-- performance: 3.0625
+## Window fix — revision 2
 
-Important complete vectors:
+`main_runtime_window_memory.gd` now separates **workstation expansion** from fullscreen presentation:
 
-- **020 ECHO TISSUE** — 4,4,4,4,4,5; avg ~4.17.
-- **012 CHEMICAL BLOCKS** — 4,3,4,3,3,3; avg ~3.33.
-- **017 EDGE BLOOM** — 3,3,3,3,2,3; avg ~2.83.
-- **014 RIBBON MORPH** — 1,1,1,1,1,1; avg 1.0.
-- **016 PREDATOR VEIN** — 1,1,1,2,1,3; avg 1.5.
-- **024 GRANULAR JAM** — 1,2,1,1,2,3; avg ~1.67.
-- **022 LIESEGANG FRONT** — 1,2,2,1,2,3; avg ~1.83.
-- **025 FARADAY QUASI** — 3,2,2,1,2,3; avg ~2.17.
+- custom Maximize uses a borderless **WINDOWED work-area rectangle**, not `WINDOW_MODE_MAXIMIZED`/fullscreen;
+- a 2 px bottom guard prevents Windows/Godot from reclassifying the borderless work-area client as fullscreen;
+- logical `maximized` state is persisted even though the native client remains windowed;
+- old revision-1 saved fullscreen produced by the Maximize control migrates to the stable expanded state;
+- real F11 artwork presentation remains independent;
+- close now starts one final telemetry publisher process immediately after flushing instead of relying only on a deferred call that can be lost during quit.
 
-Interpretation for generation: aliveness and controls remain the weak global axes. Stronger evidence favors local propagation, neighbour coupling, delayed memory and interaction that changes future evolution. Do **not** simply copy 020; ratings remain bounded probability evidence and 24% of adaptive draws remain preference-free.
+Status: **REPO_VALIDATED, HOST_VALIDATION_REQUIRED**.
 
-## REVIEW / curation
+## FARADAY QUASI fix
 
-Permanent inspector row remains compact:
+Root cause was mathematical, not subjective:
 
-`REVIEW <avg>/5  RATE  TRASH`
+- controller wrapped `u_forcing_phase` at `2π`;
+- shader multiplied the wrapped phase by fractional coefficients (`0.94`, `1.06`, `0.91`);
+- those transformed phases are not equivalent across the wrap, so a visible cut was inevitable;
+- click also added a direct local height patch, making the discontinuity more obvious.
 
-RATE modal v3 is an in-app centered opaque card with backdrop, close button, Esc and outside-click/touch dismissal. Ratings persist and Gallery `R x.x` badges remain.
+Fix:
 
-Consolidated telemetry event: `creative_preference_snapshot`.
+- forcing phase remains internal to the physical pump/state integrator;
+- shader no longer receives or renders the wrapped forcing phase;
+- visual modal phases are unwrapped and continuous;
+- touch modifies modal energy/detuning only, with smooth decay;
+- direct click-local shader bump was removed;
+- full-resolution surface shading was rebuilt with continuous harmonics, finite-difference normals and material response.
 
-Trash stays local/reversible; source remains versioned.
+Status: **REPO_VALIDATED, HOST_VALIDATION_REQUIRED**.
 
-## Adaptive batch 026–030
+## High-fidelity batch 031–035
 
-All five new definitions contain `creative_seed` and machine-readable `creative_signature`, and their actual signatures are recorded in `knowledge/cross-domain/creative_draw_space.json`.
+All five use deterministic seed provenance and implemented signatures recorded in `creative_draw_space.json`.
 
-### 026 VOID TENSION
+### 031 FOLD CHAMBER
 
-`constraint network + Voronoi territories + fracture/fold + spring inertia`
+- vector-resolution Delaunay triangulated relief;
+- 150 irregular vertices, neighbour-constrained spring surface;
+- autonomous physical loads + pressure injection;
+- per-facet normals/material shading and stressed hairline seams;
+- no coarse image texture as final output.
 
-- 18 stress-coupled network nodes;
-- edges fracture under stress and repair with scars;
-- touch cuts real links and redistributes force;
-- territory texture follows nearest/second-nearest nodes and propagated stress;
-- 8 controls.
+### 032 LUMEN SWARM
 
-### 027 GLASS TIDE
+- MultiMesh path, up to 900 luminous streak instances;
+- inertial source + spatial flow/advection;
+- source can be moved by touch without population reset;
+- separate halo/core instancing for detail and depth.
 
-`wave fronts + SDF glass + threshold/displacement + state-dependent topology`
+### 033 OBSIDIAN CATHEDRAL
 
-- four stateful moving lenses;
-- asynchronous pressure fronts, no shader `TIME` choreography;
-- touch toggles local optical topology and injects a wavefront;
-- one full-canvas shader surface under the existing ShaderSurface contract;
-- 8 controls.
+- full-resolution raymarched SDF architecture;
+- AO, normals, micro-facets, roughness/specular, spectral grazing response;
+- persistent fracture state from touch affects material/stress and mechanical orientation;
+- no shader TIME / no loop choreography.
 
-### 028 LUMEN MAZE
+### 034 PHOSPHOR SAND
 
-`light transport + graph channels + jam/release + quantization`
+- 128×72 temporal memory field is **hidden state only**;
+- final visible image is a full-resolution shader material with state gradients, optical relief, FRAGCOORD micro-grain, particulate highlights and spectral response;
+- touch writes memory; autonomous events occur only after the material genuinely settles.
 
-- 80×45 state field with deterministic channel topology;
-- six gates jam/release asynchronously;
-- blocked transport accumulates pressure then bursts;
-- touch deposits persistent obstacles the system routes around;
-- one texture draw; 9 controls.
+### 035 DUNE CHOIR
 
-### 029 FIBER FELT
+- actual damped 2D wave PDE;
+- output is dense antialiased perspective vector topography, not an enlarged grid texture;
+- longitudinal seams + curvature-derived peak glints provide multiple scales of detail;
+- autonomous excitation is hysteretic and only returns after energy decays.
 
-`fiber geometry + morphology mask + accumulation/displacement + phase transition`
+Code batch CI #287 passed repository policy, Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness before the subsequent documentation commits.
 
-- 30 constrained fibers, 13 points each;
-- coarse local compaction field exchanges state with neighbouring cells;
-- pressure and drag compact/advect fibers;
-- material transitions from loose strands toward felted state and can relax;
-- duotone; 8 controls.
+## Visual-finish contract
 
-### 030 REACTOR SKIN
+Read `knowledge/cross-domain/VISUAL_FINISH_GATE.md` for all future substantial creative work.
 
-`reaction-diffusion + procedural mesh + fracture/threshold`
+Hard requirements now include:
 
-- 52×30 Gray-Scott-style chemistry;
-- chemical gradients become mechanical stress;
-- 14×9 membrane mesh fractures and repairs on a slower timescale;
-- touch injects reagent and local structural stress;
-- no glow; 9 controls.
-
-## Temporal-quality rule
-
-User rejects cheap visible clock loops / sine-bobbing. Read `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
-
-Preferred: `time -> state/force/memory/event -> coupled system -> render`.
-
-Rejected by default: `time -> sin/cos -> visible position/scale/alpha/warp`.
-
-For 026+, direct clock trig requires `TEMPORAL_INTENT:`. CI audit remains active. None of 026–030 depends on generic direct-clock trigonometry.
-
-## Adaptive creative draw
-
-Files:
-
-- `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
-- `knowledge/cross-domain/creative_draw_space.json`
-- `scripts/creative/draw_recipe.py`
-
-Anti-repeat and preference rules remain:
-
-- historical/recent feature penalties;
-- minimum recent signature distance;
-- representation/operator families must differ;
-- forced oscillator penalized;
-- explicit REVIEW bias bounded;
-- 24% exploration share ignores preference bias.
-
-CI self-tests 180 deterministic draws for diversity collapse.
-
-## Full-canvas / performance contracts
-
-`ShaderSurface` must use `sketches/_shared/full_canvas_surface.gd`; CI rejects fixed 1280×720 surfaces. Dense fields should render as ImageTexture/fullscreen shader rather than thousands of Canvas primitives. Do not recompute expensive neighbourhood/contact work again in `_draw()`.
+- strong frozen frame before motion is considered;
+- authored composition / negative space;
+- at least three useful detail scales where appropriate;
+- final PROGRAM image must be full-resolution in appearance;
+- coarse solvers may drive state but may not simply be visibly scaled up;
+- material/light should support the claimed carrier;
+- no phase-wrap seam, reset, respawn wall or synchronized visible restart;
+- interaction must enter system state/material logic, not overlay a cursor effect.
 
 ## Required next host test
 
-1. Launch from canonical PowerShell: no small 1280×720 flash before the workstation appears.
-2. Leave workstation fullscreen, close normally, reopen: same fullscreen state/screen.
-3. Restore/window the app, move/resize it, wait >1 s, close and reopen: same mode/screen/rect.
-4. Confirm RATE modal remains centered/opaque after new top runtime.
-5. Confirm Gallery source count is 30 and open 026–030.
-6. For each 026–030: watch idle 20–30 s before interaction, then interact and remove hand; judge visual, aliveness, controls and whether consequences remain in system state.
-7. Rate 026–030 normally.
-8. Close normally and inspect fresh matching `telemetry/runtime`; require `workstation_window_state_restored` plus updated `creative_preference_snapshot` before conclusions.
-
-## Mandatory AI completion
-
-After every material repository change: finish commits, update durable docs/state, resolve final remote HEAD, wait exact-head CI, report exact short SHA + CI, include canonical CI-waiting PowerShell when host validation is relevant, then telemetry-first after user test.
+1. Launch: workstation should appear directly in its remembered logical state, with no small-window/fullscreen hop.
+2. Custom Maximize/Restore several times: it must stay stable and must not become native fullscreen.
+3. Close/reopen once expanded, then once windowed/moved/resized: each state should restore coherently.
+4. FARADAY QUASI: idle 30 s, then click/hold/drag/release repeatedly. There must be no global cut or click seam.
+5. Open 031–035 at large PREVIEW/fullscreen PROGRAM resolution. Judge frozen frame first, then idle motion, then interaction/recovery.
+6. RATE 031–035 normally.
+7. Close normally; next AI must inspect fresh telemetry first and verify the close publication is non-empty before trusting ratings.
 
 ## Non-regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, block UI with telemetry Git work, restore failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, reintroduce fixed 1280×720 ShaderSurface nodes, restore native transparent RATE popup, use naked global-clock wobble as default aliveness, or restore the visible windowed->fullscreen startup jump.
+Do not stop PROGRAM on navigation, create independent linked timelines, block Godot UI with telemetry Git work, restore failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, make glyph contours a default representation, restore permanent all-tags UI, reintroduce fixed 1280×720 ShaderSurface nodes, restore transparent native RATE popup, use naked global-clock wobble as generic aliveness, or expose coarse simulation pixels as the final visual simply because the solver is convenient.
