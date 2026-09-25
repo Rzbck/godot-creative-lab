@@ -16,13 +16,9 @@ Navigation is not PROGRAM transport. PROGRAM keeps running while the workstation
 
 ## Main runtime
 
-Entry scene:
+Entry scene: `res://app/main/main_runtime.tscn`.
 
-`res://app/main/main_runtime.tscn`
-
-Current top runtime layer:
-
-`res://app/main/main_runtime_window_memory.gd`
+Current top runtime layer: `res://app/main/main_runtime_window_memory.gd`.
 
 Important chain:
 
@@ -40,29 +36,26 @@ main_runtime_window_memory.gd
 
 Always inspect the actual `extends` chain before changing host architecture.
 
-## Workstation native-window state
+## Workstation window state — revision 2
 
-Native workstation state persists in:
+State persists in `user://creative_lab_window_state.cfg` and is restored before the first visible workstation frame.
 
-`user://creative_lab_window_state.cfg`
+The previous custom Maximize path used native maximize on a borderless Windows client. Host telemetry proved that Godot/Windows could reclassify the resulting monitor-sized client as fullscreen. That path is rejected.
 
-Persisted state includes mode, physical screen, position/size and restore rect.
+Revision 2 keeps workstation expansion distinct from artwork presentation:
 
-Startup restoration occurs before the first visible workstation frame:
+- logical `maximized` is implemented as borderless `WINDOWED` geometry using the current screen usable rect;
+- a 2 px bottom guard prevents the exact monitor-sized client from being reclassified as fullscreen;
+- the normal window restore rect remains separately tracked;
+- revision-1 saved fullscreen created by the old Maximize path migrates to logical maximized;
+- F11 / PROGRAM presentation stays separate and does not overwrite workstation state;
+- `workstation_window_state_restored` records the restored logical/native state.
 
-1. top runtime hides the root Window in `_enter_tree()`;
-2. saved native state is applied;
-3. normal UI `_ready()` chain/layout runs;
-4. after settle, the root Window is revealed;
-5. `workstation_window_state_restored` telemetry records the result.
-
-First run defaults to fullscreen. F11 artwork presentation is a separate transport/presentation state and must not overwrite the saved workstation state.
-
-This was introduced after host telemetry proved the previous implementation visibly appeared at 1280×720 then switched to fullscreen roughly 730 ms later.
+Current state: **REPO_VALIDATED / HOST_VALIDATION_REQUIRED**.
 
 ## Gallery architecture
 
-Sketches are discovered from `sketches/*/definition.json`. Current source catalogue: **001–030**.
+Sketches are discovered from `sketches/*/definition.json`. Current source catalogue: **001–035**.
 
 Current Gallery behavior:
 
@@ -71,59 +64,56 @@ Current Gallery behavior:
 - persisted sketch parameters restore into thumbnails;
 - first tag defines automatic primary group;
 - search indexes id/index/title/engine/description/all tags;
-- permanent filter rail bounded to `ALL` + at most six generated useful tags;
-- universal tags omitted; rare/rest tags in collapsed `MORE`;
-- active rare tag promoted while selected;
-- empty groups disappear; card grids respond to width.
+- permanent filter rail stays bounded with collapsed rare tags;
+- empty groups disappear and card grids respond to width.
 
 Do not restore a permanent all-tags wall.
 
 ## Review / preference feedback loop
 
-Parameter sidebar contains one compact row:
+Parameter sidebar contains `REVIEW <avg> RATE TRASH`.
 
-`REVIEW <avg> RATE TRASH`
-
-RATE opens a centered **in-app opaque modal**, not a native popup, with six explicit 1–5 criteria:
-
-- visual;
-- interaction;
-- originality;
-- aliveness;
-- controls;
-- performance.
-
-Reviews persist in `user://creative_lab_reviews.cfg`. Rated cards display `R x.x`.
+RATE is a centered **in-app opaque modal**, not a native popup. Reviews persist in `user://creative_lab_reviews.cfg`; rated cards display `R x.x`.
 
 Telemetry:
 
 - `sketch_review_changed` — individual edits;
-- `creative_preference_snapshot` — complete current reviewed set + axis averages.
+- `creative_preference_snapshot` — consolidated reviewed set + axis averages.
 
-Future creative decisions should use explicit ratings as bounded probability evidence. They must not become a clone/ranking mechanism. Adaptive exploration keeps 24% preference-free draws.
+Explicit ratings are bounded creative evidence, not clone instructions. If telemetry is empty/stale, never invent ratings. Direct qualitative host feedback should be recorded as qualitative evidence.
+
+The host explicitly rejected 026–030 as globally visually weak. Their technical diversity is not evidence of successful art direction.
 
 ## Local Trash / curation
 
 `TRASH` hides a sketch locally from the Gallery. State lives in `user://creative_lab_curation.cfg`.
 
-- RESTORE supported;
-- 7/14/30 day retention;
-- expiration/PURGE means local retirement;
-- workstation never deletes version-controlled `res://sketches/...` files.
-
-Actual source deletion remains explicit Git work.
+RESTORE is supported; expiration/PURGE means local retirement only. The workstation never deletes version-controlled `res://sketches/...` files.
 
 ## Full-canvas render contract
 
 Logical design coordinates are normally `1280×720`, but physical render surfaces follow real PREVIEW/PROGRAM size.
 
-A node named `ShaderSurface` must use:
+Any node named `ShaderSurface` must use `res://sketches/_shared/full_canvas_surface.gd`. CI rejects fixed 1280×720 ShaderSurface offsets. Host publishes `sketch_surface_contract` telemetry.
 
-`res://sketches/_shared/full_canvas_surface.gd`
+Drawing-based sketches use the logical-to-surface transform from `design_sketch_base.gd`; any margin/background must be intentional artwork, never host gray.
 
-CI rejects fixed 1280×720 ShaderSurface offsets. Host publishes `sketch_surface_contract` telemetry.
+## Visual-finish contract
 
-Drawing-based sketches use logical-to-surface transforms from `design_sketch_base.gd`; any aspect-fit margin must be intentional artwork, never exposed host gray.
+Substantial creative work must read and satisfy `knowledge/cross-domain/VISUAL_FINISH_GATE.md`.
+
+Technical novelty or signature distance is not enough. A kept work should provide:
+
+- a strong frozen frame before motion is considered;
+- authored composition, hierarchy and negative space;
+- persistent visual identity anchors;
+- several meaningful detail scales where appropriate;
+- final PROGRAM imagery that reads as high-resolution rather than an enlarged coarse solver;
+- material/light logic coherent with the claimed carrier;
+- no visible phase wrap, reset, respawn wall or synchronized restart;
+- interaction entering state/material logic rather than overlaying a generic cursor effect.
+
+A low-resolution solver may exist as hidden state, but the final renderer must reconstruct a convincing high-resolution surface/geometry/field.
 
 ## Temporal-quality contract
 
@@ -135,7 +125,7 @@ Rejected by default:
 
 `time -> sin/cos -> visible position/scale/alpha/warp`
 
-Periodic forcing is valid when it is genuinely the mechanism. Rules: `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
+Periodic forcing is valid when it is actually the mechanism, but its state must remain visually continuous. FARADAY QUASI's old wrapped forcing phase multiplied by fractional shader coefficients is the canonical example of a physically-motivated oscillator still failing the visual contract.
 
 `scripts/ci/audit_temporal_motion.py` audits the corpus. Existing <=025 findings are warnings; for 026+ direct clock trigonometry requires nearby `TEMPORAL_INTENT:` justification.
 
@@ -146,34 +136,37 @@ Files:
 - `knowledge/cross-domain/creative_draw_space.json`
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 - `scripts/creative/draw_recipe.py`
+- `knowledge/cross-domain/VISUAL_FINISH_GATE.md`
 
-A recipe draws carrier, two distant representation families, two distant operator families, temporal model, interaction consequence, design constraint and render path.
+The draw selects carrier, distant representation/operator families, temporal model, interaction consequence, design constraint and render path. Historical/recent reuse is penalized. Explicit REVIEW data applies only bounded preference bias; 24% of draws deliberately ignore preference bias.
 
-Historical/recent reuse is penalized and recent signature distance enforced. Explicit REVIEW data applies only bounded preference bias; 24% of draws deliberately ignore preference bias.
+The draw is only a collision generator. Required pipeline:
 
-For 026+, `definition.json` includes non-empty `creative_signature`. Implemented signatures 026–030 are recorded in draw history.
+`draw -> prototype -> observe -> interpret -> mutate -> art-direct -> visual-finish gate -> keep/reject`
 
-## Current adaptive batch 026–030
+For 026+, `definition.json` includes non-empty `creative_signature`. Record the implemented/mutated signature, not a discarded raw draw.
 
-- 026 VOID TENSION — constraint network + Voronoi territory + fracture/repair.
-- 027 GLASS TIDE — asynchronous wave fronts + SDF glass topology.
-- 028 LUMEN MAZE — graph light transport + jam/release + remembered obstacles.
-- 029 FIBER FELT — constrained fibers + local compaction mask + phase transition.
-- 030 REACTOR SKIN — reaction-diffusion + membrane stress + fracture/repair.
+## Creative batches
 
-They deliberately emphasize neighbour interaction, state memory and consequences that continue after touch because current ratings show aliveness/controls are the weakest catalogue axes.
+026–030 remain in source/history but are **creatively rejected by host**.
+
+Current high-fidelity batch 031–035 deliberately spans different final render representations:
+
+- **031 FOLD CHAMBER** — Delaunay vector relief + constrained spring surface + facet shading.
+- **032 LUMEN SWARM** — MultiMesh luminous streak field + spatial advection + inertial source.
+- **033 OBSIDIAN CATHEDRAL** — full-resolution SDF raymarch architecture with AO/material response and persistent fracture state.
+- **034 PHOSPHOR SAND** — hidden 128×72 memory field driving a full-resolution reconstructed material surface.
+- **035 DUNE CHOIR** — damped 2D wave PDE rendered as dense perspective antialiased vector topography.
+
+Their code batch passed repository policy + Godot 4.7.1 import/smoke before subsequent documentation commits. Final completion still requires CI on the exact final HEAD.
+
+## FARADAY QUASI correction
+
+025 no longer exposes wrapped forcing phase to the shader. Visual modal phases remain continuous, and pointer input modifies modal state rather than adding a click-local height bump. This correction is repository-validated but still needs Windows host visual validation.
 
 ## Parameters / persistence
 
-Sketch parameter values persist in:
-
-`user://creative_lab_sketch_settings.cfg`
-
-Substantial labs normally expose 6–9 meaningful independent controls when mechanism supports them.
-
-## Performance representation
-
-Dense state fields should render through ImageTexture/fullscreen shader where suitable instead of thousands of Canvas primitives. Expensive neighbourhood/contact work belongs in simulation cadence and should not be recomputed in `_draw()`.
+Sketch parameter values persist in `user://creative_lab_sketch_settings.cfg`. Substantial labs normally expose 6–9 meaningful independent controls when the mechanism supports them.
 
 ## PREVIEW / PROGRAM synchronization
 
@@ -187,7 +180,7 @@ Touch/mouse on PROGRAM is forwarded into the same logical design space used by P
 
 ## Telemetry
 
-Local runtime telemetry: `res://.telemetry_runtime/`
+Local runtime telemetry: `res://.telemetry_runtime/`.
 
 Sanitized online telemetry:
 
@@ -197,7 +190,9 @@ latest.jsonl
 sessions/
 ```
 
-Publication is asynchronous and must never block UI. After host test, require matching tested HEAD/session before conclusions.
+Publication is asynchronous and must never block UI. A publisher PID is not proof upload succeeded.
+
+The latest failed host pass exposed a close-path publication bug where an empty final payload replaced `latest.jsonl`. The close path now flushes and starts one final publisher before quitting. This fix requires host validation; next session must require a non-empty matching telemetry session before trusting new ratings.
 
 ## Knowledge / research
 
@@ -211,6 +206,7 @@ For substantial work consult relevant creative-coding/design material plus:
 - `REALTIME_PERFORMANCE_BUDGET.md`
 - `TEMPORAL_MOTION_QUALITY.md`
 - `ADAPTIVE_CREATIVE_DRAW.md`
+- `VISUAL_FINISH_GATE.md`
 
 References provide mechanisms/principles, not surfaces to copy.
 
