@@ -1,11 +1,11 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "project": "DC//LAB / Godot Creative Lab",
   "repository": "Rzbck/godot-creative-lab",
   "active_branch": "feat/creative-sketches-002-004-20260924",
   "draft_pr": 7,
   "pr_base": "feat/gallery-project-workflow-20260923",
-  "head_policy": "Resolve current remote branch HEAD at session start and again after all material code/documentation commits; exact-head CI is authoritative.",
+  "head_policy": "Resolve current remote branch HEAD at session start and after all material code/documentation commits; exact-head CI is authoritative.",
   "engine": {
     "name": "Godot",
     "version": "4.7.1.stable.official.a13da4feb",
@@ -15,14 +15,17 @@
     "local_root": "E:\\_Project\\GodotCreativeLab",
     "godot_gui": "C:\\Godot\\Godot_v4.7.1-stable_win64.exe",
     "godot_console": "C:\\Godot\\Godot_v4.7.1-stable_win64_console.exe",
-    "startup_window_mode": "native_fullscreen",
-    "startup_fullscreen_preserves_workstation_ui": true,
+    "window_state_path": "user://creative_lab_window_state.cfg",
+    "window_state_fields": ["mode", "screen", "position", "size", "restore_position", "restore_size", "has_restore_rect"],
+    "restore_before_first_visible_frame": true,
+    "first_run_fallback": "fullscreen",
     "f11_remains_render_presentation": true,
-    "windowed_restore_rect_remembered_before_startup_fullscreen": true
+    "startup_restore_event": "workstation_window_state_restored",
+    "startup_restore_host_state": "IMPLEMENTED_NOT_HOST_VALIDATED"
   },
   "runtime": {
     "main_scene": "res://app/main/main_runtime.tscn",
-    "top_runtime_script": "res://app/main/main_runtime_gallery_compact_review.gd",
+    "top_runtime_script": "res://app/main/main_runtime_window_memory.gd",
     "program_output_persistent_across_navigation": true,
     "take_live_supported": true,
     "touch_program_input": true,
@@ -38,100 +41,92 @@
     "gallery_search_indexes_all_tags": true,
     "logical_design_size": [1280, 720],
     "artwork_canvas_excludes_project_metadata": true,
-    "expected_gallery_source_count": 25
+    "expected_gallery_source_count": 30
   },
   "user_feedback_system": {
-    "runtime_base_layer": "app/main/main_runtime_gallery_feedback_trash.gd",
-    "runtime_compact_layer": "app/main/main_runtime_gallery_compact_review.gd",
     "reviews_path": "user://creative_lab_reviews.cfg",
     "review_axes": ["visual", "interaction", "originality", "aliveness", "controls", "performance"],
     "review_ui_revision": 3,
     "review_ui": "compact_row_plus_centered_opaque_in_app_modal",
     "native_popup_rejected_by_host": true,
-    "review_modal_backdrop": "dark_full_window",
-    "review_modal_centering": "CenterContainer_full_rect",
-    "review_modal_close_modes": ["close_button", "escape", "outside_mouse", "outside_touch"],
-    "review_event": "sketch_review_changed",
-    "review_modal_event": "review_modal_changed",
     "preference_snapshot_event": "creative_preference_snapshot",
-    "preference_snapshot_emitted_at_startup": true,
-    "preference_snapshot_emitted_after_rating_change": true,
     "review_badge_in_gallery": true,
     "last_known_reviewed_count": 16,
-    "known_complete_ratings": {
-      "020_echo_tissue": {"visual":4,"interaction":4,"originality":4,"aliveness":4,"controls":4,"performance":5,"average":4.1667},
-      "022_liesegang_front": {"visual":1,"interaction":2,"originality":2,"aliveness":1,"controls":2,"performance":3,"average":1.8333},
-      "025_faraday_quasi": {"visual":3,"interaction":2,"originality":2,"aliveness":1,"controls":2,"performance":3,"average":2.1667},
-      "001_signal_field": {"visual":3,"interaction":2,"originality":2,"aliveness":1,"controls":3,"performance":3,"average":2.3333}
+    "axis_averages": {
+      "visual": 2.25,
+      "interaction": 2.125,
+      "originality": 2.125,
+      "aliveness": 1.8125,
+      "controls": 2.0,
+      "performance": 3.0625
     },
+    "known_complete_ratings": {
+      "001_signal_field": {"visual":3,"interaction":2,"originality":2,"aliveness":1,"controls":3,"performance":3,"average":2.3333},
+      "011_swarm_relay": {"visual":3,"interaction":1,"originality":2,"aliveness":1,"controls":1,"performance":3,"average":1.8333},
+      "012_chemical_blocks": {"visual":4,"interaction":3,"originality":4,"aliveness":3,"controls":3,"performance":3,"average":3.3333},
+      "013_cut_cell": {"visual":1,"interaction":2,"originality":1,"aliveness":2,"controls":2,"performance":3,"average":1.8333},
+      "014_ribbon_morph": {"visual":1,"interaction":1,"originality":1,"aliveness":1,"controls":1,"performance":1,"average":1.0},
+      "015_phase_pack": {"visual":3,"interaction":1,"originality":3,"aliveness":3,"controls":1,"performance":4,"average":2.5},
+      "016_predator_vein": {"visual":1,"interaction":1,"originality":1,"aliveness":2,"controls":1,"performance":3,"average":1.5},
+      "017_edge_bloom": {"visual":3,"interaction":3,"originality":3,"aliveness":3,"controls":2,"performance":3,"average":2.8333},
+      "018_current_memory": {"visual":2,"interaction":3,"originality":2,"aliveness":1,"controls":2,"performance":3,"average":2.1667},
+      "019_soft_flock": {"visual":2,"interaction":2,"originality":2,"aliveness":2,"controls":2,"performance":3,"average":2.1667},
+      "020_echo_tissue": {"visual":4,"interaction":4,"originality":4,"aliveness":4,"controls":4,"performance":5,"average":4.1667},
+      "021_rosensweig_field": {"visual":2,"interaction":2,"originality":2,"aliveness":1,"controls":2,"performance":3,"average":2.0},
+      "022_liesegang_front": {"visual":1,"interaction":2,"originality":2,"aliveness":1,"controls":2,"performance":3,"average":1.8333},
+      "023_spinodal_marangoni": {"visual":2,"interaction":3,"originality":2,"aliveness":2,"controls":2,"performance":3,"average":2.3333},
+      "024_granular_jam": {"visual":1,"interaction":2,"originality":1,"aliveness":1,"controls":2,"performance":3,"average":1.6667},
+      "025_faraday_quasi": {"visual":3,"interaction":2,"originality":2,"aliveness":1,"controls":2,"performance":3,"average":2.1667}
+    },
+    "ratings_are_evidence_not_clone_instruction": true,
     "curation_path": "user://creative_lab_curation.cfg",
     "trash_restore_supported": true,
-    "trash_auto_retire_supported": true,
     "purge_scope": "local_gallery_only_source_remains_versioned"
   },
   "render_contract": {
-    "logical_design_size_is_not_fixed_surface_size": true,
     "shader_surface_component": "sketches/_shared/full_canvas_surface.gd",
     "ci_rejects_fixed_1280_720_shader_surface": true,
-    "host_runtime_fallback_sizes_named_shader_surface": true,
     "telemetry_event": "sketch_surface_contract"
   },
   "temporal_quality": {
     "knowledge": "knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md",
     "audit_script": "scripts/ci/audit_temporal_motion.py",
-    "historical_observation_count": 38,
     "historical_indices_are_warning_only_through": 25,
     "direct_clock_trig_requires_intent_since_index": 26,
     "intent_marker": "TEMPORAL_INTENT:",
-    "preferred_chain": "time_to_state_force_memory_event_to_coupled_system_to_render",
-    "generic_clock_wobble_rejected": true,
-    "current_batch_refactors": {
-      "021_rosensweig_field": "variable_target_dwell_plus_hysteretic_state_no_lissajous_or_shader_clock",
-      "022_liesegang_front": "reservoir_exhaustion_rest_recharge_no_visible_front_snap_reset",
-      "024_granular_jam": "state_driven_creep_plus_event_indexed_avalanche",
-      "025_faraday_quasi": "physical_forcing_intentional_stateful_chirp_no_decorative_touch_clock_ripple"
-    }
+    "generic_clock_wobble_rejected": true
   },
   "adaptive_creative_draw": {
     "documentation": "knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md",
     "space": "knowledge/cross-domain/creative_draw_space.json",
     "script": "scripts/creative/draw_recipe.py",
     "exploration_probability": 0.24,
-    "recent_window": 5,
     "minimum_recent_axis_distance": 4,
     "ratings_bias_bounded": true,
     "approx_feature_preference_influence": 0.24,
-    "preference_free_exploration_share": true,
-    "representation_pair_requires_different_families": true,
-    "operator_pair_requires_different_families": true,
-    "forced_oscillator_penalized": true,
     "creative_signature_required_since_index": 26,
     "ci_self_test_draw_count": 180,
-    "last_self_test_unique_count": 180,
-    "record_only_implemented_signatures": true
+    "record_only_implemented_signatures": true,
+    "latest_implemented_batch": ["026_void_tension", "027_glass_tide", "028_lumen_maze", "029_fiber_felt", "030_reactor_skin"]
   },
   "telemetry": {
     "remote_branch": "telemetry/runtime",
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "publication": "asynchronous_queued_sanitized",
+    "latest_rating_session": "session_5e0960d4c3e0c6a7.jsonl",
     "telemetry_first_after_host_test": true,
-    "prefer_consolidated_preference_snapshot": true,
-    "last_checked_remote_head": "dd9194667593b7bdc2d8178ad34124fafbd70bcc",
-    "last_checked_remote_time": "2026-09-25T07:09:55Z",
-    "latest_was_empty_at_latest_popup_feedback": true,
-    "latest_popup_feedback_not_telemetry_validated": true,
-    "startup_fullscreen_event": "workstation_startup_fullscreen"
+    "prefer_consolidated_preference_snapshot": true
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
     "required_for_runtime_code": ["repository_policy", "temporal_motion_audit", "adaptive_creative_draw_self_test", "godot_4_7_1_headless_import", "main_scene_smoke_test", "tracked_file_cleanliness"],
-    "latest_code_head_before_docs": "82e5fcd92d71a076268a4cc5ca5a01169950afad",
-    "latest_code_ci_run": 270,
-    "latest_code_ci_passed": true,
+    "latest_runtime_code_head_before_docs": "ce0e6fe87f38ee2e3c202e3ec8b9af49db851e53",
+    "latest_runtime_ci_run": 277,
+    "latest_runtime_ci_passed": true,
     "final_exact_head_ci_must_be_resolved_after_docs": true,
-    "current_host_state": "REVIEW_MODAL_V3_STARTUP_FULLSCREEN_IMPLEMENTED_NOT_HOST_VALIDATED"
+    "current_host_state": "WINDOW_MEMORY_AND_026_030_IMPLEMENTED_NOT_HOST_VALIDATED"
   },
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
@@ -140,10 +135,10 @@
     "do_not_stop_program_on_navigation": true,
     "do_not_create_independent_linked_output_timeline": true,
     "do_not_restore_fixed_1280_720_shader_surfaces": true,
-    "do_not_treat_local_purge_as_git_source_deletion": true,
     "do_not_use_generic_direct_clock_animation_as_default_aliveness": true,
     "ratings_bias_must_preserve_exploration": true,
     "do_not_restore_native_transparent_offcenter_review_popup": true,
+    "do_not_restore_visible_windowed_to_fullscreen_startup_jump": true,
     "canonical_host_test_uses_exact_head_ci_wait": true
   }
 }
