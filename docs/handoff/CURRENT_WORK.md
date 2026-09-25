@@ -1,6 +1,6 @@
 # Current work — DC//LAB
 
-Last refreshed: 2026-09-24.
+Last refreshed: 2026-09-25.
 
 ## Active branch / PR
 
@@ -12,140 +12,137 @@ Last refreshed: 2026-09-24.
 
 ## Stable product areas to preserve
 
-- Gallery real previews, hover animation, automatic groups, tag filters and search.
+- Gallery real previews, hover animation, automatic groups/tags/search.
 - Per-sketch parameter persistence.
-- PREVIEW / PROGRAM separation.
-- Persistent PROGRAM while browsing/editing elsewhere.
-- `TAKE LIVE` replacement workflow.
-- Physical display selection and PROGRAM touch/mouse forwarding.
+- PREVIEW / PROGRAM separation and persistent PROGRAM while navigating.
+- `TAKE LIVE`, physical display selection and PROGRAM touch/mouse forwarding.
 - Linked PREVIEW/PROGRAM state synchronization.
-- Sanitized asynchronous telemetry on `telemetry/runtime`.
-- PROGRAM canvas is artwork-only: no sketch title/index/tags/debug/project chrome unless artistically intentional.
+- Async sanitized telemetry on `telemetry/runtime`.
+- logical artwork canvas `1280×720`, artwork-only: no title/index/tag/debug chrome unless artistically intentional.
 
-## Existing sketches
+## Historical constraints
 
-001–010 remain the established earlier body of work. `005_pressure_lattice` visibly remains **REGISTER TYPE**; never restore the rejected Pressure Lattice concept. The rejected generalized contour pass `6c20a094...` across 006–010 must not be restored.
+001–010 remain the earlier body of work. `005_pressure_lattice` visibly remains **REGISTER TYPE**; never restore rejected Pressure Lattice. The generalized glyph-contour pass `6c20a094...` was host-rejected and must not be restored as a default representation.
 
-## Host feedback on collision-first batch 011–015
+011–015 established collision-first diversity but were host-judged visually weak, under-parameterized (3 controls) and insufficiently organic.
 
-The first collision-first batch improved the technical/creative diversity, but the host test established three important shortcomings:
+016–020 improved substantially: 8–9 controls, stronger local coupling and more autonomous behavior. Host feedback on 2026-09-25: **clearly better and starting to become interesting**, but still missing real-world material/physical richness and some sketches appeared to fall below the user's very high smooth FPS baseline.
 
-1. **visual quality is still too weak** — mechanisms are more interesting, but default compositions/palettes are not yet studio-grade;
-2. **three exposed parameters are insufficient** for substantial Gallery laboratories;
-3. cellular/raster systems still need deeper organic coupling — pixels/cells should exchange state, resources, pressure, phase or memory rather than behave as independent tiles.
+## Telemetry status for the latest host feedback
 
-Telemetry from the test showed 15 Gallery previews loaded on runtime head `6dd4b307...`; the feedback is therefore primarily creative/systemic, not evidence that the batch failed to load.
+Telemetry-first check was performed before changing runtime.
 
-These lessons are now versioned in `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`.
+Remote `telemetry/runtime` is stale for the 016–020 host test:
 
-## Durable new creative rules
+- latest telemetry commit: `82114646068521140f1727b7d323803f7de51e58`;
+- latest published session still reports runtime head `6dd4b307...` and 15 Gallery previews (011–015 era);
+- therefore **do not attribute exact FPS numbers to individual 016–020 sketches from telemetry**.
 
-For a substantial collision-first Gallery lab:
+The user nevertheless observed some sketches dropping below roughly 330 FPS on their host. Code audit found clear structural hotspots independent of missing telemetry:
 
-- normally expose **6–9 meaningful independent controls** when the mechanism supports them;
-- parameter vocabulary should describe the system itself (`APPETITE`, `SCAR MEMORY`, `REFRACTORY TIME`, `MESH TENSION`, etc.), not generic aliases for more effect;
-- at least half the controls should influence future evolution, not only current rendering;
-- organic/cellular claims require real local coupling between neighbours or subsystems;
-- prefer multiple time scales: fast response + slower repair/memory/transport/fatigue;
-- raw research does **not** excuse ugly defaults — coherent palette, composition and frozen-frame quality are required before Gallery promotion;
-- interaction should perturb state the system then redistributes.
+- 017 could draw roughly 2304 CanvasItem cell primitives every render frame;
+- 020 could draw roughly 2880 cell primitives and recomputed neighbour statistics again during `_draw()`.
 
-## New batch 016–020 — organic collision laboratories
+Corrections now implemented:
 
-Blind draw seed: `202609242031`.
+- 017 dense field -> low-resolution `ImageTexture` refreshed only on simulation steps + one texture draw; sparse spores remain geometry;
+- 020 dense field -> low-resolution `ImageTexture`, neighbour density cached during simulation, no second neighbour scan during draw;
+- performance rules are versioned in `knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md`.
 
-These are new raw Gallery labs, not approved final artworks.
+Fresh host telemetry is required after the next test for exact per-sketch performance attribution.
 
-### 016 — PREDATOR VEIN
+## New knowledge — physical / chemical systems
 
-Path: `sketches/016_predator_vein/`
+Added `knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`.
 
-Mechanism:
+New real-world mechanism cards include:
 
-`nutrient nodes -> dynamic graph -> neighbour resource diffusion -> hysteresis -> raster field cohesion -> persistent predators -> scars / recovery`
+- Belousov–Zhabotinsky excitable waves;
+- Liesegang precipitation/dissolution bands;
+- spinodal/Cahn–Hilliard phase separation;
+- Bénard–Marangoni surface-tension convection;
+- Faraday parametric waves;
+- Rosensweig ferrofluid instability;
+- diffusion-limited aggregation;
+- granular jamming / force chains;
+- Rayleigh–Taylor, Kelvin–Helmholtz and Saffman–Taylor interfacial instabilities.
 
-- 30 drifting resource nodes;
-- network activation uses hysteresis;
-- node energy regrows and diffuses through neighbours;
-- coarse field cells also smooth with neighbouring cells;
-- touch injects persistent predators rather than a temporary visual mask;
-- predators seek rich nodes, consume energy and leave scars;
-- 8 parameters: `REGROWTH`, `RESOURCE FLOW`, `APPETITE`, `PREDATOR SPEED`, `NETWORK RANGE`, `HYSTERESIS`, `SCAR MEMORY`, `FIELD COHESION`;
-- tags: `ECOSYSTEM`, `NETWORK`, `INTERACTIVE`.
+New physical-condition interaction vocabulary includes concentration, temperature, pressure, surface tension, viscosity, magnetic field, gravity, forcing frequency, supersaturation, friction, confinement and catalyst/inhibitor state.
 
-### 017 — EDGE BLOOM
+Rule: preserve at least one genuine causal relationship/threshold from a scientific phenomenon; do not merely copy the surface look.
 
-Path: `sketches/017_edge_bloom/`
+## New batch 021–025 — physical / chemical collision labs
 
-Mechanism:
+Blind draw seed: `202609250742`.
 
-`edge-fed cellular tissue -> neighbour excitation -> refractory waves -> mobile spores -> gradient following -> deposit / split`
+These are experimental Gallery labs, not approved final artworks. All expose 8–9 mechanism-level controls and all use the shared live-sync contract.
 
-- 64×36 excitable cell field;
-- each cell reads eight neighbours;
-- cells enter a refractory period after strong excitation;
-- screen edges feed the system continuously;
-- spores follow local gradients, deposit activity and can split in rich zones;
-- touch seeds a local excitable wave;
-- 9 parameters: `CELL COUPLING`, `EXCITATION THRESHOLD`, `REFRACTORY TIME`, `EDGE FEED`, `DECAY`, `SPORE SPEED`, `SPORE SPLIT`, `SPORE DEPOSIT`, `SEED RADIUS`;
-- tags: `CELLULAR`, `GROWTH`, `INTERACTIVE`.
+### 021 — ROSENSWEIG FIELD
 
-### 018 — CURRENT MEMORY
+Path: `sketches/021_rosensweig_field/`
 
-Path: `sketches/018_current_memory/`
+`magnetic field -> instability threshold -> coupled peak modes -> viscosity/hysteresis -> relaxation`
 
-Mechanism:
+- fullscreen single-pass shader;
+- autonomous moving magnetic field when untouched;
+- touch becomes a movable magnet rather than a deformation brush;
+- crossing field threshold raises ordered peak structures;
+- field memory and viscosity remain after release;
+- 8 controls: `FIELD STRENGTH`, `MAGNET RADIUS`, `VISCOSITY`, `SURFACE TENSION`, `PEAK SHARPNESS`, `MODE COUPLING`, `HYSTERESIS`, `RELAXATION`.
 
-`wave-equation lattice -> delayed field memory -> particle current -> dynamic proximity reconnection -> reciprocal particle injection`
+### 022 — LIESEGANG FRONT
 
-- 52×30 wave membrane with neighbour Laplacian exchange;
-- field memory pulls current state toward its recent history;
-- 76 particles sample the wave gradient/tangent and can reconnect visually in coherent regions;
-- particles inject small impulses back into the membrane;
-- asymmetric void shapes the composition;
-- pointer movement redirects current and injects wave energy rather than directly moving particles;
-- 9 parameters: `WAVE TENSION`, `WAVE DAMPING`, `FLOW GAIN`, `PARTICLE INERTIA`, `RECONNECT RANGE`, `REGIME RATE`, `VOID RADIUS`, `FIELD MEMORY`, `CURRENT SPEED`;
-- tags: `FLOW`, `WAVE`, `INTERACTIVE`.
+Path: `sketches/022_liesegang_front/`
 
-### 019 — SOFT FLOCK
+`diffusing reservoir -> supersaturation -> precipitation -> depletion spacing -> dissolution / persistent bands`
 
-Path: `sketches/019_soft_flock/`
+- up to four reagent reservoirs;
+- moving fronts cross threshold and create persistent band generations;
+- old bands retain their historical centres when the source later moves;
+- depletion affects spacing, dissolution erases old material, field bias deforms future rings;
+- 8 controls: `DIFFUSION`, `SUPERSATURATION`, `NUCLEATION`, `DEPLETION`, `DISSOLUTION`, `FRONT SPEED`, `BAND MEMORY`, `FIELD BIAS`.
 
-Mechanism:
+### 023 — SPINODAL MARANGONI
 
-`boid population -> Verlet constraint membrane -> agent pressure -> link abrasion -> repair -> persistent obstacle`
+Path: `sketches/023_spinodal_marangoni/`
 
-- two-color composition only;
-- 13×8 soft mesh with horizontal/vertical/diagonal constraints;
-- 42 flocking agents push against the membrane;
-- agent traffic erodes actual link health;
-- damaged links repair over time;
-- touch creates a temporary obstacle that continues to redirect agents and mesh after release;
-- 9 parameters: `MESH TENSION`, `MESH DAMPING`, `FLOCK COHESION`, `FLOCK ALIGNMENT`, `FLOCK SEPARATION`, `AGENT PRESSURE`, `LINK EROSION`, `LINK REPAIR`, `OBSTACLE RADIUS`;
-- tags: `PHYSICS`, `FLOCK`, `INTERACTIVE`.
+`conserved phase field -> chemical potential -> coarsening -> thermal quench -> surface-tension advection`
 
-### 020 — ECHO TISSUE
+- 56×32 conserved-ish phase field at fixed 22 Hz;
+- Cahn–Hilliard-inspired two-pass chemical-potential update;
+- mean phase corrected after each step to preserve mass approximately;
+- touch injects thermal quench, not phase paint;
+- thermal gradients advect interfaces through Marangoni-like coupling;
+- one low-resolution field texture draw;
+- 9 controls: `QUENCH DEPTH`, `MOBILITY`, `INTERFACE ENERGY`, `COARSENING`, `MASS BIAS`, `ADVECTION`, `THERMAL MEMORY`, `SURFACE TENSION`, `QUENCH RADIUS`.
 
-Path: `sketches/020_echo_tissue/`
+### 024 — GRANULAR JAM
 
-Mechanism:
+Path: `sketches/024_granular_jam/`
 
-`excitable cells -> eight-neighbour coupling -> density morphology -> refractory state -> delayed feedback -> autonomous reseeding`
+`packed grains -> collision contacts -> friction/load -> force chains -> creep -> delayed avalanche`
 
-- 72×40 tissue grid;
-- every cell reads eight neighbours;
-- local density can merge growth or consume over-dense regions;
-- cells carry refractory memory;
-- two-stage delayed history can re-trigger regions after visible activity fades;
-- autonomous reseeding prevents the work from waiting for input;
-- touch seeds activity that then migrates through the tissue;
-- 9 parameters: `NEIGHBOUR COUPLING`, `FIRE THRESHOLD`, `EXCITATION`, `TISSUE DECAY`, `REFRACTORY TIME`, `DELAYED FEEDBACK`, `MEMORY DECAY`, `MERGE / CONSUME`, `SEED RADIUS`;
-- tags: `TISSUE`, `MEMORY`, `INTERACTIVE`.
+- 54 grains in a confining chamber;
+- pairwise contacts computed at fixed 45 Hz;
+- force-chain contacts are cached and reused for drawing instead of recalculating the contact graph;
+- touch applies load/pressure, not positional dragging;
+- accumulated stress can release later as avalanche/slip;
+- 9 controls: `PACKING`, `FRICTION`, `LOAD`, `STIFFNESS`, `FORCE CHAINS`, `CREEP`, `AVALANCHE`, `CONFINEMENT`, `GRAIN SIZE`.
 
-All five extend the shared design/runtime contract and include custom live-sync state.
+### 025 — FARADAY QUASI
 
-Implementation commit: `e2ff8328532a4eab057c63b8bd1d361bc706ba15`.
-Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness all passed on CI #221 for that runtime commit.
+Path: `sketches/025_faraday_quasi/`
+
+`parametric forcing -> resonance windows -> mode competition -> nonlinear saturation -> standing-wave field`
+
+- only four modal amplitudes/phases simulated on CPU;
+- fullscreen single shader pass reconstructs the fluid surface;
+- frequency/chirp moves the system through resonance windows;
+- touch injects local phase/impulse and decays after release;
+- 8 controls: `DRIVE`, `FREQUENCY`, `DAMPING`, `CAPILLARITY`, `DEPTH`, `MODE COUPLING`, `RESONANCE WIDTH`, `CHIRP`.
+
+Runtime implementation commit: `50e7d9f9296768a09a56c7a8f7ac421a4d823389`.
+CI #224 passed repository policy, Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness for that runtime commit.
 
 ## Knowledge priority
 
@@ -154,37 +151,34 @@ For current creative work read:
 1. `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
 2. `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
 3. `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
-4. `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
-5. relevant creative-coding/design atlases
-6. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` when promoting a mechanism into a real artwork.
+4. `knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
+5. `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
+6. `knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md`
+7. relevant creative-coding/design atlases
+8. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` for promotion into finished artwork.
 
-## Required host test for 016–020
+## Required next host test
 
-1. Gallery should contain **20 sketches**.
-2. Open 016–020 at default values first; evaluate composition/palette before touching controls.
-3. Watch each for 20–30 seconds hands-off.
-4. Interact once, release, then observe whether state migrates/repairs/propagates.
-5. Only then explore the 8–9 controls and check whether they create materially different regimes.
-6. Test the strongest mechanisms on PROGRAM/touch.
-7. After the test, inspect fresh `telemetry/runtime` before requesting manual logs.
+Expected Gallery count: **25 sketches**.
 
-Evaluation is now two-dimensional:
+1. Open 017 and 020 first and compare smoothness to the previous build.
+2. Watch 021–025 for 20–30 seconds at defaults before touching controls.
+3. Interact once, release, and watch delayed physical/chemical consequences.
+4. Then explore the 8–9 controls and verify materially different regimes.
+5. Test strongest candidates in PROGRAM/touch.
+6. Close normally so telemetry can publish.
+7. Immediately inspect fresh `telemetry/runtime`; require matching tested HEAD/session before attributing exact FPS.
 
-- **mechanism** — does the system genuinely negotiate state internally?
-- **art direction** — is the default visual already compelling enough to deserve further development?
+Evaluation now has three axes:
+
+- **mechanism** — does state really negotiate/propagate internally?
+- **art direction** — is the default image already compelling?
+- **performance architecture** — is the representation appropriate for realtime Gallery/PREVIEW/PROGRAM use?
 
 ## Mandatory AI operational completion
 
-After every material repository change, every AI must automatically:
-
-1. finish intended feature-branch commits;
-2. update durable handoff/state docs when state/NEXT/validation changes;
-3. resolve the final remote HEAD after all commits;
-4. wait for CI on that exact final SHA;
-5. report exact short HEAD + CI result;
-6. when host validation is relevant, include the canonical `sync + exact-head CI wait + launch Godot` PowerShell from `docs/handoff/OPERATIONS.md` without waiting to be asked;
-7. after host testing, inspect telemetry before requesting manual logs.
+After every material repository change, every AI must automatically finish commits, update durable handoff/state, resolve final remote HEAD after all commits, wait for exact-head CI, report exact short SHA + CI, provide the canonical CI-waiting PowerShell when host testing is relevant, then inspect telemetry first after the host test.
 
 ## Non-regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, move the workstation as normal output, block UI with telemetry Git work, resurrect the failed cross-window texture path, add card-covering overlays, fake Spout/NDI, restore Pressure Lattice, reintroduce artwork metadata captions, or make glyph contours the default representation.
+Do not stop PROGRAM on navigation, create independent linked timelines, move the workstation as normal output, block UI with telemetry Git work, resurrect failed cross-window texture sampling, add card-covering overlays, fake Spout/NDI, restore Pressure Lattice, reintroduce artwork metadata captions, or make glyph contours the default representation.
