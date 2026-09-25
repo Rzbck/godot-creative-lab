@@ -11,14 +11,14 @@ const GALLERY_CURATION_REVISION: int = 1
 const REVIEW_PATH: String = "user://creative_lab_reviews.cfg"
 const CURATION_PATH: String = "user://creative_lab_curation.cfg"
 const DEFAULT_TRASH_RETENTION_DAYS: int = 30
-const REVIEW_CRITERIA: PackedStringArray = PackedStringArray([
+const REVIEW_CRITERIA = [
     "visual",
     "interaction",
     "originality",
     "aliveness",
     "controls",
     "performance",
-])
+]
 
 var _review_config := ConfigFile.new()
 var _curation_config := ConfigFile.new()
