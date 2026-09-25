@@ -22,120 +22,168 @@ Last refreshed: 2026-09-25.
 - logical artwork space usually `1280×720`, but render surfaces adapt to actual viewport.
 - PROGRAM is artwork-only.
 - local Trash never deletes Git source.
-- workstation now opens in native fullscreen by default; F11 remains sketch presentation, not app startup mode.
+- workstation native window state persists across launches.
 
 ## Current top runtime
 
-`app/main/main_runtime_gallery_compact_review.gd`
+`app/main/main_runtime_window_memory.gd`
 
-It extends `main_runtime_gallery_feedback_trash.gd`, then adaptive filters / organizer / PROGRAM layers.
+It extends `main_runtime_gallery_compact_review.gd`, then feedback/trash, adaptive filters, organizer, PROGRAM/output/window/telemetry layers.
 
-## Latest host feedback and fix
+## Window-state startup contract
 
-User host-tested REVIEW v2 and explicitly rejected the RATE popup because it was transparent, ugly and not centered.
+Fresh host telemetry on runtime `9fa6d889...` proved startup was visibly wrong: the app appeared `1280×720` windowed and only about 730 ms later switched to fullscreen.
 
-The old native `PopupPanel` implementation is rejected and must not return.
+New layer `main_runtime_window_memory.gd` persists:
 
-Revision 3 now uses an in-app modal:
+- native mode: windowed / maximized / fullscreen;
+- current screen;
+- window position and size;
+- restore rect used by custom window controls.
 
-- full-window dim backdrop;
-- opaque `PanelContainer` card with design-system raised surface + border;
-- true geometric centering through `CenterContainer`;
-- width 430 logical UI px;
-- title includes current sketch;
-- six 1–5 rows;
-- × close button;
-- Escape closes modal first;
-- outside mouse/touch closes modal;
-- score persistence and Gallery badge unchanged.
+State path:
 
-New telemetry event: `review_modal_changed`.
+`user://creative_lab_window_state.cfg`
 
-## Startup fullscreen
+Startup hides the root native window in `_enter_tree()`, applies the saved state before the normal `_ready()` chain, waits for layout to settle, then reveals the workstation. First run falls back to fullscreen. F11 artwork presentation must not overwrite workstation preference.
 
-The same top runtime now requests `DisplayServer.WINDOW_MODE_FULLSCREEN` after base `_ready()` has already remembered the normal 1280×720-ish restore rectangle.
-
-Intent:
-
-- app/workstation opens fullscreen with all workstation chrome visible;
-- this is distinct from F11 render presentation;
-- custom restore control can still return to remembered windowed rect;
-- F11 should restore the prior fullscreen workstation mode after presentation exit.
-
-Headless CI explicitly skips the startup mode request via `DisplayServer.get_name() == "headless"`.
-
-New telemetry event: `workstation_startup_fullscreen` with requested/actual mode, match flag and window size.
-
-## Telemetry evidence for this host feedback
-
-Telemetry was inspected first, but remote telemetry was stale:
-
-- `telemetry/runtime/latest.jsonl` empty;
-- telemetry branch HEAD `dd9194667593...` dated 2026-09-25 07:09:55Z;
-- therefore it does not represent the latest RATE host test.
-
-Do not claim telemetry validated the popup bug. The visual failure comes from direct user feedback. After next test, inspect telemetry again and require tested-head/session match.
+Status: **IMPLEMENTED_NOT_HOST_VALIDATED**. Required evidence is a Windows close/reopen test showing no visible small-window -> fullscreen jump and correct restoration after leaving the app windowed/maximized/fullscreen.
 
 ## Explicit user-rating evidence
 
-Previously known complete vectors:
+Fresh telemetry session `session_5e0960d4c3e0c6a7.jsonl` contained a consolidated `creative_preference_snapshot` with **16 reviewed sketches**.
 
-- 020 ECHO TISSUE — 4,4,4,4,4,5; average ~4.17.
-- 022 LIESEGANG FRONT — 1,2,2,1,2,3; average ~1.83.
-- 025 FARADAY QUASI — 3,2,2,1,2,3; average ~2.17.
-- 001 SIGNAL FIELD — 3,2,2,1,3,3; average ~2.33.
-- last known reviewed count: 16.
+Axis averages:
 
-`creative_preference_snapshot` remains the preferred consolidated source after host telemetry advances.
+- visual: 2.25
+- interaction: 2.125
+- originality: 2.125
+- aliveness: 1.8125
+- controls: 2.0
+- performance: 3.0625
 
-## Temporal-loop audit
+Important complete vectors:
 
-User rejects visible cheap clock periodicity. Preferred:
+- **020 ECHO TISSUE** — 4,4,4,4,4,5; avg ~4.17.
+- **012 CHEMICAL BLOCKS** — 4,3,4,3,3,3; avg ~3.33.
+- **017 EDGE BLOOM** — 3,3,3,3,2,3; avg ~2.83.
+- **014 RIBBON MORPH** — 1,1,1,1,1,1; avg 1.0.
+- **016 PREDATOR VEIN** — 1,1,1,2,1,3; avg 1.5.
+- **024 GRANULAR JAM** — 1,2,1,1,2,3; avg ~1.67.
+- **022 LIESEGANG FRONT** — 1,2,2,1,2,3; avg ~1.83.
+- **025 FARADAY QUASI** — 3,2,2,1,2,3; avg ~2.17.
 
-`time -> state/force/memory/event -> coupled dynamics -> render`
+Interpretation for generation: aliveness and controls remain the weak global axes. Stronger evidence favors local propagation, neighbour coupling, delayed memory and interaction that changes future evolution. Do **not** simply copy 020; ratings remain bounded probability evidence and 24% of adaptive draws remain preference-free.
 
-Reject by default:
+## REVIEW / curation
 
-`time -> sin/cos -> visible position/scale/alpha/warp`.
+Permanent inspector row remains compact:
 
-Rules: `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
+`REVIEW <avg>/5  RATE  TRASH`
 
-CI script: `scripts/ci/audit_temporal_motion.py`.
+RATE modal v3 is an in-app centered opaque card with backdrop, close button, Esc and outside-click/touch dismissal. Ratings persist and Gallery `R x.x` badges remain.
 
-Historical audit found 38 observations across <=025. For 026+, direct clock trig requires `TEMPORAL_INTENT:`; `creative_signature` also mandatory.
+Consolidated telemetry event: `creative_preference_snapshot`.
 
-Current targeted fixes remain:
+Trash stays local/reversible; source remains versioned.
 
-- 021 ROSENSWEIG: no analytic orbit/Lissajous auto motion.
-- 022 LIESEGANG: no visible front snap-reset.
-- 024 GRANULAR JAM: state-driven creep + event-indexed avalanche.
-- 025 FARADAY: intentional physical forcing only; stateful chirp; no decorative touch-clock ripple.
+## Adaptive batch 026–030
+
+All five new definitions contain `creative_seed` and machine-readable `creative_signature`, and their actual signatures are recorded in `knowledge/cross-domain/creative_draw_space.json`.
+
+### 026 VOID TENSION
+
+`constraint network + Voronoi territories + fracture/fold + spring inertia`
+
+- 18 stress-coupled network nodes;
+- edges fracture under stress and repair with scars;
+- touch cuts real links and redistributes force;
+- territory texture follows nearest/second-nearest nodes and propagated stress;
+- 8 controls.
+
+### 027 GLASS TIDE
+
+`wave fronts + SDF glass + threshold/displacement + state-dependent topology`
+
+- four stateful moving lenses;
+- asynchronous pressure fronts, no shader `TIME` choreography;
+- touch toggles local optical topology and injects a wavefront;
+- one full-canvas shader surface under the existing ShaderSurface contract;
+- 8 controls.
+
+### 028 LUMEN MAZE
+
+`light transport + graph channels + jam/release + quantization`
+
+- 80×45 state field with deterministic channel topology;
+- six gates jam/release asynchronously;
+- blocked transport accumulates pressure then bursts;
+- touch deposits persistent obstacles the system routes around;
+- one texture draw; 9 controls.
+
+### 029 FIBER FELT
+
+`fiber geometry + morphology mask + accumulation/displacement + phase transition`
+
+- 30 constrained fibers, 13 points each;
+- coarse local compaction field exchanges state with neighbouring cells;
+- pressure and drag compact/advect fibers;
+- material transitions from loose strands toward felted state and can relax;
+- duotone; 8 controls.
+
+### 030 REACTOR SKIN
+
+`reaction-diffusion + procedural mesh + fracture/threshold`
+
+- 52×30 Gray-Scott-style chemistry;
+- chemical gradients become mechanical stress;
+- 14×9 membrane mesh fractures and repairs on a slower timescale;
+- touch injects reagent and local structural stress;
+- no glow; 9 controls.
+
+## Temporal-quality rule
+
+User rejects cheap visible clock loops / sine-bobbing. Read `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
+
+Preferred: `time -> state/force/memory/event -> coupled system -> render`.
+
+Rejected by default: `time -> sin/cos -> visible position/scale/alpha/warp`.
+
+For 026+, direct clock trig requires `TEMPORAL_INTENT:`. CI audit remains active. None of 026–030 depends on generic direct-clock trigonometry.
 
 ## Adaptive creative draw
 
 Files:
 
-- `knowledge/cross-domain/creative_draw_space.json`
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
+- `knowledge/cross-domain/creative_draw_space.json`
 - `scripts/creative/draw_recipe.py`
 
-Anti-repetition remains historical/recent weighting + signature distance. REVIEW bias is bounded and 24% exploration ignores preferences. CI self-test: 180 unique / 180 on first validated run.
+Anti-repeat and preference rules remain:
 
-## Full-canvas contract
+- historical/recent feature penalties;
+- minimum recent signature distance;
+- representation/operator families must differ;
+- forced oscillator penalized;
+- explicit REVIEW bias bounded;
+- 24% exploration share ignores preference bias.
 
-`ShaderSurface` must use `sketches/_shared/full_canvas_surface.gd`; CI rejects legacy fixed 1280×720 surfaces. Host `sketch_surface_contract` telemetry remains the dynamic coverage check.
+CI self-tests 180 deterministic draws for diversity collapse.
+
+## Full-canvas / performance contracts
+
+`ShaderSurface` must use `sketches/_shared/full_canvas_surface.gd`; CI rejects fixed 1280×720 surfaces. Dense fields should render as ImageTexture/fullscreen shader rather than thousands of Canvas primitives. Do not recompute expensive neighbourhood/contact work again in `_draw()`.
 
 ## Required next host test
 
-1. Launch: verify full workstation opens fullscreen immediately.
-2. Restore to windowed and re-expand; verify no broken geometry.
-3. Open any sketch and click RATE.
-4. Verify RATE card is opaque, visually consistent and dead-center.
-5. Restore/resize app and reopen RATE; it must stay centered.
-6. Test ×, Escape, outside click/touch.
-7. Change/clear a score, reopen, return Gallery and verify badge.
-8. F11 active sketch then Esc; workstation should return to previous fullscreen mode.
-9. Close normally, then inspect fresh `telemetry/runtime` first and require matching tested HEAD/session.
+1. Launch from canonical PowerShell: no small 1280×720 flash before the workstation appears.
+2. Leave workstation fullscreen, close normally, reopen: same fullscreen state/screen.
+3. Restore/window the app, move/resize it, wait >1 s, close and reopen: same mode/screen/rect.
+4. Confirm RATE modal remains centered/opaque after new top runtime.
+5. Confirm Gallery source count is 30 and open 026–030.
+6. For each 026–030: watch idle 20–30 s before interaction, then interact and remove hand; judge visual, aliveness, controls and whether consequences remain in system state.
+7. Rate 026–030 normally.
+8. Close normally and inspect fresh matching `telemetry/runtime`; require `workstation_window_state_restored` plus updated `creative_preference_snapshot` before conclusions.
 
 ## Mandatory AI completion
 
@@ -143,4 +191,4 @@ After every material repository change: finish commits, update durable docs/stat
 
 ## Non-regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, block UI with telemetry Git work, restore failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, reintroduce fixed 1280×720 ShaderSurface nodes, restore native transparent RATE popup, or use naked global-clock wobble as default aliveness.
+Do not stop PROGRAM on navigation, create independent linked timelines, block UI with telemetry Git work, restore failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, reintroduce fixed 1280×720 ShaderSurface nodes, restore native transparent RATE popup, use naked global-clock wobble as default aliveness, or restore the visible windowed->fullscreen startup jump.
