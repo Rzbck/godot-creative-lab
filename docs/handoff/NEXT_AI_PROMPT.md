@@ -17,6 +17,26 @@ Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924
 
 Pour un retour après test, inspecte d'abord `telemetry/runtime`. N'attribue jamais des FPS à un sketch si la télémétrie ne correspond pas au HEAD/session testé.
 
+## Gallery — règle actuelle
+
+La Gallery utilise maintenant un rail de tags **adaptatif** via :
+
+`app/main/main_runtime_gallery_adaptive_filters.gd`
+
+Ne restaure pas l'ancien mur de tous les tags visibles.
+
+Contrat :
+
+- `ALL` toujours visible ;
+- max 6 quick tags générés statistiquement depuis le catalogue ;
+- tags universels non affichés comme filtres inutiles ;
+- tags rares/restants dans `MORE`, fermé par défaut ;
+- un rare tag sélectionné est promu dans le rail tant qu'il est actif ;
+- la recherche indexe toujours tous les tags ;
+- les groupes continuent à venir du premier tag de `definition.json`.
+
+Le prochain test hôte doit vérifier ce comportement à 25 sketches et au resize.
+
 ## Direction créative
 
 Méthode actuelle : **collision-first**.
@@ -38,33 +58,22 @@ Règles : 6–9 contrôles indépendants pour un lab substantiel lorsque pertine
 
 Une ancienne passe contours généralisée `6c20a094...` sur 006–010 est rejetée. `005_pressure_lattice` reste visuellement **REGISTER TYPE**, jamais Pressure Lattice.
 
-## Retour hôte 016–020
+## Perf / télémétrie
 
-Le user juge 016–020 **clairement meilleurs / commence à être pas mal**, mais veut encore plus de matière réelle, d'interactivité et de beauté. Il a aussi observé certains sketches sous son très haut baseline de fluidité (~330 FPS).
+Le user a observé certains sketches 016–020 sous son très haut baseline de fluidité (~330 FPS), mais la télémétrie distante disponible au moment du diagnostic était stale (`6dd4b307...`, 15 previews). Donc ne recycle pas ces chiffres comme attribution exacte.
 
-Telemetry-first a été fait, mais le remote est stale : dernier publish `82114646068521140f1727b7d323803f7de51e58`, runtime `6dd4b307...`, 15 previews. Donc aucune attribution exacte de FPS à 016–020 n'est actuellement justifiée.
+017 et 020 ont été optimisés : champs denses en `ImageTexture` à cadence simulation; 020 ne recalcule plus les voisins dans `_draw()`.
 
-Code audit a néanmoins trouvé deux hotspots évidents :
-
-- 017 : ~2304 primitives Canvas potentielles par frame;
-- 020 : ~2880 cellules + voisinage recalculé pendant `_draw()`.
-
-Ils ont été optimisés : champ dense -> `ImageTexture` mise à jour à cadence de simulation + un draw; 020 cache la densité.
-
-## Nouvelle banque physique/chimie
-
-`PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md` ajoute notamment : BZ, Liesegang, spinodal/Cahn–Hilliard, Bénard–Marangoni, Faraday, Rosensweig/ferrofluides, DLA, jamming/force chains, Rayleigh–Taylor, Kelvin–Helmholtz et Saffman–Taylor.
-
-Principe obligatoire : conserver au moins une vraie causalité/seuil du phénomène, pas uniquement son look.
+Après le prochain test, exige de la télémétrie fraîche correspondant au HEAD testé avant d'attribuer un coût exact.
 
 ## Batch actuelle 021–025
 
 Graine : `202609250742`.
 
-- `021_rosensweig_field` / **ROSENSWEIG FIELD** — seuil magnétique, pics couplés, viscosité/hystérésis; movable magnet; 8 params; shader plein écran.
+- `021_rosensweig_field` / **ROSENSWEIG FIELD** — seuil magnétique, pics couplés, viscosité/hystérésis; 8 params; shader plein écran.
 - `022_liesegang_front` / **LIESEGANG FRONT** — réservoirs, front diffusif, supersaturation, bandes précipitées, déplétion/dissolution; 8 params.
 - `023_spinodal_marangoni` / **SPINODAL MARANGONI** — phase-field conservé-ish + quench thermique + advection tension de surface; 9 params; texture basse résolution.
-- `024_granular_jam` / **GRANULAR JAM** — grains packés, contacts/friction/load, chaînes de force, creep, avalanche retardée; 9 params; graphe de contact calculé une seule fois par step.
+- `024_granular_jam` / **GRANULAR JAM** — grains packés, contacts/friction/load, chaînes de force, creep, avalanche retardée; 9 params.
 - `025_faraday_quasi` / **FARADAY QUASI** — quatre modes CPU + résonance paramétrique/mode competition + shader plein écran; 8 params.
 
 Commit runtime : `50e7d9f9296768a09a56c7a8f7ac421a4d823389`.
@@ -74,16 +83,18 @@ Toujours résoudre le **HEAD final docs inclus** et sa CI avant test.
 
 ## Prochaine opération
 
-Test hôte :
+Test hôte combiné :
 
 1. Gallery doit afficher **25 sketches**.
-2. Tester 017 + 020 d'abord pour comparer la fluidité après optimisation.
-3. Regarder 021–025 20–30 secondes aux defaults.
-4. Interagir, relâcher, regarder les conséquences physiques/chimiques continuer.
-5. Explorer ensuite les contrôles.
-6. Tester les meilleurs sur PROGRAM/touch.
-7. Fermer normalement puis lire immédiatement la télémétrie fraîche.
-8. Exiger que la télémétrie corresponde au HEAD testé avant d'attribuer une chute FPS.
+2. Vérifier le rail adaptatif : max 6 quick tags + `MORE`, pas de tag universel inutile, rare tag promu si sélectionné, recherche complète.
+3. Tester le resize de la Gallery.
+4. Tester 017 + 020 pour comparer la fluidité après optimisation.
+5. Regarder 021–025 20–30 secondes aux defaults.
+6. Interagir, relâcher, regarder les conséquences physiques/chimiques continuer.
+7. Explorer ensuite les contrôles.
+8. Tester les meilleurs sur PROGRAM/touch.
+9. Fermer normalement puis lire immédiatement la télémétrie fraîche.
+10. Exiger que la télémétrie corresponde au HEAD testé avant d'attribuer une chute FPS.
 
 Préserve Gallery/PREVIEW/PROGRAM, TAKE LIVE, persistence, touch, live-sync et telemetry. Ne merge jamais `main` sans accord explicite.
 
