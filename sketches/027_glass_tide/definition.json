@@ -1,0 +1,19 @@
+{
+  "id": "027_glass_tide",
+  "index": "027",
+  "title": "GLASS TIDE",
+  "scene": "res://sketches/027_glass_tide/runtime/glass_tide.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["OPTICAL", "GLASS", "INTERACTIVE"],
+  "description": "A mutable glass field formed by moving signed-distance lenses and asynchronous pressure fronts. Touch splits or rejoins the optical topology instead of merely displacing pixels.",
+  "creative_seed": 22333602,
+  "creative_signature": {
+    "carrier": "glass",
+    "representations": ["wave_field", "sdf_field"],
+    "operators": ["displace", "threshold"],
+    "temporal_model": "state_dependent_regime",
+    "interaction": "alter_topology",
+    "constraint": "two_scale_hierarchy",
+    "render_path": "fullscreen_shader"
+  }
+}

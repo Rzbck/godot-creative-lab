@@ -1,0 +1,19 @@
+{
+  "id": "030_reactor_skin",
+  "index": "030",
+  "title": "REACTOR SKIN",
+  "scene": "res://sketches/030_reactor_skin/runtime/reactor_skin.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["CHEMISTRY", "MEMBRANE", "INTERACTIVE"],
+  "description": "Reaction-diffusion drives a deforming membrane. Chemical gradients create mechanical stress, fracture mesh connections and recover on a slower repair timescale.",
+  "creative_seed": 19051606,
+  "creative_signature": {
+    "carrier": "membrane",
+    "representations": ["procedural_mesh", "reaction_diffusion"],
+    "operators": ["fracture", "threshold"],
+    "temporal_model": "stochastic_events",
+    "interaction": "inject_energy",
+    "constraint": "no_glow",
+    "render_path": "image_texture_field"
+  }
+}

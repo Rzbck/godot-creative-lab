@@ -1,0 +1,19 @@
+{
+  "id": "029_fiber_felt",
+  "index": "029",
+  "title": "FIBER FELT",
+  "scene": "res://sketches/029_fiber_felt/runtime/fiber_felt.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["MATERIAL", "FIBER", "INTERACTIVE"],
+  "description": "A field of fibers accumulates pressure, compacts into felt and can slowly relax again. Local density and stored pressure change how neighboring strands move and bind.",
+  "creative_seed": 190891858,
+  "creative_signature": {
+    "carrier": "fiber",
+    "representations": ["image_morphology", "mask_distance_field"],
+    "operators": ["accumulate", "displace"],
+    "temporal_model": "phase_transition",
+    "interaction": "pressure_load",
+    "constraint": "duotone",
+    "render_path": "canvas_geometry"
+  }
+}
