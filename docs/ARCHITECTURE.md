@@ -2,13 +2,13 @@
 
 ## Status
 
-Implemented Godot 4.7.1 creative-coding workstation. Repository state + telemetry are authoritative when they disagree with chat history.
+Implemented Godot 4.7.1 creative-coding workstation. Repository state + matching runtime telemetry are authoritative when they disagree with chat history.
 
 ## Product model
 
 DC//LAB separates:
 
-1. **WORKSTATION / EDITOR** — Gallery, Settings, PREVIEW, parameters, compact review/curation and navigation.
+1. **WORKSTATION / EDITOR** — Gallery, Settings, PREVIEW, parameters, review/curation and navigation.
 2. **PROGRAM / LIVE OUT** — audience-facing output on a selected physical display.
 3. **SKETCH** — isolated creative runtime with parameters, interaction and optional live-state synchronization.
 
@@ -22,26 +22,47 @@ Entry scene:
 
 Current top runtime layer:
 
-`res://app/main/main_runtime_gallery_compact_review.gd`
+`res://app/main/main_runtime_window_memory.gd`
 
 Important chain:
 
 ```text
-main_runtime_gallery_compact_review.gd
-    -> main_runtime_gallery_feedback_trash.gd
-        -> main_runtime_gallery_adaptive_filters.gd
-            -> main_runtime_gallery_organizer.gd
-                -> main_runtime_program_output.gd
-                    -> main_runtime_gallery_persistence.gd
-                        -> main_runtime_live_output.gd
-                            -> lower output/window/telemetry layers
+main_runtime_window_memory.gd
+    -> main_runtime_gallery_compact_review.gd
+        -> main_runtime_gallery_feedback_trash.gd
+            -> main_runtime_gallery_adaptive_filters.gd
+                -> main_runtime_gallery_organizer.gd
+                    -> main_runtime_program_output.gd
+                        -> main_runtime_gallery_persistence.gd
+                            -> main_runtime_live_output.gd
+                                -> lower output/window/telemetry layers
 ```
 
 Always inspect the actual `extends` chain before changing host architecture.
 
+## Workstation native-window state
+
+Native workstation state persists in:
+
+`user://creative_lab_window_state.cfg`
+
+Persisted state includes mode, physical screen, position/size and restore rect.
+
+Startup restoration occurs before the first visible workstation frame:
+
+1. top runtime hides the root Window in `_enter_tree()`;
+2. saved native state is applied;
+3. normal UI `_ready()` chain/layout runs;
+4. after settle, the root Window is revealed;
+5. `workstation_window_state_restored` telemetry records the result.
+
+First run defaults to fullscreen. F11 artwork presentation is a separate transport/presentation state and must not overwrite the saved workstation state.
+
+This was introduced after host telemetry proved the previous implementation visibly appeared at 1280×720 then switched to fullscreen roughly 730 ms later.
+
 ## Gallery architecture
 
-Sketches are discovered from `sketches/*/definition.json`.
+Sketches are discovered from `sketches/*/definition.json`. Current source catalogue: **001–030**.
 
 Current Gallery behavior:
 
@@ -50,20 +71,20 @@ Current Gallery behavior:
 - persisted sketch parameters restore into thumbnails;
 - first tag defines automatic primary group;
 - search indexes id/index/title/engine/description/all tags;
-- permanent filter rail is bounded: `ALL` + at most six generated useful tags;
-- universal tags are omitted; rare/rest tags live in collapsed `MORE`;
-- active rare tag is promoted while selected;
+- permanent filter rail bounded to `ALL` + at most six generated useful tags;
+- universal tags omitted; rare/rest tags in collapsed `MORE`;
+- active rare tag promoted while selected;
 - empty groups disappear; card grids respond to width.
 
 Do not restore a permanent all-tags wall.
 
 ## Review / preference feedback loop
 
-The parameter sidebar contains only a compact row:
+Parameter sidebar contains one compact row:
 
-`REVIEW  <avg>  RATE  TRASH`
+`REVIEW <avg> RATE TRASH`
 
-`RATE` opens a temporary popup with six explicit 1–5 criteria:
+RATE opens a centered **in-app opaque modal**, not a native popup, with six explicit 1–5 criteria:
 
 - visual;
 - interaction;
@@ -74,40 +95,37 @@ The parameter sidebar contains only a compact row:
 
 Reviews persist in `user://creative_lab_reviews.cfg`. Rated cards display `R x.x`.
 
-Two telemetry levels exist:
+Telemetry:
 
-- `sketch_review_changed` — individual edit event;
-- `creative_preference_snapshot` — consolidated current ratings for every reviewed sketch plus axis averages, emitted at startup and after rating changes.
+- `sketch_review_changed` — individual edits;
+- `creative_preference_snapshot` — complete current reviewed set + axis averages.
 
-Future creative decisions should use the consolidated explicit ratings when available. Ratings are evidence and probability bias; they must not become a cloning/ranking mechanism that collapses exploration.
+Future creative decisions should use explicit ratings as bounded probability evidence. They must not become a clone/ranking mechanism. Adaptive exploration keeps 24% preference-free draws.
 
-## Local trash / curation
+## Local Trash / curation
 
 `TRASH` hides a sketch locally from the Gallery. State lives in `user://creative_lab_curation.cfg`.
 
-- `TRASH n` drawer appears only when needed;
 - RESTORE supported;
-- 7/14/30 day retention, default 30;
-- expiration / PURGE means local retirement;
+- 7/14/30 day retention;
+- expiration/PURGE means local retirement;
 - workstation never deletes version-controlled `res://sketches/...` files.
 
-Actual source deletion remains an explicit Git operation.
+Actual source deletion remains explicit Git work.
 
 ## Full-canvas render contract
 
-Logical design coordinates are normally `1280×720`, but render surfaces must follow the real PREVIEW/PROGRAM size.
+Logical design coordinates are normally `1280×720`, but physical render surfaces follow real PREVIEW/PROGRAM size.
 
-A node named `ShaderSurface` is a semantic full-canvas surface and must use:
+A node named `ShaderSurface` must use:
 
 `res://sketches/_shared/full_canvas_surface.gd`
 
-CI rejects legacy fixed 1280×720 ShaderSurface offsets. The host also applies a runtime fallback and publishes `sketch_surface_contract` coverage telemetry.
+CI rejects fixed 1280×720 ShaderSurface offsets. Host publishes `sketch_surface_contract` telemetry.
 
 Drawing-based sketches use logical-to-surface transforms from `design_sketch_base.gd`; any aspect-fit margin must be intentional artwork, never exposed host gray.
 
 ## Temporal-quality contract
-
-DC//LAB distinguishes **state evolution** from **visible clock animation**.
 
 Preferred:
 
@@ -117,17 +135,11 @@ Rejected by default:
 
 `time -> sin/cos -> visible position/scale/alpha/warp`
 
-Periodic forcing is valid when it is genuinely part of the mechanism (for example Faraday excitation), but final visible motion should still emerge through state rather than unrelated decorative wobble.
+Periodic forcing is valid when it is genuinely the mechanism. Rules: `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
 
-Rules are documented in:
-
-`knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
-
-`scripts/ci/audit_temporal_motion.py` audits the historical corpus. Existing <=025 findings are warnings; for 026+ direct clock trigonometry requires a nearby `TEMPORAL_INTENT:` explanation. Fixed update cadences are diagnostic warnings, not automatically artistic failures.
+`scripts/ci/audit_temporal_motion.py` audits the corpus. Existing <=025 findings are warnings; for 026+ direct clock trigonometry requires nearby `TEMPORAL_INTENT:` justification.
 
 ## Adaptive creative draw
-
-Future exploration starts from a machine-readable diversity-aware draw rather than repeatedly choosing familiar techniques by intuition.
 
 Files:
 
@@ -135,21 +147,21 @@ Files:
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 - `scripts/creative/draw_recipe.py`
 
-A recipe draws:
+A recipe draws carrier, two distant representation families, two distant operator families, temporal model, interaction consequence, design constraint and render path.
 
-- carrier;
-- two representations from different technical families;
-- two operators from different families;
-- temporal model;
-- interaction consequence;
-- severe design constraint;
-- render path.
+Historical/recent reuse is penalized and recent signature distance enforced. Explicit REVIEW data applies only bounded preference bias; 24% of draws deliberately ignore preference bias.
 
-Weighting penalizes historically/recently reused features and requires substantial distance from recent signatures. Explicit REVIEW data may apply a bounded preference bias, but 24% of draws deliberately ignore preference bias and remain exploration-first.
+For 026+, `definition.json` includes non-empty `creative_signature`. Implemented signatures 026–030 are recorded in draw history.
 
-For sketch index 026+, `definition.json` must include a non-empty `creative_signature`. Record only implemented/kept work in draw history, not every discarded candidate.
+## Current adaptive batch 026–030
 
-CI self-tests the draw engine across 180 deterministic seeds to detect diversity collapse or oscillator/render-path dominance.
+- 026 VOID TENSION — constraint network + Voronoi territory + fracture/repair.
+- 027 GLASS TIDE — asynchronous wave fronts + SDF glass topology.
+- 028 LUMEN MAZE — graph light transport + jam/release + remembered obstacles.
+- 029 FIBER FELT — constrained fibers + local compaction mask + phase transition.
+- 030 REACTOR SKIN — reaction-diffusion + membrane stress + fracture/repair.
+
+They deliberately emphasize neighbour interaction, state memory and consequences that continue after touch because current ratings show aliveness/controls are the weakest catalogue axes.
 
 ## Parameters / persistence
 
@@ -157,17 +169,21 @@ Sketch parameter values persist in:
 
 `user://creative_lab_sketch_settings.cfg`
 
-Substantial labs normally expose 6–9 meaningful independent controls when the mechanism supports them.
+Substantial labs normally expose 6–9 meaningful independent controls when mechanism supports them.
+
+## Performance representation
+
+Dense state fields should render through ImageTexture/fullscreen shader where suitable instead of thousands of Canvas primitives. Expensive neighbourhood/contact work belongs in simulation cadence and should not be recomputed in `_draw()`.
 
 ## PREVIEW / PROGRAM synchronization
 
-When PREVIEW and PROGRAM are linked, the editor sketch is simulation authority and PROGRAM follows synchronized state. On navigation/detach, the final state is synchronized and PROGRAM continues autonomously. Do not create unrelated linked timelines.
+When PREVIEW and PROGRAM are linked, editor sketch is simulation authority and PROGRAM follows synchronized state. On navigation/detach, final state synchronizes and PROGRAM continues autonomously. Do not create unrelated linked timelines.
 
 ## Physical output / input
 
-PROGRAM uses a dedicated native output renderer on the selected display. A historical cross-window texture-sampling path produced gray output and must not be casually restored.
+PROGRAM uses the established output path on the selected display. A historical cross-window texture-sampling path produced gray output and must not be casually restored.
 
-Touch/mouse on PROGRAM is forwarded into the same logical design space used by PREVIEW. Linked input updates source/master state; detached PROGRAM remains interactable while the workstation browses elsewhere.
+Touch/mouse on PROGRAM is forwarded into the same logical design space used by PREVIEW.
 
 ## Telemetry
 
@@ -181,7 +197,7 @@ latest.jsonl
 sessions/
 ```
 
-Publication is asynchronous and must never block the Godot UI. After a host test, require telemetry to match the tested HEAD/session before drawing conclusions.
+Publication is asynchronous and must never block UI. After host test, require matching tested HEAD/session before conclusions.
 
 ## Knowledge / research
 
