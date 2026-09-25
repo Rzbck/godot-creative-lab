@@ -18,7 +18,7 @@
   },
   "runtime": {
     "main_scene": "res://app/main/main_runtime.tscn",
-    "top_runtime_script": "res://app/main/main_runtime_gallery_adaptive_filters.gd",
+    "top_runtime_script": "res://app/main/main_runtime_gallery_feedback_trash.gd",
     "program_output_persistent_across_navigation": true,
     "take_live_supported": true,
     "touch_program_input": true,
@@ -26,16 +26,23 @@
     "gallery_real_thumbnails": true,
     "gallery_hover_animation": true,
     "gallery_auto_groups_from_tags": true,
-    "gallery_tag_filter": true,
     "gallery_adaptive_tag_filters": true,
     "gallery_quick_tag_limit": 6,
     "gallery_hide_universal_tags": true,
     "gallery_more_tag_drawer": true,
     "gallery_search_indexes_all_tags": true,
-    "gallery_search": true,
+    "gallery_reviews": true,
+    "gallery_review_criteria": ["visual", "interaction", "originality", "aliveness", "controls", "performance"],
+    "gallery_review_scale": [1, 5],
+    "gallery_local_trash": true,
+    "gallery_trash_default_retention_days": 30,
+    "gallery_trash_retention_choices_days": [7, 14, 30],
+    "gallery_trash_deletes_source_files": false,
     "logical_design_size": [1280, 720],
+    "full_canvas_shader_component": "res://sketches/_shared/full_canvas_surface.gd",
+    "shader_surface_runtime_coverage_telemetry": true,
     "artwork_canvas_excludes_project_metadata": true,
-    "expected_gallery_sketch_count": 25
+    "source_gallery_sketch_count": 25
   },
   "creative_rules": {
     "preferred_exploration_mode": "collision-first",
@@ -49,7 +56,8 @@
     "random_stacking_without_state_coupling_is_rejected": true,
     "no_sketch_metadata_inside_artwork_canvas": true,
     "real_world_references_preserve_causal_structure": true,
-    "performance_representation_must_match_scale": true
+    "performance_representation_must_match_scale": true,
+    "explicit_host_review_scores_are_first_class_creative_evidence": true
   },
   "knowledge": {
     "technique_palette": "knowledge/cross-domain/TECHNIQUE_PALETTE.md",
@@ -58,75 +66,81 @@
     "physical_chemical_systems": "knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md",
     "organic_coupling_and_controls": "knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md",
     "realtime_performance_budget": "knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md",
-    "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
-    "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
-    "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md"
+    "sketch_contract": "docs/SKETCH_CONTRACT.md"
   },
   "sketches": [
     {"id":"001_signal_field","role":"technical-foundation"},
     {"id":"002_liquid_type","role":"gallery-sketch"},
     {"id":"003_chroma_lens","role":"gallery-sketch"},
     {"id":"004_gommage_type","role":"gallery-sketch"},
-    {"id":"005_pressure_lattice","visible_title":"REGISTER TYPE","role":"gallery-sketch","rejected_previous_concept":"Pressure Lattice"},
+    {"id":"005_pressure_lattice","visible_title":"REGISTER TYPE","role":"gallery-sketch","rejected_previous_concept":"Pressure Lattice","full_canvas_shader_surface":true},
     {"id":"006_breath_score","visible_title":"BREATH SCORE","role":"gallery-sketch"},
     {"id":"007_redaction_field","visible_title":"REDACTION FIELD","role":"gallery-sketch"},
     {"id":"008_palimpsest","visible_title":"PALIMPSEST","role":"gallery-sketch"},
     {"id":"009_chorus_drift","visible_title":"CHORUS DRIFT","role":"gallery-sketch"},
     {"id":"010_fault_register","visible_title":"FAULT REGISTER","role":"gallery-sketch"},
-    {"id":"011_swarm_relay","visible_title":"SWARM RELAY","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"012_chemical_blocks","visible_title":"CHEMICAL BLOCKS","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"013_cut_cell","visible_title":"CUT CELL","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"014_ribbon_morph","visible_title":"RIBBON MORPH","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"015_phase_pack","visible_title":"PHASE PACK","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
+    {"id":"011_swarm_relay","visible_title":"SWARM RELAY","role":"collision-first-lab"},
+    {"id":"012_chemical_blocks","visible_title":"CHEMICAL BLOCKS","role":"collision-first-lab"},
+    {"id":"013_cut_cell","visible_title":"CUT CELL","role":"collision-first-lab"},
+    {"id":"014_ribbon_morph","visible_title":"RIBBON MORPH","role":"collision-first-lab"},
+    {"id":"015_phase_pack","visible_title":"PHASE PACK","role":"collision-first-lab"},
     {"id":"016_predator_vein","visible_title":"PREDATOR VEIN","role":"organic-collision-lab","parameter_count":8},
     {"id":"017_edge_bloom","visible_title":"EDGE BLOOM","role":"organic-collision-lab","parameter_count":9,"performance_refactor":"dense_field_image_texture"},
     {"id":"018_current_memory","visible_title":"CURRENT MEMORY","role":"organic-collision-lab","parameter_count":9},
     {"id":"019_soft_flock","visible_title":"SOFT FLOCK","role":"organic-collision-lab","parameter_count":9},
     {"id":"020_echo_tissue","visible_title":"ECHO TISSUE","role":"organic-collision-lab","parameter_count":9,"performance_refactor":"dense_field_image_texture_plus_cached_neighbour_density"},
-    {"id":"021_rosensweig_field","visible_title":"ROSENSWEIG FIELD","role":"physical-chemical-collision-lab","parameter_count":8,"primary_representation":"fullscreen_magnetic_instability_shader"},
-    {"id":"022_liesegang_front","visible_title":"LIESEGANG FRONT","role":"physical-chemical-collision-lab","parameter_count":8,"primary_representation":"precipitation_band_generations"},
-    {"id":"023_spinodal_marangoni","visible_title":"SPINODAL MARANGONI","role":"physical-chemical-collision-lab","parameter_count":9,"primary_representation":"conserved_phase_field_texture"},
-    {"id":"024_granular_jam","visible_title":"GRANULAR JAM","role":"physical-chemical-collision-lab","parameter_count":9,"primary_representation":"packed_grain_contact_graph"},
-    {"id":"025_faraday_quasi","visible_title":"FARADAY QUASI","role":"physical-chemical-collision-lab","parameter_count":8,"primary_representation":"modal_resonance_fullscreen_shader"}
+    {"id":"021_rosensweig_field","visible_title":"ROSENSWEIG FIELD","role":"physical-chemical-collision-lab","parameter_count":8,"full_canvas_shader_surface":true},
+    {"id":"022_liesegang_front","visible_title":"LIESEGANG FRONT","role":"physical-chemical-collision-lab","parameter_count":8},
+    {"id":"023_spinodal_marangoni","visible_title":"SPINODAL MARANGONI","role":"physical-chemical-collision-lab","parameter_count":9},
+    {"id":"024_granular_jam","visible_title":"GRANULAR JAM","role":"physical-chemical-collision-lab","parameter_count":9},
+    {"id":"025_faraday_quasi","visible_title":"FARADAY QUASI","role":"physical-chemical-collision-lab","parameter_count":8,"full_canvas_shader_surface":true}
   ],
-  "current_batch": {
-    "ids": ["021_rosensweig_field","022_liesegang_front","023_spinodal_marangoni","024_granular_jam","025_faraday_quasi"],
-    "random_seed": "202609250742",
-    "status": "IMPLEMENTED_HOST_NOT_VALIDATED",
-    "implementation_commit": "50e7d9f9296768a09a56c7a8f7ac421a4d823389",
-    "runtime_ci_run": 224,
-    "runtime_ci_passed": true
-  },
   "gallery_filtering": {
     "mode": "adaptive_generated_tag_rail",
     "runtime_layer": "app/main/main_runtime_gallery_adaptive_filters.gd",
     "quick_tag_limit": 6,
-    "minimum_quick_tag_count": 2,
     "universal_tags_hidden_from_filter_ui": true,
     "rare_tags_in_collapsed_more_drawer": true,
-    "selected_rare_tag_promoted_while_active": true,
-    "search_indexes_all_tags": true,
-    "primary_group_source": "first_definition_tag",
-    "runtime_ci_run": 233,
-    "runtime_ci_passed": true,
-    "host_state": "IMPLEMENTED_NOT_VALIDATED"
+    "search_indexes_all_tags": true
+  },
+  "user_feedback_system": {
+    "runtime_layer": "app/main/main_runtime_gallery_feedback_trash.gd",
+    "reviews_path": "user://creative_lab_reviews.cfg",
+    "review_event": "sketch_review_changed",
+    "review_badge_in_gallery": true,
+    "curation_path": "user://creative_lab_curation.cfg",
+    "trash_restore_supported": true,
+    "trash_auto_retire_supported": true,
+    "purge_scope": "local_gallery_only_source_remains_versioned"
+  },
+  "render_contract": {
+    "logical_design_size_is_not_fixed_surface_size": true,
+    "shader_surface_component": "sketches/_shared/full_canvas_surface.gd",
+    "ci_rejects_fixed_1280_720_shader_surface": true,
+    "host_runtime_fallback_sizes_named_shader_surface": true,
+    "telemetry_event": "sketch_surface_contract",
+    "host_regression_source": "025_faraday_quasi_maximized_preview_gray_gap",
+    "observed_preview_size": [1520, 852]
   },
   "telemetry": {
     "remote_branch": "telemetry/runtime",
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "publication": "asynchronous_queued_sanitized",
-    "last_observed_runtime_head": "6dd4b307724d",
-    "last_observed_gallery_preview_count": 15,
-    "last_host_feedback_source": "016_020_test_but_remote_telemetry_stale",
+    "last_observed_runtime_head": "03917e676fce",
+    "last_host_feedback_source": "025_faraday_quasi_full_canvas_test",
     "telemetry_first_after_host_test": true
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
     "required_for_runtime_code": ["repository_policy","godot_4_7_1_headless_import","main_scene_smoke_test","tracked_file_cleanliness"],
-    "final_exact_head_ci_must_be_resolved_from_github": true,
-    "current_host_state": "ADAPTIVE_GALLERY_AND_021_025_HOST_NOT_VALIDATED"
+    "repository_policy_checks_full_canvas_shader_surface": true,
+    "code_head": "e8c1a826b69756bf02f5a82008563c378fc06608",
+    "code_ci_run": 256,
+    "code_ci_passed": true,
+    "final_exact_head_ci_must_be_resolved_after_docs": true,
+    "current_host_state": "FULL_CANVAS_REVIEW_TRASH_IMPLEMENTED_NOT_HOST_VALIDATED"
   },
   "ai_completion_protocol": {
     "mandatory": true,
@@ -147,6 +161,8 @@
     "do_not_restore_pressure_lattice_visual_concept": true,
     "do_not_make_glyph_contours_default": true,
     "do_not_restore_permanent_all_tags_wall": true,
+    "do_not_restore_fixed_1280_720_shader_surfaces": true,
+    "do_not_treat_local_purge_as_git_source_deletion": true,
     "canonical_host_test_uses_exact_head_ci_wait": true
   }
 }
