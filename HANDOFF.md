@@ -56,7 +56,7 @@ Adaptive filter contract:
 
 This behavior exists specifically to keep Gallery discovery compact as sketch/tag count grows. Do not restore a permanent all-tags wall.
 
-Runtime CI #233 passed policy, Godot 4.7.1 import, main-scene smoke and cleanliness for the adaptive filter runtime state.
+Runtime CI #233 passed policy, Godot 4.7.1 import, main-scene smoke and cleanliness for the adaptive filter runtime state. Host validation of layout/interaction is still pending.
 
 ## Historical creative state
 
