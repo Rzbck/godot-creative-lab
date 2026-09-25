@@ -28,6 +28,7 @@ var _contact_force := PackedFloat32Array()
 var _accum := 0.0
 var _load_memory := 0.0
 var _avalanche_clock := 0.0
+var _avalanche_index := 0
 
 
 func _ready() -> void:
@@ -112,6 +113,9 @@ func _update_source_simulation(delta: float) -> void:
 func _step_grains(dt: float) -> void:
     _contact_pairs.clear()
     _contact_force = PackedFloat32Array()
+    var chamber_center_x := CHAMBER.position.x + CHAMBER.size.x * 0.5
+    var chamber_half_width := CHAMBER.size.x * 0.5
+
     for i: int in range(GRAIN_COUNT):
         _radius[i] = lerpf(_radius[i], _base_radius[i] * grain_scale * packing, clampf(dt * 1.5, 0.0, 1.0))
         _stress[i] *= pow(0.96, dt * 45.0)
@@ -132,7 +136,13 @@ func _step_grains(dt: float) -> void:
                 v += load_dir * load * w * 185.0 * dt
                 _stress[i] += load * w * 0.12
 
-        var creep_dir := sin(float(i) * 2.17 + sketch_time * 0.51)
+        # Creep follows actual material state instead of a visible global clock:
+        # existing lateral velocity, confinement position, stress and a stable
+        # per-grain imperfection determine the slow slip direction.
+        var lateral_position := clampf((_pos[i].x - chamber_center_x) / chamber_half_width, -1.0, 1.0)
+        var velocity_bias := clampf(v.x / 90.0, -1.0, 1.0)
+        var material_asymmetry := (hash01(float(i) * 17.3 + 4.1) * 2.0 - 1.0) * 0.22
+        var creep_dir := clampf(velocity_bias * 0.55 - lateral_position * 0.28 + material_asymmetry, -1.0, 1.0)
         v.x += creep_dir * creep * (0.6 + _stress[i]) * dt * 11.0
         _vel[i] = v
 
@@ -177,8 +187,9 @@ func _step_grains(dt: float) -> void:
         mean_stress /= float(GRAIN_COUNT)
         var trigger := lerpf(1.25, 0.28, clampf(avalanche / 1.5, 0.0, 1.0))
         if mean_stress + _load_memory * load * 0.25 > trigger:
+            _avalanche_index += 1
             for i: int in range(GRAIN_COUNT):
-                var slip_bias := hash01(float(i) * 31.1 + floor(sketch_time * 5.0)) - 0.5
+                var slip_bias := hash01(float(i) * 31.1 + float(_avalanche_index) * 13.7) - 0.5
                 _vel[i].x += slip_bias * avalanche * (18.0 + _stress[i] * 34.0)
                 _vel[i].y += absf(slip_bias) * avalanche * 7.0
                 _stress[i] *= 0.62
@@ -210,7 +221,8 @@ func _get_custom_live_sync_state() -> Dictionary:
     return {
         "pos": _pos.duplicate(), "vel": _vel.duplicate(),
         "radius": _radius.duplicate(), "stress": _stress.duplicate(),
-        "load_memory": _load_memory, "accum": _accum, "avalanche_clock": _avalanche_clock,
+        "load_memory": _load_memory, "accum": _accum,
+        "avalanche_clock": _avalanche_clock, "avalanche_index": _avalanche_index,
     }
 
 
@@ -226,6 +238,7 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
     _load_memory = float(state.get("load_memory", _load_memory))
     _accum = float(state.get("accum", _accum))
     _avalanche_clock = float(state.get("avalanche_clock", _avalanche_clock))
+    _avalanche_index = int(state.get("avalanche_index", _avalanche_index))
     _rebuild_contacts_for_draw()
 
 
@@ -243,8 +256,14 @@ func _rebuild_contacts_for_draw() -> void:
 
 func _get_custom_live_debug_state() -> Dictionary:
     var mean_stress := 0.0
-    for s: float in _stress: mean_stress += s
-    return {"grains": GRAIN_COUNT, "contacts": _contact_pairs.size(), "mean_stress": mean_stress / float(GRAIN_COUNT)}
+    for s: float in _stress:
+        mean_stress += s
+    return {
+        "grains": GRAIN_COUNT,
+        "contacts": _contact_pairs.size(),
+        "mean_stress": mean_stress / float(GRAIN_COUNT),
+        "avalanche_events": _avalanche_index,
+    }
 
 
 func _draw() -> void:
