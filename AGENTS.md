@@ -130,6 +130,7 @@ Do not claim a publisher PID means upload succeeded; verify the telemetry branch
 - Per-sketch parameters persist across app sessions.
 - Gallery cards show real rendered thumbnails; only the hovered preview animates.
 - Gallery organization/search/filtering is generated from `definition.json` tags/metadata.
+- Gallery permanent tag UI must remain bounded/scalable: do not restore a permanently expanded all-tags wall. Current behavior uses a generated quick rail plus collapsed `MORE` drawer while search indexes every tag.
 - Final PROGRAM output contains no debug labels or sketch-title chrome unless text is intentionally part of the artwork.
 - Selecting a fullscreen display must not move/destroy the workstation UI.
 
