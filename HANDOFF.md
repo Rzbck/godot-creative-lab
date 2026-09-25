@@ -2,7 +2,7 @@
 
 Canonical restart point for a new human or AI session.
 
-**Always resolve the current remote branch HEAD and exact-head CI before trusting recorded SHAs.** Repository state is authoritative; chat history is secondary.
+**Always resolve the current remote branch HEAD and exact-head CI before trusting recorded SHAs. Repository state is authoritative; chat history is secondary.**
 
 Last material refresh: **2026-09-25**.
 
@@ -17,100 +17,128 @@ Last material refresh: **2026-09-25**.
 - PR base: `feat/gallery-project-workflow-20260923`
 - never merge/change `main` without explicit user approval
 
-## Product state to preserve
+## Product state
 
-DC//LAB is a Godot creative-coding workstation with data-driven Gallery discovery, real thumbnails, hover previews, generated parameter inspector/persistence, PREVIEW / PROGRAM separation, persistent PROGRAM while navigating, `TAKE LIVE`, physical display selection, PROGRAM touch/mouse forwarding, linked PREVIEW/PROGRAM state synchronization, async telemetry and versioned creative research.
+DC//LAB is a Godot creative-coding workstation with data-driven Gallery discovery, real thumbnails/hover previews, generated parameter inspector and persistence, PREVIEW / PROGRAM separation, persistent PROGRAM during navigation, TAKE LIVE, physical display output, PROGRAM input forwarding, linked live-state synchronization, async telemetry, user reviews/curation, and versioned creative research.
 
-Normal logical artwork space: `1280×720`.
+PROGRAM canvas is artwork-only: no index/title/tag/debug/project metadata unless intentionally part of the art.
 
-PROGRAM canvas is artwork-only: no sketch title/index/tags/debug/project metadata unless the text is genuinely part of the artwork.
+## Current top runtime / chain
 
-## Gallery discovery / adaptive tags
+Entry scene:
 
-The Gallery no longer renders every metadata tag permanently.
+`res://app/main/main_runtime.tscn`
 
-Top runtime layer is now:
+Top runtime script:
 
-`res://app/main/main_runtime_gallery_adaptive_filters.gd`
+`res://app/main/main_runtime_gallery_feedback_trash.gd`
 
-Runtime chain starts:
+Chain begins:
 
 ```text
-main_runtime_gallery_adaptive_filters.gd
-    -> main_runtime_gallery_organizer.gd
-        -> main_runtime_program_output.gd
-        -> ...
+main_runtime_gallery_feedback_trash.gd
+    -> main_runtime_gallery_adaptive_filters.gd
+        -> main_runtime_gallery_organizer.gd
+            -> main_runtime_program_output.gd
+                -> main_runtime_gallery_persistence.gd
+                    -> main_runtime_live_output.gd
+                    -> ...
 ```
 
-Adaptive filter contract:
+Inspect actual Git chain before changing host architecture.
+
+## Hard render-surface rule
+
+Host test of 025 FARADAY QUASI on runtime `03917e676fce...` showed gray right/bottom space in maximized PREVIEW. Fresh telemetry proved the host and SubViewport were correctly **1520×852**; the sketch's `ShaderSurface` itself was fixed to 1280×720.
+
+The fix is now architectural:
+
+- shared component: `res://sketches/_shared/full_canvas_surface.gd`;
+- any node named `ShaderSurface` must use that component and follow actual viewport size;
+- converted 005, 021 and 025 existing shader surfaces;
+- host has a runtime sizing fallback for named `ShaderSurface` controls;
+- opening a sketch emits `sketch_surface_contract` telemetry with viewport size / coverage / pass;
+- repository CI rejects `ShaderSurface` scenes that lack the shared component or restore fixed 1280×720 offsets.
+
+Never reintroduce a fixed 1280×720 `ShaderSurface`. Logical design coordinates may remain 1280×720, but the physical render surface must cover the actual PREVIEW/PROGRAM viewport.
+
+See `docs/SKETCH_CONTRACT.md`.
+
+## Gallery discovery
+
+Adaptive tag rail contract:
 
 - `ALL` always visible;
-- max 6 generated quick tags in the permanent rail;
-- quick tags are selected automatically from catalogue frequency/discrimination;
-- universal tags matching the entire catalogue are omitted as useless filters;
-- rare/singleton/remaining tags are inside a collapsed `MORE` drawer;
-- selecting a rare tag promotes it into the compact rail while active;
-- Gallery search still indexes every tag whether or not it is visible in the rail;
-- primary Gallery groups still derive from the first `definition.json` tag;
-- no per-sketch UI hard-coding or manually curated filter list is required.
+- max 6 generated quick tags;
+- universal tags hidden from filter UI;
+- rare/rest tags inside collapsed `MORE`;
+- selected rare tag promoted while active;
+- search indexes every tag;
+- primary group remains first `definition.json` tag;
+- do not restore a permanent all-tags wall.
 
-This behavior exists specifically to keep Gallery discovery compact as sketch/tag count grows. Do not restore a permanent all-tags wall.
+## User REVIEW system
 
-Runtime CI #233 passed policy, Godot 4.7.1 import, main-scene smoke and cleanliness for the adaptive filter runtime state. Host validation of layout/interaction is still pending.
+Every open sketch gets a workstation-side `REVIEW` block after creative parameters.
 
-## Historical creative state
+1–5 axes:
 
-001–010 remain available. `005_pressure_lattice` visibly remains **REGISTER TYPE**; original Pressure Lattice is rejected. A generalized contour pass (`6c20a094...`) across 006–010 was host-rejected because several glyphs looked broken/inverted and the series converged around one technique. Do not restore it.
+- `VISUAL`
+- `INTERACTION`
+- `ORIGINALITY`
+- `ALIVENESS`
+- `CONTROLS`
+- `PERFORMANCE`
 
-## Collision-first evolution
+Persistence:
 
-### 011–015
+`user://creative_lab_reviews.cfg`
 
-First raw collision batch:
+Behavior:
 
-- **SWARM RELAY** — agents + dynamic graph;
-- **CHEMICAL BLOCKS** — Gray-Scott reaction-diffusion;
-- **CUT CELL** — nearest-site territories + cut/healing graph;
-- **RIBBON MORPH** — raster morphology + ribbons;
-- **PHASE PACK** — packed bodies + phase rules + distance field.
+- same selected score clicked again clears it;
+- inspector shows aggregate average;
+- rated Gallery cards show `R x.x`;
+- `sketch_review_changed` telemetry publishes sanitized numeric ratings + average.
 
-Host feedback: technically/creatively better than the earlier type-heavy direction, but visually weak, under-parameterized (3 controls each) and not organic enough in how pixels/cells influence one another.
+Future AI sessions must use these explicit ratings as first-class creative preference evidence when available. They are meant to gradually sharpen what DC//LAB creates and what existing sketches deserve refinement.
 
-### 016–020
+## Local Trash / retirement
 
-Blind draw seed: `202609242031`.
+Open-sketch inspector provides `MOVE TO TRASH`.
 
-- `016_predator_vein` / **PREDATOR VEIN** — nutrient graph + neighbour field + predators/scars; 8 controls.
-- `017_edge_bloom` / **EDGE BLOOM** — excitable tissue + refractory state + spores; 9 controls.
-- `018_current_memory` / **CURRENT MEMORY** — wave membrane + delayed memory + particle current; 9 controls.
-- `019_soft_flock` / **SOFT FLOCK** — boids + Verlet membrane + erosion/repair; 9 controls.
-- `020_echo_tissue` / **ECHO TISSUE** — eight-neighbour tissue + morphology + delayed feedback; 9 controls.
+Persistence:
 
-Host feedback: clearly better / starting to become interesting, but real-world physical/chemical matter was still missing and some sketches appeared to fall below the user's very high smooth-FPS baseline.
+`user://creative_lab_curation.cfg`
 
-017 and 020 were subsequently optimized structurally:
+Behavior:
 
-- dense cellular fields render through low-resolution `ImageTexture` instead of thousands of CanvasItem primitives per frame;
-- 020 caches neighbour density during simulation instead of rescanning neighbourhoods in draw.
+- trashed sketch disappears from normal Gallery immediately;
+- `TRASH n` appears only when non-empty;
+- Trash drawer offers `RESTORE`;
+- retention choices 7 / 14 / 30 days, default 30;
+- expiration moves entry to local `retired` state;
+- `PURGE` retires locally immediately.
 
-Remote telemetry for that host test was stale and corresponded to the older 011–015 runtime, so do not claim exact per-sketch FPS from it.
+Safety rule: runtime Trash/Purge **never deletes version-controlled `res://sketches/...` source files**. True source deletion is an explicit Git operation. Do not silently resurrect locally retired work during normal Gallery loads; local curation is intentional user state.
 
-## 021–025 — physical / chemical collision labs
+## Current creative body
 
-Blind draw seed: `202609250742`.
+Gallery source catalogue: 25 sketches.
 
-- `021_rosensweig_field` / **ROSENSWEIG FIELD** — magnetic threshold + coupled peak modes + viscosity/hysteresis; 8 controls; fullscreen shader.
-- `022_liesegang_front` / **LIESEGANG FRONT** — diffusion + supersaturation + precipitation/depletion/dissolution bands; 8 controls.
-- `023_spinodal_marangoni` / **SPINODAL MARANGONI** — conserved-ish phase field + thermal quench + Marangoni-style advection; 9 controls; low-res texture field.
-- `024_granular_jam` / **GRANULAR JAM** — packed grains + contacts + force chains + creep + delayed avalanche; 9 controls.
-- `025_faraday_quasi` / **FARADAY QUASI** — parametric resonance + mode competition + standing-wave shader; 8 controls.
+Important history:
 
-Runtime commit: `50e7d9f9296768a09a56c7a8f7ac421a4d823389`.
-CI #224 passed Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness for that runtime commit.
+- 005 internal id/path stays `005_pressure_lattice`, visible work is REGISTER TYPE; original Pressure Lattice rejected.
+- generalized glyph-contour pass `6c20a094...` across 006–010 rejected; do not restore as default representation.
+- 011–015 collision-first increased technical diversity but were visually weak / only 3 controls.
+- 016–020 added stronger organic coupling and 8–9 controls.
+- 021–025 add physical/chemical causal mechanisms: Rosensweig, Liesegang, spinodal/Marangoni, granular jamming, Faraday resonance.
 
-## Durable creative rules
+017/020 dense-field rendering was optimized to low-resolution ImageTexture; 020 also caches neighbour density.
 
-Read:
+## Creative research rules
+
+Read first:
 
 - `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
 - `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
@@ -118,76 +146,58 @@ Read:
 - `knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
 - `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
 - `knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md`
+- relevant design/creative-coding atlases.
 
-Current rules:
+Current method often uses:
 
-1. substantial collision labs normally expose **6–9 meaningful independent controls** when mechanism supports them;
-2. at least half the controls should alter future evolution, not only current rendering;
-3. cellular/raster work claiming organic behavior must exchange state through neighbours/resources/pressure/phase/delay/constraints;
-4. prefer several time scales: immediate response + slower memory/repair/transport/fatigue;
-5. raw collision-first work still requires a coherent default palette/composition and respectable frozen frames;
-6. interaction should perturb a living system and leave consequences the system redistributes;
-7. real-world science references must preserve at least one genuine causal relationship/threshold instead of borrowing surface appearance only;
-8. performance architecture matters: dense fields should use texture/shader representations when appropriate, simulation cadence should be separated from render cadence, and expensive neighbourhood/contact calculations should not be repeated just for drawing.
+`technical/phenomenon collision -> coupled prototype -> observe -> interpret -> art-direct -> mutate`
 
-Preferred exploration mode remains:
+No technique is the default house style. Real-world references preserve causal relationships, not just surface aesthetics. Substantial labs normally expose 6–9 distinct controls when the mechanism supports it.
 
-`blind technical/phenomenon collision -> coupled prototype -> observe -> interpret -> art-direct -> mutate`
+## Current validation
 
-No technique is the default house style. Random stacking without state coupling is rejected.
+Runtime/feature commits:
+
+- `6471a875...` — full-canvas contract + review/trash layer;
+- CI #255 caught one invalid constant expression before host test;
+- `e8c1a826...` fixed it;
+- CI #256 passed policy, Godot 4.7.1 import, main-scene smoke and tracked-file cleanliness on that exact code head.
+
+Resolve a new final exact-head CI after all documentation commits before declaring the task complete.
 
 ## Next host validation
 
-Expected Gallery count: **25 sketches**.
+1. Open 025 in the same maximized workstation layout: no gray right/bottom gap; artwork covers the full 1520×852 PREVIEW.
+2. Resize/maximize and test 025, 021 and 005.
+3. Test F11 presentation on a shader sketch.
+4. Rate one or more sketches across several REVIEW axes; confirm `R x.x` in Gallery and persistence after reopen/relaunch.
+5. Move a disposable sketch to Trash, confirm it disappears and `TRASH 1` appears; restore it.
+6. Optionally change retention; do not source-delete via this UI test.
+7. Continue artistic/performance test of 021–025.
+8. Close normally.
+9. Immediately inspect `telemetry/runtime`; verify tested HEAD/session, `sketch_surface_contract`, review and trash events before asking for logs.
 
-First validate adaptive Gallery tags:
+## PROGRAM / LIVE OUT invariants
 
-1. default filter area shows `ALL`, at most six quick tags and optional `MORE`;
-2. universal tags such as a 25/25 tag do not occupy permanent space;
-3. `MORE` reveals rare/remaining tags and is closed by default;
-4. selecting a rare tag promotes it into the compact rail while active;
-5. hidden tags remain searchable;
-6. resize does not recreate the original multi-row tag wall.
-
-Then continue artwork/performance validation:
-
-1. compare 017 + 020 smoothness after optimization;
-2. watch 021–025 for 20–30 seconds at defaults;
-3. interact, release, observe delayed physical/chemical consequences;
-4. explore the 8–9 controls;
-5. test strongest mechanisms on PROGRAM/touch;
-6. close normally so telemetry can publish;
-7. inspect fresh `telemetry/runtime` and require a matching tested HEAD/session before attributing FPS.
-
-## PROGRAM / LIVE OUT architecture
-
-Navigation is not transport. PROGRAM must continue while browsing Gallery/Settings or opening another PREVIEW. `TAKE LIVE` replaces PROGRAM. Linked output follows synchronized source state; detached PROGRAM continues autonomously from the last synchronized state.
-
-Inspect `res://app/main/main_runtime.tscn` and its actual `extends` chain before changing host architecture.
-
-## Telemetry-first debugging
-
-After any host runtime test:
-
-1. inspect branch `telemetry/runtime`;
-2. read `latest.jsonl` and relevant session data;
-3. verify telemetry corresponds to the tested HEAD/session;
-4. only ask for manual logs/screenshots if telemetry genuinely lacks the evidence.
+- navigation never stops PROGRAM;
+- TAKE LIVE replaces PROGRAM;
+- linked PREVIEW/PROGRAM share one generative state;
+- detached PROGRAM continues from last synchronized state;
+- physical output remains interactive;
+- workstation stays usable.
 
 ## Mandatory AI completion protocol
 
-After every material repository change, before final response:
+After every material repo change, before final response:
 
 1. finish intended feature-branch commits;
-2. update `CURRENT_WORK.md`, this handoff, `project_state.json`, `NEXT_AI_PROMPT.md` and `OPERATIONS.md` where durable state/workflow changed;
-3. resolve the final remote branch HEAD **after all code + docs commits**;
+2. update `CURRENT_WORK.md`, this handoff, `project_state.json`, `NEXT_AI_PROMPT.md`, and `OPERATIONS.md` where durable state/workflow changed;
+3. resolve final remote branch HEAD after all code/docs commits;
 4. wait for and inspect CI for that exact SHA;
-5. report exact short HEAD + CI result;
-6. when host validation is relevant, automatically include the canonical PowerShell from `OPERATIONS.md` that syncs, waits for exact-head CI success and only then launches Godot;
-7. after the user tests, inspect telemetry first.
+5. report exact short HEAD + CI;
+6. if host validation is useful, automatically include canonical PowerShell from `OPERATIONS.md`;
+7. after host test, telemetry-first.
 
 ## Rejected regressions
 
-Do not casually reintroduce root-window fullscreen as normal PROGRAM output, the failed cross-window texture path, synchronous telemetry network work, independent linked PREVIEW/PROGRAM simulations, Gallery overlays over cards, permanent all-tags filter walls, fake Spout/NDI, Pressure Lattice, project metadata inside artwork, or glyph contours as the default creative representation.
-
-See `docs/handoff/CURRENT_WORK.md` for detailed current work and `docs/handoff/OPERATIONS.md` for the canonical exact-CI PowerShell.
+Do not restore root-window fullscreen as PROGRAM architecture, failed cross-window texture sampling, synchronous telemetry network work, independent linked simulations, card-covering overlays, permanent all-tags walls, fixed 1280×720 shader surfaces, fake Spout/NDI, Pressure Lattice, project metadata inside artwork, or glyph contours as a default technique.
