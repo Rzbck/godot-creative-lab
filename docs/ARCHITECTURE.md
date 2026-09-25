@@ -2,25 +2,24 @@
 
 ## Status
 
-Implemented Godot 4.7.1 creative-coding workstation. Repository state + matching runtime telemetry are authoritative when they disagree with chat history.
+Godot 4.7.1 creative-coding workstation. Repository state + matching runtime telemetry are authoritative when they disagree with chat history.
 
 ## Product model
 
 DC//LAB separates:
 
 1. **WORKSTATION / EDITOR** — Gallery, Settings, PREVIEW, parameters, review/curation and navigation.
-2. **PROGRAM / LIVE OUT** — audience-facing output on a selected physical display.
-3. **SKETCH** — isolated creative runtime with parameters, interaction and optional live-state synchronization.
+2. **PROGRAM / LIVE OUT** — audience-facing persistent output.
+3. **SKETCH** — isolated creative runtime with state, parameters and interaction.
 
-Navigation is not PROGRAM transport. PROGRAM keeps running while the workstation browses or opens another PREVIEW. `TAKE LIVE` replaces PROGRAM explicitly.
+Navigation is not transport: PROGRAM continues while the workstation browses or edits another PREVIEW. `TAKE LIVE` explicitly replaces PROGRAM.
 
 ## Main runtime
 
 Entry scene: `res://app/main/main_runtime.tscn`.
+Top layer: `res://app/main/main_runtime_window_memory.gd`.
 
-Current top runtime layer: `res://app/main/main_runtime_window_memory.gd`.
-
-Important chain:
+Important chain begins:
 
 ```text
 main_runtime_window_memory.gd
@@ -34,86 +33,100 @@ main_runtime_window_memory.gd
                                 -> lower output/window/telemetry layers
 ```
 
-Always inspect the actual `extends` chain before changing host architecture.
+Always inspect the actual `extends` chain before host edits.
 
-## Workstation window state — revision 2
+## Workstation window memory revision 3
 
-State persists in `user://creative_lab_window_state.cfg` and is restored before the first visible workstation frame.
+State persists in `user://creative_lab_window_state.cfg`.
 
-The previous custom Maximize path used native maximize on a borderless Windows client. Host telemetry proved that Godot/Windows could reclassify the resulting monitor-sized client as fullscreen. That path is rejected.
+The host proved two separate Windows/Godot problems:
 
-Revision 2 keeps workstation expansion distinct from artwork presentation:
+1. native maximize on a borderless monitor-sized client could collapse into fullscreen semantics;
+2. Godot 4.7.1 rejects changing visibility of the main Window from `_enter_tree()`.
 
-- logical `maximized` is implemented as borderless `WINDOWED` geometry using the current screen usable rect;
-- a 2 px bottom guard prevents the exact monitor-sized client from being reclassified as fullscreen;
-- the normal window restore rect remains separately tracked;
-- revision-1 saved fullscreen created by the old Maximize path migrates to logical maximized;
-- F11 / PROGRAM presentation stays separate and does not overwrite workstation state;
-- `workstation_window_state_restored` records the restored logical/native state.
+Current strategy:
 
-Current state: **REPO_VALIDATED / HOST_VALIDATION_REQUIRED**.
+- saved screen/mode/position/size is applied in `_enter_tree()` without changing `Window.visible`;
+- logical Maximize is a borderless **WINDOWED** usable-screen rectangle with a 2 px bottom guard;
+- `_workstation_expanded` prevents that geometry from overwriting the normal restore rectangle;
+- F11 is separate artwork presentation state;
+- first-frame cleanliness and restore behavior require host validation, but CI has no runtime error in headless mode.
 
 ## Gallery architecture
 
-Sketches are discovered from `sketches/*/definition.json`. Current source catalogue: **001–035**.
+Sketches are data-driven from `sketches/*/definition.json`. Current source catalogue: **001–040**.
 
-Current Gallery behavior:
+Gallery behavior:
 
-- real SubViewport thumbnail render per sketch;
-- idle thumbnails freeze; only hovered card animates;
-- persisted sketch parameters restore into thumbnails;
-- first tag defines automatic primary group;
-- search indexes id/index/title/engine/description/all tags;
-- permanent filter rail stays bounded with collapsed rare tags;
-- empty groups disappear and card grids respond to width.
+- real SubViewport thumbnails;
+- idle thumbnails freeze; hovered card animates;
+- persisted sketch parameters restore;
+- search indexes metadata/all tags;
+- adaptive tag rail exposes only a bounded useful subset plus `MORE`;
+- local Trash is reversible and never deletes Git source;
+- review badges reflect persisted explicit ratings.
 
-Do not restore a permanent all-tags wall.
+## Review / preference feedback
 
-## Review / preference feedback loop
+Compact row:
 
-Parameter sidebar contains `REVIEW <avg> RATE TRASH`.
+`REVIEW <avg> RATE TRASH`
 
-RATE is a centered **in-app opaque modal**, not a native popup. Reviews persist in `user://creative_lab_reviews.cfg`; rated cards display `R x.x`.
+RATE is an opaque centered in-app modal with six 1–5 axes:
 
-Telemetry:
+- visual
+- interaction
+- originality
+- aliveness
+- controls
+- performance
 
-- `sketch_review_changed` — individual edits;
-- `creative_preference_snapshot` — consolidated reviewed set + axis averages.
+Reviews persist in `user://creative_lab_reviews.cfg`.
+Telemetry publishes individual changes plus consolidated `creative_preference_snapshot`.
 
-Explicit ratings are bounded creative evidence, not clone instructions. If telemetry is empty/stale, never invent ratings. Direct qualitative host feedback should be recorded as qualitative evidence.
+Recovered 21-review evidence strongly rejects 026–030; 031–035 are qualitatively weak according to the host. Ratings bias future exploration but never dictate it; 24% of adaptive draws remain preference-free.
 
-The host explicitly rejected 026–030 as globally visually weak. Their technical diversity is not evidence of successful art direction.
+## Visual Finish Gate
 
-## Local Trash / curation
+Technical diversity is not a quality guarantee. Read:
 
-`TRASH` hides a sketch locally from the Gallery. State lives in `user://creative_lab_curation.cfg`.
+`knowledge/cross-domain/VISUAL_FINISH_GATE.md`
 
-RESTORE is supported; expiration/PURGE means local retirement only. The workstation never deletes version-controlled `res://sketches/...` files.
+Required creative pipeline:
+
+`adaptive draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
+
+Since sketch 036, repository CI requires `definition.json.visual_finish` with:
+
+- `composition`
+- `material_model`
+- `final_render`
+- at least three `detail_scales`
+- `interaction_stateful=true`
+
+This is deliberately a process contract, not an automated beauty score.
+
+## Current batch 036–040
+
+- 036 POLAR STRESS — analytic photoelastic stress field / birefringent full-res material.
+- 037 DENDRITE BLOOM — hidden phase/nutrient crystal solver -> full-res faceted mineral material.
+- 038 ELECTRIC LACE — antialiased vector electrostatic field-line integration around stateful charges.
+- 039 SOAP CONSTELLATION — pressure-coupled foam cells -> full-res thin-film interference material.
+- 040 SCHLIEREN VEIL — hidden density/heat/velocity field -> full-res schlieren gradient optics.
+
+Each has 8–9 meaningful controls and stateful interaction. Implemented creative signatures are recorded in `knowledge/cross-domain/creative_draw_space.json`.
 
 ## Full-canvas render contract
 
-Logical design coordinates are normally `1280×720`, but physical render surfaces follow real PREVIEW/PROGRAM size.
+Logical artwork coordinates remain normally 1280×720. Physical PREVIEW/PROGRAM surfaces adapt to their actual viewport.
 
-Any node named `ShaderSurface` must use `res://sketches/_shared/full_canvas_surface.gd`. CI rejects fixed 1280×720 ShaderSurface offsets. Host publishes `sketch_surface_contract` telemetry.
+A node named `ShaderSurface` must use:
 
-Drawing-based sketches use the logical-to-surface transform from `design_sketch_base.gd`; any margin/background must be intentional artwork, never host gray.
+`res://sketches/_shared/full_canvas_surface.gd`
 
-## Visual-finish contract
+CI rejects fixed 1280×720 ShaderSurface offsets.
 
-Substantial creative work must read and satisfy `knowledge/cross-domain/VISUAL_FINISH_GATE.md`.
-
-Technical novelty or signature distance is not enough. A kept work should provide:
-
-- a strong frozen frame before motion is considered;
-- authored composition, hierarchy and negative space;
-- persistent visual identity anchors;
-- several meaningful detail scales where appropriate;
-- final PROGRAM imagery that reads as high-resolution rather than an enlarged coarse solver;
-- material/light logic coherent with the claimed carrier;
-- no visible phase wrap, reset, respawn wall or synchronized restart;
-- interaction entering state/material logic rather than overlaying a generic cursor effect.
-
-A low-resolution solver may exist as hidden state, but the final renderer must reconstruct a convincing high-resolution surface/geometry/field.
+Low-resolution simulation grids are allowed as hidden state only. The final visible image must reconstruct appropriate high-resolution geometry/material/detail; do not expose enlarged nearest-neighbour solver pixels as finished art.
 
 ## Temporal-quality contract
 
@@ -125,9 +138,9 @@ Rejected by default:
 
 `time -> sin/cos -> visible position/scale/alpha/warp`
 
-Periodic forcing is valid when it is actually the mechanism, but its state must remain visually continuous. FARADAY QUASI's old wrapped forcing phase multiplied by fractional shader coefficients is the canonical example of a physically-motivated oscillator still failing the visual contract.
+Also reject visible phase wraps, global resets, respawn walls and synchronized restarts. Physical periodic forcing is allowed only when the visible representation stays continuous.
 
-`scripts/ci/audit_temporal_motion.py` audits the corpus. Existing <=025 findings are warnings; for 026+ direct clock trigonometry requires nearby `TEMPORAL_INTENT:` justification.
+`scripts/ci/audit_temporal_motion.py` audits the corpus. For 026+, direct clock trig requires `TEMPORAL_INTENT:`.
 
 ## Adaptive creative draw
 
@@ -136,53 +149,21 @@ Files:
 - `knowledge/cross-domain/creative_draw_space.json`
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 - `scripts/creative/draw_recipe.py`
-- `knowledge/cross-domain/VISUAL_FINISH_GATE.md`
 
-The draw selects carrier, distant representation/operator families, temporal model, interaction consequence, design constraint and render path. Historical/recent reuse is penalized. Explicit REVIEW data applies only bounded preference bias; 24% of draws deliberately ignore preference bias.
+The engine selects distant carriers/representations/operators/temporal models/interactions/constraints/render paths and penalizes recent repetition. Explicit REVIEW data is only bounded probability evidence. It is a collision generator, not an art director.
 
-The draw is only a collision generator. Required pipeline:
+## Performance representation
 
-`draw -> prototype -> observe -> interpret -> mutate -> art-direct -> visual-finish gate -> keep/reject`
-
-For 026+, `definition.json` includes non-empty `creative_signature`. Record the implemented/mutated signature, not a discarded raw draw.
-
-## Creative batches
-
-026–030 remain in source/history but are **creatively rejected by host**.
-
-Current high-fidelity batch 031–035 deliberately spans different final render representations:
-
-- **031 FOLD CHAMBER** — Delaunay vector relief + constrained spring surface + facet shading.
-- **032 LUMEN SWARM** — MultiMesh luminous streak field + spatial advection + inertial source.
-- **033 OBSIDIAN CATHEDRAL** — full-resolution SDF raymarch architecture with AO/material response and persistent fracture state.
-- **034 PHOSPHOR SAND** — hidden 128×72 memory field driving a full-resolution reconstructed material surface.
-- **035 DUNE CHOIR** — damped 2D wave PDE rendered as dense perspective antialiased vector topography.
-
-Their code batch passed repository policy + Godot 4.7.1 import/smoke before subsequent documentation commits. Final completion still requires CI on the exact final HEAD.
-
-## FARADAY QUASI correction
-
-025 no longer exposes wrapped forcing phase to the shader. Visual modal phases remain continuous, and pointer input modifies modal state rather than adding a click-local height bump. This correction is repository-validated but still needs Windows host visual validation.
-
-## Parameters / persistence
-
-Sketch parameter values persist in `user://creative_lab_sketch_settings.cfg`. Substantial labs normally expose 6–9 meaningful independent controls when the mechanism supports them.
-
-## PREVIEW / PROGRAM synchronization
-
-When PREVIEW and PROGRAM are linked, editor sketch is simulation authority and PROGRAM follows synchronized state. On navigation/detach, final state synchronizes and PROGRAM continues autonomously. Do not create unrelated linked timelines.
-
-## Physical output / input
-
-PROGRAM uses the established output path on the selected display. A historical cross-window texture-sampling path produced gray output and must not be casually restored.
-
-Touch/mouse on PROGRAM is forwarded into the same logical design space used by PREVIEW.
+- dense fields: simulate at an appropriate cadence, render via texture/fullscreen material when suitable;
+- expensive neighbour/contact work belongs in simulation, not duplicated in `_draw()`;
+- vector geometry is preferred when it preserves useful line/facet resolution;
+- MultiMesh/GPU paths remain available for large populations;
+- performance is part of visual quality, but high FPS alone never compensates for weak art direction.
 
 ## Telemetry
 
-Local runtime telemetry: `res://.telemetry_runtime/`.
-
-Sanitized online telemetry:
+Local runtime telemetry lives under `res://.telemetry_runtime/`.
+Sanitized remote telemetry:
 
 ```text
 branch: telemetry/runtime
@@ -190,13 +171,23 @@ latest.jsonl
 sessions/
 ```
 
-Publication is asynchronous and must never block UI. A publisher PID is not proof upload succeeded.
+Publishing must never block the UI. Revision 3 close handling flushes and releases the active telemetry file before spawning the final hidden PowerShell publisher, fixing the previous empty-close race in principle. Host validation still required.
 
-The latest failed host pass exposed a close-path publication bug where an empty final payload replaced `latest.jsonl`. The close path now flushes and starts one final publisher before quitting. This fix requires host validation; next session must require a non-empty matching telemetry session before trusting new ratings.
+After any host test, inspect matching telemetry before asking for logs or drawing conclusions.
 
-## Knowledge / research
+## FARADAY continuity rule
 
-For substantial work consult relevant creative-coding/design material plus:
+FARADAY QUASI established an important failure case: a physically periodic state can still render badly if a wrapped phase is transformed with non-integer coefficients. Current 025 keeps forcing phase internal and visual modal phases continuous. Treat any visible seam/cut as a blocker.
+
+## PREVIEW / PROGRAM synchronization
+
+When linked, editor PREVIEW is simulation authority and PROGRAM follows synchronized state. On navigation/detach, final state syncs and PROGRAM continues autonomously. Never create unrelated linked timelines.
+
+PROGRAM touch/mouse maps through the same logical design space as PREVIEW.
+
+## Knowledge references
+
+For substantial work consult relevant sections of:
 
 - `TECHNIQUE_PALETTE.md`
 - `RANDOM_COLLISION_ENGINE.md`
@@ -208,8 +199,8 @@ For substantial work consult relevant creative-coding/design material plus:
 - `ADAPTIVE_CREATIVE_DRAW.md`
 - `VISUAL_FINISH_GATE.md`
 
-References provide mechanisms/principles, not surfaces to copy.
+References supply mechanisms and constraints, never surfaces to copy.
 
 ## Optional future outputs
 
-Spout and NDI remain future adapters and must not be represented as working.
+Spout and NDI remain future adapters and must never be represented as already working.
