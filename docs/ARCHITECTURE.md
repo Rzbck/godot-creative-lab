@@ -10,11 +10,11 @@ This document describes the current runtime model, not the original scaffold pla
 
 DC//LAB separates three responsibilities:
 
-1. **WORKSTATION / EDITOR** — Gallery, Settings, PREVIEW, parameter controls, navigation.
-2. **PROGRAM / LIVE OUT** — the physical audience-facing output on a selected display.
+1. **WORKSTATION / EDITOR** — Gallery, Settings, PREVIEW, parameter controls, reviews, curation and navigation.
+2. **PROGRAM / LIVE OUT** — audience-facing output on a selected physical display.
 3. **SKETCH** — isolated creative runtime with parameters and optional live-state synchronization contract.
 
-The key rule is that navigation in the workstation is not PROGRAM transport.
+Navigation is not PROGRAM transport.
 
 ```text
 Gallery / Settings / PREVIEW
@@ -27,45 +27,44 @@ Gallery / Settings / PREVIEW
 selected physical display
 ```
 
-PROGRAM can keep running while the workstation browses the Gallery or edits a different project.
+PROGRAM can keep running while the workstation browses the Gallery or edits another project.
 
 ## Files / ownership
 
 ```text
 app/                     application UI + runtime host
 sketches/                isolated creative works
-shared/                  genuinely reusable project resources
-knowledge/               external research memory / design references / cross-domain idea system
+shared/                  reusable project resources
+knowledge/               research / design / cross-domain system
 scripts/                 validation and telemetry publishing utilities
 .telemetry_runtime/      local runtime telemetry (ignored)
 ```
 
-Each sketch owns its scene/scripts/resources under `sketches/<id>/` and provides `definition.json` metadata.
+Each sketch owns scene/scripts/resources under `sketches/<id>/` and provides `definition.json` metadata.
 
 ## Main runtime
 
-Godot entry scene:
+Entry scene:
 
 `res://app/main/main_runtime.tscn`
 
 Current top runtime script:
 
-`res://app/main/main_runtime_gallery_adaptive_filters.gd`
+`res://app/main/main_runtime_gallery_feedback_trash.gd`
 
-It extends the implemented runtime layers beneath it. Important current layers include:
+Important chain:
 
 ```text
-main_runtime_gallery_adaptive_filters.gd
-    -> main_runtime_gallery_organizer.gd
-        -> main_runtime_program_output.gd
-            -> main_runtime_gallery_persistence.gd
-                -> main_runtime_live_output.gd
-                    -> lower output/window/telemetry layers
+main_runtime_gallery_feedback_trash.gd
+    -> main_runtime_gallery_adaptive_filters.gd
+        -> main_runtime_gallery_organizer.gd
+            -> main_runtime_program_output.gd
+                -> main_runtime_gallery_persistence.gd
+                    -> main_runtime_live_output.gd
+                        -> lower output/window/telemetry layers
 ```
 
-Always follow the actual `extends` chain in Git before editing. Several historical layers exist because window/output behavior was iteratively debugged on the real Windows/Godot host.
-
-Do not refactor the chain merely for aesthetic cleanliness while live behavior is stable unless the task explicitly calls for consolidation and includes regression testing.
+Always inspect the actual `extends` chain before changing host architecture. Do not refactor working output/window layers merely for cleanliness without real host regression testing.
 
 ## Gallery architecture
 
@@ -73,87 +72,134 @@ Sketches are discovered from `sketches/*/definition.json`.
 
 Current Gallery behavior:
 
-- builds a real `SubViewport` render for each thumbnail;
-- freezes thumbnails when idle;
-- animates only the hovered card;
-- restores persisted sketch parameters into thumbnails;
-- groups cards automatically using the first tag as primary family;
-- searches id/index/title/engine/description/**all tags**;
-- uses an adaptive generated tag rail instead of rendering every tag permanently;
-- keeps `ALL` plus at most six automatically selected discriminating tags visible by default;
-- omits universal tags from filter UI when they would not narrow the Gallery;
-- keeps rare/remaining tags inside a collapsed `MORE` drawer;
-- promotes a selected rare tag into the compact rail while it is active;
-- hides empty groups after filtering;
-- keeps group card grids responsive to available width.
+- real `SubViewport` thumbnail render per sketch;
+- idle thumbnails freeze; only hovered card animates;
+- persisted sketch parameters restore into thumbnails;
+- first tag defines automatic primary group;
+- search indexes id/index/title/engine/description/**all tags**;
+- adaptive tag rail keeps `ALL` plus at most six useful generated quick tags;
+- universal tags are omitted when they filter nothing;
+- rare/remaining tags live in collapsed `MORE`;
+- active rare tag is promoted while selected;
+- empty groups disappear;
+- card grids respond to available width.
 
-The adaptive rail is derived only from catalogue metadata/statistics; it does not require per-sketch hard-coded UI edits. Search remains the complete escape hatch, so hiding a tag from the permanent rail never makes it undiscoverable.
+The tag rail is statistical/presentational, not a second manually curated taxonomy. Rich metadata may continue to grow without creating a permanent tag wall.
 
-The Gallery must scale to many sketches without hard-coded per-project UI changes or a tag wall that grows linearly with the catalogue.
+## User review / creative-feedback loop
 
-## Sketch contract
+Every opened sketch receives a workstation-side `REVIEW` block after its creative parameters.
 
-A sketch should expose parameter metadata/value access through the established methods used by current sketches.
+Six independent 1–5 criteria are currently stored:
 
-The host builds the inspector from that contract and persists values in:
+- visual;
+- interaction;
+- originality;
+- aliveness;
+- controls;
+- performance.
+
+Reviews persist locally in:
+
+`user://creative_lab_reviews.cfg`
+
+Rated Gallery cards display a compact aggregate badge (`R x.x`). Changes emit sanitized numeric `sketch_review_changed` telemetry including the criterion scores and average. Future AI sessions should treat these explicit host ratings as first-class creative evidence when deciding what to improve, mutate, repeat or avoid.
+
+Review data does not modify sketch source files.
+
+## Local trash / curation
+
+The workstation can hide a sketch from the local Gallery through `MOVE TO TRASH`.
+
+State persists in:
+
+`user://creative_lab_curation.cfg`
+
+Behavior:
+
+- trashed sketch disappears from normal catalogue immediately;
+- Gallery shows `TRASH n` only when trash is non-empty;
+- drawer supports `RESTORE`;
+- retention can be 7 / 14 / 30 days (default 30);
+- expired items move to local `retired` state;
+- `PURGE` also moves the item to local retired state immediately.
+
+Important safety boundary: workstation trash/purge **does not delete version-controlled `res://sketches/...` source files**. Actual Git deletion remains an explicit repo operation. This keeps accidental artistic deletion reversible at the source-history level and works in packaged/read-only builds.
+
+## Sketch rendering / full-canvas contract
+
+Logical design size is normally `1280×720`, but the real PREVIEW/PROGRAM surface can be any size.
+
+A logical design size is not a fixed render rectangle.
+
+For shader-backed sketches, a node named `ShaderSurface` is a semantic full-canvas surface and must use:
+
+`res://sketches/_shared/full_canvas_surface.gd`
+
+The component follows the actual `SubViewport` size in thumbnails, resizable/maximized PREVIEW, F11 presentation and PROGRAM.
+
+The host additionally scans named `ShaderSurface` controls and applies a runtime sizing fallback. When a sketch opens it emits `sketch_surface_contract` telemetry with viewport size, surface count, minimum coverage and pass/fail.
+
+Repository policy in `scripts/ci/validate_repository.py` fails when a runtime scene contains `ShaderSurface` but:
+
+- does not reference the shared full-canvas component;
+- restores a fixed `offset_right = 1280`;
+- restores a fixed `offset_bottom = 720`;
+- omits a script assignment on the surface.
+
+This guard was added after host validation showed FARADAY QUASI receiving a correct 1520×852 PREVIEW while its own `ColorRect` remained fixed at 1280×720.
+
+Drawing-based Node2D sketches should keep using logical-to-surface transforms from the shared design base. Any aspect-fit margin/background must be intentional artwork, never accidental host gray.
+
+See `docs/SKETCH_CONTRACT.md` for the complete sketch-facing contract.
+
+## Parameters / persistence
+
+A sketch exposes the established parameter schema/value methods. The host generates its inspector and persists creative parameter values in:
 
 `user://creative_lab_sketch_settings.cfg`
 
-For linked PROGRAM output, generative sketches should expose the existing live-sync state contract so the PROGRAM renderer follows the editor simulation rather than running an unrelated second timeline.
-
-Current design sketches use a stable logical design space so different preview/output resolutions do not change composition topology.
+Ratings and curation use their separate workstation-owned config files described above.
 
 ## PREVIEW / PROGRAM behavior
 
 ### Linked state
 
-When the project currently open in PREVIEW is also the project in PROGRAM:
+When the project open in PREVIEW is also in PROGRAM:
 
-- editor instance is the simulation authority;
-- output renderer is a follower;
-- parameters and runtime state are mirrored continuously;
+- editor instance is simulation authority;
+- output renderer follows;
+- parameters/runtime state mirror continuously;
 - workstation remains interactive.
 
 ### Detached state
 
-When the user returns to Gallery or opens a different project:
+When the user returns to Gallery or opens another project:
 
 - PROGRAM is not stopped;
 - final linked state is synchronized;
-- PROGRAM renderer becomes autonomous and continues from that state;
-- the newly opened editor project gets normal realtime preview behavior.
+- PROGRAM becomes autonomous from that state;
+- the new editor project gets normal PREVIEW behavior.
 
 ### TAKE LIVE
 
-If a different project is in PREVIEW while another project is live:
-
-- UI presents `TAKE LIVE`;
-- invoking it replaces PROGRAM with the current PREVIEW project;
-- transport replacement should not require closing the workstation.
-
-This boundary is intentionally suitable for future A/B/C deck or mixing architecture.
+A different PREVIEW project can replace the current PROGRAM using `TAKE LIVE` without closing the workstation.
 
 ## Physical output
 
-User selects output display in Settings.
+PROGRAM runs on a dedicated native output surface for the selected display while workstation UI remains available.
 
-PROGRAM runs on a dedicated native output surface while the workstation remains on its own display.
-
-A previously attempted approach that sampled the editor SubViewport texture into another native Window produced gray output on the validated host. Current live output instead uses an output renderer instance with synchronized state.
-
-Do not replace the working PROGRAM model with workstation fullscreen/window-resize behavior without strong host evidence.
+A historical cross-window texture-sampling approach produced gray output on the validated Windows host. Current live output uses a separate renderer instance synchronized to source state. Do not resurrect the failed texture path casually.
 
 ## Touch / pointer input
 
-Input from the native PROGRAM surface is explicitly forwarded.
-
 Requirements:
 
-- `ScreenTouch` / `ScreenDrag` supported;
-- mouse motion / primary button supported;
-- physical coordinates mapped into the sketch logical design space;
-- while linked, input updates the source/master sketch and then synchronizes to output;
-- while detached, input targets the autonomous PROGRAM sketch even if the workstation is browsing another page/project.
+- `ScreenTouch` / `ScreenDrag`;
+- mouse motion / primary button;
+- physical coordinates mapped into logical design space;
+- linked input updates source/master then syncs to output;
+- detached PROGRAM remains interactable while workstation browses elsewhere.
 
 ## Telemetry architecture
 
@@ -169,60 +215,31 @@ latest.jsonl
 sessions/
 ```
 
-Publication is asynchronous/queued. It must not block the Godot main thread.
+Publication is asynchronous/queued and must never block the UI.
 
-Telemetry captures state needed to debug:
+Telemetry includes window/layout, SubViewport/render state, output display, PREVIEW/PROGRAM linkage, input mapping, resize/navigation, Gallery filter state, review events, trash/restore events and shader-surface coverage diagnostics.
 
-- native/root window modes and geometry;
-- layout sizes/minimum-size overflow;
-- SubViewport/render state;
-- numeric render probes;
-- physical output display;
-- PROGRAM/editor linkage;
-- live-sync counts/state;
-- touch/mouse forwarding;
-- resize/navigation transitions;
-- Gallery filter/tag state including adaptive-rail/drawer diagnostics.
+After a host test, always require telemetry to match the tested HEAD/session before drawing performance conclusions.
 
-## UI / layout
+## UI / layout rules
 
-The workstation uses a custom dark compact application shell.
-
-Important rules:
-
-- app chrome never appears in PROGRAM output;
+- app chrome never appears in PROGRAM;
 - output remains visually clean;
-- runtime resizing must not let preview minimum size explode the application layout;
-- Gallery card overlays/tooltips must not obscure previews;
-- Gallery filtering must remain compact as the catalogue grows;
-- sketch/debug captions are not burned into final creative output unless intentionally part of the artwork.
+- PREVIEW resizing cannot expose unrendered host gray because a sketch surface stayed fixed-size;
+- Gallery overlays/tooltips do not obscure artwork;
+- Gallery filtering remains compact as the catalogue grows;
+- project metadata is never burned into artwork unless intentionally part of the piece.
 
 ## Knowledge / creative research
 
-Before substantial new creative work, consult all relevant layers:
+Consult the relevant layers before substantial creative work:
 
-- `knowledge/creative-coding/` — technical vocabulary: shaders, simulation, feedback, particles, fields, geometry and GPU methods;
-- `knowledge/design/` — typography, layout, grid, hierarchy, color, identity and professional composition rules;
-- `knowledge/cross-domain/` — representation bridges and the mutation/idea engine that turns the two libraries above into original visual systems.
+- `knowledge/creative-coding/`;
+- `knowledge/design/`;
+- `knowledge/cross-domain/`.
 
-For a new artwork, the intended flow is:
-
-```text
-research several independent sources
--> extract principles / carriers / representations
--> build genuine cross-domain bridges
--> mutate the first coherent combination
--> define persistent identity rules and constraints
--> choose the cheapest Godot-native representation that preserves the concept
--> implement within the sketch/PREVIEW/PROGRAM contract
-```
-
-The goal is not to reproduce the surface appearance of a reference or stack generic effects. The cross-domain layer should make the research library generative: typography can become geometry/SDF/data, grids can become coordinate systems, interaction can become forces, simulations can become graphic language, and feedback can become temporal memory.
-
-The library stores links/summaries/tags and project notes by default, not copied third-party source code.
+Current exploration often uses collision-first research, physical/chemical causal systems, organic coupling and explicit realtime performance budgets. References provide principles and mechanisms, not looks to copy.
 
 ## Optional future outputs
 
-Spout and NDI remain future adapters.
-
-They are not implemented and must not be represented as working.
+Spout and NDI remain future adapters. They are not implemented and must not be represented as working.
