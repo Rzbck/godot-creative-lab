@@ -107,6 +107,8 @@
     "selected_rare_tag_promoted_while_active": true,
     "search_indexes_all_tags": true,
     "primary_group_source": "first_definition_tag",
+    "runtime_ci_run": 233,
+    "runtime_ci_passed": true,
     "host_state": "IMPLEMENTED_NOT_VALIDATED"
   },
   "telemetry": {
