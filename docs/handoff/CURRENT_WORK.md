@@ -20,6 +20,27 @@ Last refreshed: 2026-09-25.
 - Async sanitized telemetry on `telemetry/runtime`.
 - logical artwork canvas `1280×720`, artwork-only: no title/index/tag/debug chrome unless artistically intentional.
 
+## Gallery filtering — adaptive tag rail
+
+Host feedback on the 25-sketch Gallery: rendering every metadata tag as a permanent button already creates a dense multi-row wall and will not scale as the catalogue grows.
+
+Implemented replacement:
+
+- top runtime layer is now `app/main/main_runtime_gallery_adaptive_filters.gd`;
+- `ALL` is always visible;
+- at most **6 quick tags** are visible by default;
+- quick tags are generated from catalogue frequencies and favor tags that are repeated enough to be useful while still discriminating;
+- tags present on the whole catalogue are omitted from filter UI because they cannot narrow results;
+- singleton/rare/remaining tags live in a collapsed `MORE` drawer;
+- selecting a rare tag promotes it into the compact rail while active, then closes the drawer;
+- all tags remain fully indexed by Gallery search;
+- no per-sketch hard-coded UI taxonomy is required;
+- primary groups still derive from the first `definition.json` tag.
+
+This is deliberately a statistical/adaptive presentation layer, not a second manually curated taxonomy. The catalogue may keep rich tags without making the permanent toolbar grow linearly.
+
+Runtime adaptive-filter commit chain culminated in `5429fcac...`; CI #233 passed repository policy, Godot 4.7.1 import, smoke and cleanliness for that runtime state.
+
 ## Historical constraints
 
 001–010 remain the earlier body of work. `005_pressure_lattice` visibly remains **REGISTER TYPE**; never restore rejected Pressure Lattice. The generalized glyph-contour pass `6c20a094...` was host-rejected and must not be restored as a default representation.
@@ -28,22 +49,22 @@ Last refreshed: 2026-09-25.
 
 016–020 improved substantially: 8–9 controls, stronger local coupling and more autonomous behavior. Host feedback on 2026-09-25: **clearly better and starting to become interesting**, but still missing real-world material/physical richness and some sketches appeared to fall below the user's very high smooth FPS baseline.
 
-## Telemetry status for the latest host feedback
+## Telemetry status for latest performance feedback
 
 Telemetry-first check was performed before changing runtime.
 
-Remote `telemetry/runtime` is stale for the 016–020 host test:
+Remote `telemetry/runtime` was stale for the 016–020 host test:
 
-- latest telemetry commit: `82114646068521140f1727b7d323803f7de51e58`;
-- latest published session still reports runtime head `6dd4b307...` and 15 Gallery previews (011–015 era);
-- therefore **do not attribute exact FPS numbers to individual 016–020 sketches from telemetry**.
+- latest telemetry commit observed then: `82114646068521140f1727b7d323803f7de51e58`;
+- latest published session still reported runtime head `6dd4b307...` and 15 Gallery previews (011–015 era);
+- therefore **do not attribute exact FPS numbers to individual 016–020 sketches from that telemetry**.
 
 The user nevertheless observed some sketches dropping below roughly 330 FPS on their host. Code audit found clear structural hotspots independent of missing telemetry:
 
 - 017 could draw roughly 2304 CanvasItem cell primitives every render frame;
 - 020 could draw roughly 2880 cell primitives and recomputed neighbour statistics again during `_draw()`.
 
-Corrections now implemented:
+Corrections implemented:
 
 - 017 dense field -> low-resolution `ImageTexture` refreshed only on simulation steps + one texture draw; sparse spores remain geometry;
 - 020 dense field -> low-resolution `ImageTexture`, neighbour density cached during simulation, no second neighbour scan during draw;
@@ -71,7 +92,7 @@ New physical-condition interaction vocabulary includes concentration, temperatur
 
 Rule: preserve at least one genuine causal relationship/threshold from a scientific phenomenon; do not merely copy the surface look.
 
-## New batch 021–025 — physical / chemical collision labs
+## Batch 021–025 — physical / chemical collision labs
 
 Blind draw seed: `202609250742`.
 
@@ -161,6 +182,17 @@ For current creative work read:
 
 Expected Gallery count: **25 sketches**.
 
+First inspect the new adaptive filtering behavior:
+
+1. default Gallery should show only `ALL`, at most six useful quick tags, and `MORE` if rare filters exist;
+2. `INTERACTIVE` or any other 25/25 universal tag should not occupy the rail;
+3. opening `MORE` should reveal remaining filters without permanently bloating the layout;
+4. selecting a rare filter should close the drawer and promote that active filter into the main rail;
+5. search must still match hidden/rare tags;
+6. resize should not recreate the old multi-row permanent tag wall.
+
+Then continue the current artwork/performance test:
+
 1. Open 017 and 020 first and compare smoothness to the previous build.
 2. Watch 021–025 for 20–30 seconds at defaults before touching controls.
 3. Interact once, release, and watch delayed physical/chemical consequences.
@@ -169,11 +201,12 @@ Expected Gallery count: **25 sketches**.
 6. Close normally so telemetry can publish.
 7. Immediately inspect fresh `telemetry/runtime`; require matching tested HEAD/session before attributing exact FPS.
 
-Evaluation now has three axes:
+Evaluation now has four axes:
 
 - **mechanism** — does state really negotiate/propagate internally?
 - **art direction** — is the default image already compelling?
 - **performance architecture** — is the representation appropriate for realtime Gallery/PREVIEW/PROGRAM use?
+- **catalogue UX** — does discovery remain compact and understandable as tags/sketches multiply?
 
 ## Mandatory AI operational completion
 
@@ -181,4 +214,4 @@ After every material repository change, every AI must automatically finish commi
 
 ## Non-regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, move the workstation as normal output, block UI with telemetry Git work, resurrect failed cross-window texture sampling, add card-covering overlays, fake Spout/NDI, restore Pressure Lattice, reintroduce artwork metadata captions, or make glyph contours the default representation.
+Do not stop PROGRAM on navigation, create independent linked timelines, move the workstation as normal output, block UI with telemetry Git work, resurrect failed cross-window texture sampling, add card-covering overlays, fake Spout/NDI, restore Pressure Lattice, reintroduce artwork metadata captions, make glyph contours the default representation, or reintroduce a permanently expanded all-tags wall in the Gallery.
