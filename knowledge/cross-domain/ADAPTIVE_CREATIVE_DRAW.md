@@ -4,7 +4,7 @@
 
 DC//LAB should get better at proposing new creative systems as the user rates work, without converging into copies of whatever scored highest last week.
 
-The draw engine therefore optimizes two things at once:
+The draw engine optimizes two things at once:
 
 1. **diversity / technical distance** — avoid repeatedly selecting the same representations, render paths and temporal models;
 2. **explicit preference evidence** — gently bias choices using workstation REVIEW scores when available.
@@ -16,6 +16,7 @@ Preference is a bias, never a deterministic recommendation engine.
 - draw space + recent history: `knowledge/cross-domain/creative_draw_space.json`
 - executable draw: `scripts/creative/draw_recipe.py`
 - temporal quality rules: `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
+- visual finish rules: `knowledge/cross-domain/VISUAL_FINISH_GATE.md`
 - explicit rating snapshot: telemetry event `creative_preference_snapshot`
 
 ## Recipe shape
@@ -32,11 +33,27 @@ A draw selects:
 
 The output is a candidate `creative_signature` plus the random seed.
 
-This signature is a **starting constraint**, not a finished artwork. The normal collision-first pipeline still follows:
+This signature is a **starting collision**, not a finished artwork. The required pipeline is now:
 
-`draw -> coupled prototype -> observe -> interpret -> art-direct -> mutate`
+`draw -> prototype -> observe -> interpret -> mutate -> art-direct -> VISUAL_FINISH_GATE -> keep/reject`
 
-Do not implement the raw draw literally if the coupling is weak.
+Do not implement the raw draw literally if the coupling is weak, and do not keep a technically diverse prototype just because it is novel.
+
+## Visual-finish correction after 026–030
+
+The host explicitly rejected the 026–030 batch as globally weak even though it satisfied the adaptive diversity contract. That is durable evidence that **signature diversity is not visual quality**.
+
+Every future kept work must also pass `VISUAL_FINISH_GATE.md`:
+
+- strong frozen frame;
+- authored composition and negative space;
+- full-screen detail rather than visibly enlarged coarse simulation pixels;
+- multiple meaningful detail scales;
+- material/light logic appropriate to the carrier;
+- no visible cuts/resets/phase-wrap seams;
+- interaction must enter state/material logic rather than overlay a cursor effect.
+
+A low-resolution solver may remain hidden behind a high-resolution visible render. It must not become the final image simply because it is convenient.
 
 ## Anti-repetition weighting
 
@@ -60,7 +77,9 @@ When a snapshot is passed to the draw engine, ratings are correlated only with *
 
 The influence is deliberately bounded. Current implementation limits feature-level rating influence to roughly ±24% before diversity penalties.
 
-This means a strong rating for ECHO TISSUE can teach the system that delayed feedback / cellular state exchange worked well without turning every future sketch into ECHO TISSUE.
+A strong rating may teach the system that a mechanism worked; it must never turn every future sketch into a clone.
+
+If telemetry is missing or stale, do not invent numeric review values. Direct qualitative host feedback remains valid evidence, but it should be recorded as such rather than fabricated into scores.
 
 ## Exploration share
 
@@ -70,22 +89,17 @@ This is essential. If every future choice exploited existing ratings, the catalo
 
 ## Temporal guard
 
-`forced_oscillator` remains available because periodic forcing can be conceptually/physically valid, but it carries an additional base penalty. It should be selected less often than non-periodic state models unless history/diversity makes it genuinely useful.
+`forced_oscillator` remains available because periodic forcing can be physically valid, but it carries an additional base penalty.
 
-The temporal CI audit separately rejects unexplained direct clock trigonometry for new sketches.
+The temporal CI audit separately rejects unexplained direct clock trigonometry for new sketches. A physically valid oscillator can still fail the finish gate if wrapped state produces a visible discontinuity. FARADAY QUASI's old wrapped forcing phase multiplied by fractional shader coefficients is the canonical failure.
 
 ## Recording history
 
 Do not record every candidate draw. Record a signature only when a sketch is actually implemented/kept.
 
-For sketch index 026+, `definition.json` must include a non-empty `creative_signature`. This gives future sessions machine-readable provenance for:
+For sketch index 026+, `definition.json` must include a non-empty `creative_signature`. This gives future sessions machine-readable provenance for anti-repetition, ratings correlation, batch-distance checking and technique usage analysis.
 
-- anti-repetition;
-- ratings correlation;
-- batch distance checking;
-- technique usage analysis.
-
-When a future sketch is added, update the draw-space history (or its future generated equivalent) with the implemented signature.
+When a future sketch is added, update the draw-space history with the implemented/mutated signature, not the raw discarded draw.
 
 ## Commands
 
@@ -117,4 +131,4 @@ Do not:
 - use inferred taste when explicit structured ratings exist;
 - optimize only the aggregate average while ignoring which axis failed.
 
-For art direction, inspect the individual axes. A sketch with high originality but weak interaction suggests a different intervention from a sketch with strong interaction but weak visual composition.
+For art direction, inspect individual axes plus direct qualitative host critique. A sketch with high originality but weak interaction needs a different intervention from a sketch with strong interaction but weak visual composition.
