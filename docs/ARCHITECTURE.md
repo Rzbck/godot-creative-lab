@@ -48,18 +48,19 @@ Godot entry scene:
 
 `res://app/main/main_runtime.tscn`
 
-At the time of this handoff the top runtime script is:
+Current top runtime script:
 
-`res://app/main/main_runtime_gallery_organizer.gd`
+`res://app/main/main_runtime_gallery_adaptive_filters.gd`
 
 It extends the implemented runtime layers beneath it. Important current layers include:
 
 ```text
-main_runtime_gallery_organizer.gd
-    -> main_runtime_program_output.gd
-        -> main_runtime_gallery_persistence.gd
-            -> main_runtime_live_output.gd
-                -> lower output/window/telemetry layers
+main_runtime_gallery_adaptive_filters.gd
+    -> main_runtime_gallery_organizer.gd
+        -> main_runtime_program_output.gd
+            -> main_runtime_gallery_persistence.gd
+                -> main_runtime_live_output.gd
+                    -> lower output/window/telemetry layers
 ```
 
 Always follow the actual `extends` chain in Git before editing. Several historical layers exist because window/output behavior was iteratively debugged on the real Windows/Godot host.
@@ -77,12 +78,18 @@ Current Gallery behavior:
 - animates only the hovered card;
 - restores persisted sketch parameters into thumbnails;
 - groups cards automatically using the first tag as primary family;
-- exposes all tags as generated filters;
-- searches id/index/title/engine/description/tags;
+- searches id/index/title/engine/description/**all tags**;
+- uses an adaptive generated tag rail instead of rendering every tag permanently;
+- keeps `ALL` plus at most six automatically selected discriminating tags visible by default;
+- omits universal tags from filter UI when they would not narrow the Gallery;
+- keeps rare/remaining tags inside a collapsed `MORE` drawer;
+- promotes a selected rare tag into the compact rail while it is active;
 - hides empty groups after filtering;
 - keeps group card grids responsive to available width.
 
-The Gallery must scale to many sketches without hard-coded per-project UI changes.
+The adaptive rail is derived only from catalogue metadata/statistics; it does not require per-sketch hard-coded UI edits. Search remains the complete escape hatch, so hiding a tag from the permanent rail never makes it undiscoverable.
+
+The Gallery must scale to many sketches without hard-coded per-project UI changes or a tag wall that grows linearly with the catalogue.
 
 ## Sketch contract
 
@@ -174,7 +181,8 @@ Telemetry captures state needed to debug:
 - PROGRAM/editor linkage;
 - live-sync counts/state;
 - touch/mouse forwarding;
-- resize/navigation transitions.
+- resize/navigation transitions;
+- Gallery filter/tag state including adaptive-rail/drawer diagnostics.
 
 ## UI / layout
 
@@ -186,6 +194,7 @@ Important rules:
 - output remains visually clean;
 - runtime resizing must not let preview minimum size explode the application layout;
 - Gallery card overlays/tooltips must not obscure previews;
+- Gallery filtering must remain compact as the catalogue grows;
 - sketch/debug captions are not burned into final creative output unless intentionally part of the artwork.
 
 ## Knowledge / creative research
@@ -217,17 +226,3 @@ The library stores links/summaries/tags and project notes by default, not copied
 Spout and NDI remain future adapters.
 
 They are not implemented and must not be represented as working.
-
-Any future native integration must document source/version/license and preserve a clean fallback when unavailable.
-
-## Validation
-
-Runtime changes require:
-
-- repository policy;
-- Godot 4.7.1 headless import;
-- main-scene smoke test;
-- tracked-file cleanliness after import;
-- host validation when behavior depends on Windows/display/touch/runtime presentation.
-
-CI: `.github/workflows/ci.yml`
