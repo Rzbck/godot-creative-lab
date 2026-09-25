@@ -1,18 +1,22 @@
 extends "res://app/main/main_runtime_gallery_compact_review.gd"
 
 # Persist the workstation's native window state and restore it before the first
-# rendered frame. The root window stays hidden while mode/screen/rect are applied,
-# avoiding the visible 1280x720 -> fullscreen jump seen in host telemetry.
+# rendered frame. Revision 2 also stops treating the custom maximize control as
+# a real fullscreen transition on Windows: an expanded workstation remains a
+# borderless WINDOWED client that fills the usable display with a 2 px guard.
+# F11/PROGRAM presentation stays completely separate.
 
-const WINDOW_MEMORY_REVISION: int = 1
+const WINDOW_MEMORY_REVISION: int = 2
 const WINDOW_STATE_PATH: String = "user://creative_lab_window_state.cfg"
 const WINDOW_STATE_SECTION: String = "window"
 const WINDOW_STATE_SETTLE_SECONDS: float = 0.45
+const WINDOW_EXPANDED_GUARD_PX: int = 2
 
 var _startup_window_restore_active: bool = true
 var _window_state_candidate_key: String = ""
 var _window_state_candidate_age: float = 0.0
 var _window_state_saved_key: String = ""
+var _workstation_expanded: bool = false
 
 
 func _enter_tree() -> void:
@@ -30,9 +34,8 @@ func _ready() -> void:
     call_deferred("_finish_startup_window_restore")
 
 
-# main_runtime_gallery_compact_review calls this during _ready(). Window memory
-# has already applied the saved state in _enter_tree(), so the legacy forced
-# fullscreen startup must not overwrite a previously saved windowed/maximized state.
+# The saved native state is already applied in _enter_tree(). Do not let the
+# legacy startup layer overwrite it with a later fullscreen request.
 func _enter_startup_workstation_fullscreen() -> void:
     pass
 
@@ -82,6 +85,8 @@ func _finish_startup_window_restore() -> void:
 
     _telemetry_event("workstation_window_state_restored", {
         "window_memory_revision": WINDOW_MEMORY_REVISION,
+        "logical_mode": str(state.get("mode", "windowed")),
+        "expanded_windowed": _workstation_expanded,
         "state": state,
         "visible_after_restore": root_window.visible,
     })
@@ -90,7 +95,7 @@ func _finish_startup_window_restore() -> void:
 func _load_saved_window_state() -> Dictionary:
     var current_screen := DisplayServer.window_get_current_screen()
     var fallback := {
-        "mode": "fullscreen",
+        "mode": "maximized",
         "screen": current_screen,
         "position": [DisplayServer.window_get_position().x, DisplayServer.window_get_position().y],
         "size": [DisplayServer.window_get_size().x, DisplayServer.window_get_size().y],
@@ -103,10 +108,19 @@ func _load_saved_window_state() -> Dictionary:
     if config.load(WINDOW_STATE_PATH) != OK:
         return fallback
 
+    var revision := int(config.get_value(WINDOW_STATE_SECTION, "revision", 1))
     var state_variant: Variant = config.get_value(WINDOW_STATE_SECTION, "state", fallback)
-    if state_variant is Dictionary:
-        return (state_variant as Dictionary).duplicate(true)
-    return fallback
+    if not state_variant is Dictionary:
+        return fallback
+
+    var state := (state_variant as Dictionary).duplicate(true)
+    # Revision 1 had no dedicated workstation-fullscreen control: its saved
+    # "fullscreen" state came from the custom maximize button. Migrate that
+    # state to the stable borderless expanded window instead of resurrecting the
+    # Windows fullscreen/maximize ambiguity seen in host telemetry.
+    if revision < WINDOW_MEMORY_REVISION and str(state.get("mode", "")) == "fullscreen":
+        state["mode"] = "maximized"
+    return state
 
 
 func _apply_saved_window_state(state: Dictionary) -> void:
@@ -120,7 +134,7 @@ func _apply_saved_window_state(state: Dictionary) -> void:
     _restore_size = Vector2i(maxi(MIN_WINDOW_SIZE.x, restore_size.x), maxi(MIN_WINDOW_SIZE.y, restore_size.y))
     _has_restore_rect = bool(state.get("has_restore_rect", false))
 
-    var mode_name := str(state.get("mode", "fullscreen"))
+    var mode_name := str(state.get("mode", "maximized"))
     var position := _array_to_vec2i(state.get("position", []), DisplayServer.window_get_position())
     var size := _array_to_vec2i(state.get("size", []), DisplayServer.window_get_size())
     size.x = maxi(MIN_WINDOW_SIZE.x, size.x)
@@ -128,26 +142,94 @@ func _apply_saved_window_state(state: Dictionary) -> void:
 
     DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
     DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
+    get_window().unresizable = false
+    _workstation_expanded = false
 
     match mode_name:
         "windowed":
             DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
             DisplayServer.window_set_size(size)
             DisplayServer.window_set_position(position)
-        "maximized":
-            DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-            if _has_restore_rect:
-                DisplayServer.window_set_size(_restore_size)
-                DisplayServer.window_set_position(_restore_position)
-            DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
-        _:
+        "fullscreen":
+            # Kept for forward compatibility if a future explicit workstation
+            # fullscreen control is added. The current maximize control never
+            # writes this state.
             DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+        _:
+            _workstation_expanded = true
+            _apply_expanded_window_rect(screen)
+
+
+func _apply_expanded_window_rect(screen: int) -> void:
+    var usable := DisplayServer.screen_get_usable_rect(screen)
+    var expanded_size := usable.size
+    # On this Windows/Godot setup, an exact monitor-sized borderless client is
+    # reclassified as FULLSCREEN/EXCLUSIVE_FULLSCREEN. Keep a visually invisible
+    # 2 px guard on the bottom edge so the workstation remains genuinely windowed.
+    expanded_size.y = maxi(MIN_WINDOW_SIZE.y, expanded_size.y - WINDOW_EXPANDED_GUARD_PX)
+
+    DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+    DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
+    DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, true)
+    get_window().unresizable = true
+    DisplayServer.window_set_position(usable.position)
+    DisplayServer.window_set_size(expanded_size)
+
+
+func _toggle_maximize_window() -> void:
+    if _fullscreen_active or _presentation_transition or _restoring_window:
+        return
+
+    var mode := DisplayServer.window_get_mode()
+    _telemetry_event("window_toggle_maximize", {
+        "from_mode": _window_mode_name(mode),
+        "logical_expanded": _workstation_expanded,
+        "strategy": "windowed_workarea",
+    })
+
+    if _workstation_expanded or _is_expanded_mode(mode):
+        _workstation_expanded = false
+        DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
+        get_window().unresizable = false
+        _restore_window()
+        return
+
+    if mode == DisplayServer.WINDOW_MODE_WINDOWED:
+        _remember_windowed_rect()
+
+    _workstation_expanded = true
+    _apply_expanded_window_rect(DisplayServer.window_get_current_screen())
+    _sync_window_controls()
+    _telemetry_event("window_maximize_requested", {
+        "logical_mode": "maximized",
+        "actual_mode": _window_mode_name(DisplayServer.window_get_mode()),
+        "strategy": "windowed_workarea",
+    })
+
+
+func _restore_window() -> void:
+    _workstation_expanded = false
+    DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
+    get_window().unresizable = false
+    super._restore_window()
+
+
+func _remember_windowed_rect() -> void:
+    if _workstation_expanded:
+        return
+    super._remember_windowed_rect()
+
+
+func _is_expanded_mode(mode: int) -> bool:
+    return _workstation_expanded or super._is_expanded_mode(mode)
 
 
 func _current_window_state() -> Dictionary:
     var mode := DisplayServer.window_get_mode()
     var mode_name := "windowed"
-    if mode == DisplayServer.WINDOW_MODE_MAXIMIZED:
+    if _workstation_expanded:
+        mode_name = "maximized"
+    elif mode == DisplayServer.WINDOW_MODE_MAXIMIZED:
         mode_name = "maximized"
     elif mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
         mode_name = "fullscreen"
@@ -180,7 +262,44 @@ func _array_to_vec2i(value: Variant, fallback: Vector2i) -> Vector2i:
     return fallback
 
 
+# On close, do not rely only on the deferred publish queued by _telemetry_event:
+# the SceneTree is about to stop and that deferred call can be lost. Start one
+# final sanitized publisher process immediately after flushing the complete file.
+func _close_window() -> void:
+    _telemetry_event("session_close_request", {
+        "window_memory_revision": WINDOW_MEMORY_REVISION,
+        "final_publish_spawned_before_quit": true,
+    })
+    if _telemetry_file != null:
+        _telemetry_file.flush()
+    _spawn_final_telemetry_publisher()
+    get_tree().quit()
+
+
+func _spawn_final_telemetry_publisher() -> void:
+    if OS.get_name() != "Windows":
+        return
+    if _telemetry_path.is_empty() or not FileAccess.file_exists(_telemetry_path):
+        return
+
+    var script_path := ProjectSettings.globalize_path(CHECKPOINT_PUBLISH_SCRIPT)
+    var repo_root := ProjectSettings.globalize_path("res://")
+    var telemetry_path := ProjectSettings.globalize_path(_telemetry_path)
+    var arguments := PackedStringArray([
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", script_path,
+        "-RepoRoot", repo_root,
+        "-TelemetryFile", telemetry_path,
+        "-Reason", "session_close_request",
+    ])
+    var pid := OS.create_process("powershell.exe", arguments)
+    if pid <= 0:
+        push_warning("Could not start final telemetry publisher before quit.")
+
+
 func _telemetry_event(event_name: String, data: Dictionary = {}) -> void:
     var enriched := data.duplicate(true)
     enriched["window_memory_revision"] = WINDOW_MEMORY_REVISION
+    enriched["workstation_expanded"] = _workstation_expanded
     super._telemetry_event(event_name, enriched)
