@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="PackedScene" path="res://app/main/main.tscn" id="1_base"]
-[ext_resource type="Script" path="res://app/main/main_runtime_gallery_adaptive_filters.gd" id="2_runtime"]
+[ext_resource type="Script" path="res://app/main/main_runtime_gallery_feedback_trash.gd" id="2_runtime"]
 
 [node name="Main" instance=ExtResource("1_base")]
 script = ExtResource("2_runtime")

@@ -34,6 +34,8 @@ ALLOWED_CONVENTIONAL_FILENAMES = {
     "LICENSE.md",
 }
 
+FULL_CANVAS_SURFACE_SCRIPT = "res://sketches/_shared/full_canvas_surface.gd"
+
 # Sketch identity belongs to the workstation/gallery UI, never to the rendered
 # visual surface. This catches the common accidental burn-in form "002 / TITLE"
 # inside runtime GDScript while still allowing typography that is the artwork.
@@ -75,6 +77,7 @@ def validate_required_files() -> None:
         ".gitignore",
         ".gitattributes",
         "docs/ARCHITECTURE.md",
+        "sketches/_shared/full_canvas_surface.gd",
     )
 
     for relative in required:
@@ -170,6 +173,46 @@ def validate_no_burned_in_sketch_titles(files: list[str]) -> None:
             )
 
 
+def validate_full_canvas_shader_surfaces(files: list[str]) -> None:
+    """Prevent fixed-size shader surfaces from reappearing in sketches.
+
+    A node named ShaderSurface is a semantic contract: it is the artwork's full
+    render surface. It must use the shared viewport-sizing component and must not
+    contain legacy 1280x720 offsets. This static gate complements the runtime
+    host fallback and catches regressions before host testing.
+    """
+
+    for relative in files:
+        normalized = relative.replace("\\", "/")
+        if not normalized.startswith("sketches/"):
+            continue
+        if "/runtime/" not in normalized or not normalized.endswith(".tscn"):
+            continue
+
+        path = ROOT / relative
+        text = path.read_text(encoding="utf-8")
+        marker = '[node name="ShaderSurface"'
+        if marker not in text:
+            continue
+
+        if FULL_CANVAS_SURFACE_SCRIPT not in text:
+            fail(
+                "ShaderSurface must use shared full-canvas sizing component: "
+                f"{normalized}"
+            )
+
+        blocks = text.split("\n[node ")
+        for block in blocks:
+            if not block.startswith('name="ShaderSurface"'):
+                continue
+            if re.search(r"offset_right\s*=\s*1280(?:\.0+)?", block):
+                fail(f"fixed 1280px ShaderSurface width forbidden: {normalized}")
+            if re.search(r"offset_bottom\s*=\s*720(?:\.0+)?", block):
+                fail(f"fixed 720px ShaderSurface height forbidden: {normalized}")
+            if "script = ExtResource" not in block:
+                fail(f"ShaderSurface missing sizing script assignment: {normalized}")
+
+
 def main() -> None:
     print("Creative Lab repository policy")
 
@@ -182,6 +225,7 @@ def main() -> None:
     validate_project_owned_names()
     validate_project_config()
     validate_no_burned_in_sketch_titles(files)
+    validate_full_canvas_shader_surfaces(files)
 
     print(f"Tracked files checked: {len(files)}")
     print("Repository policy: PASS")
