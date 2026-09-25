@@ -14,78 +14,73 @@ Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924
 
 Après un test hôte, inspecte `telemetry/runtime` avant de demander logs/captures et vérifie que la session correspond au HEAD testé.
 
-## Important — RATE UI
+## Priorité 1 — startup window memory
 
-Le user a host-rejeté le `PopupPanel` RATE v2 : transparent, moche, pas centré. Ne le restaure pas.
+Le user a rejeté le démarrage visible `1280×720 windowed -> fullscreen`. La télémétrie fraîche a confirmé ce jump (~730 ms).
 
-`app/main/main_runtime_gallery_compact_review.gd` est maintenant REVIEW UI revision 3 :
+Top runtime actuel :
 
-- sidebar compact `REVIEW <avg>/5  RATE  TRASH`;
-- RATE = modal **in-app** plein écran, pas popup natif;
-- backdrop sombre;
-- carte opaque design-system;
-- centrage `CenterContainer`;
-- × / Escape / clic ou touch hors carte pour fermer;
-- notes persistantes + badge Gallery inchangés.
+`app/main/main_runtime_window_memory.gd`
 
-Après le prochain test, inspecte `review_modal_changed` si la télémétrie a bien avancé.
+État persisté :
 
-## Important — démarrage fullscreen
+`user://creative_lab_window_state.cfg`
 
-L’application doit maintenant ouvrir le **workstation complet en native fullscreen** dès `_ready()` du top runtime.
+Le root Window est caché dans `_enter_tree()`, le dernier mode/screen/position/size/restore rect est appliqué, puis l’app n’est révélée qu’après settle. Premier lancement = fullscreen par défaut.
 
-Ce n’est pas F11 :
+F11 reste la présentation du sketch et ne doit pas écraser la préférence de fenêtre du workstation.
 
-- UI Gallery/paramètres/chrome reste visible au lancement;
-- F11 reste présentation render d’un sketch;
-- le rect windowed normal est mémorisé avant le passage fullscreen pour permettre Restore;
-- après F11/Esc, le workstation doit revenir au mode fullscreen précédent.
+Événement attendu : `workstation_window_state_restored`.
 
-Événement télémétrie : `workstation_startup_fullscreen`.
+État : **IMPLEMENTED_NOT_HOST_VALIDATED**. Après test Windows, vérifie spécifiquement absence du flash et restauration fullscreen/maximized/windowed.
 
-## Important — état télémétrie du feedback précédent
+## Priorité 2 — notes utilisateur
 
-Lors de la critique du popup, telemetry-first a été fait mais la branche distante était stale :
+Lis d’abord `creative_preference_snapshot` d’une session fraîche.
 
-- `latest.jsonl` vide;
-- `telemetry/runtime` encore à `dd9194667593...` (2026-09-25 07:09:55Z), antérieur au test.
+Dernier snapshot complet connu : `session_5e0960d4c3e0c6a7.jsonl`, 16 sketches notés.
 
-Donc ne prétends pas que ce feedback popup était telemetry-validated. Il vient directement du user.
+Moyennes axes : visual 2.25, interaction 2.125, originality 2.125, aliveness 1.8125, controls 2.0, performance 3.0625.
 
-## Important — notes utilisateur
+Signaux forts :
 
-Lis en priorité `creative_preference_snapshot` lorsqu’il existe dans une session fraîche. Il contient l’état consolidé des notes explicites.
+- 020 ECHO TISSUE ~4.17;
+- 012 CHEMICAL BLOCKS ~3.33;
+- 017 EDGE BLOOM ~2.83.
 
-Les notes servent de preuve et de biais modéré, pas de classement à cloner. Conserve une vraie exploration.
+Faibles : 014 = 1.0, 016 ~1.5, 024 ~1.67, 022 ~1.83.
 
-## Important — qualité temporelle
+Interprétation : favoriser couplage local, propagation, mémoire et interaction qui change l’évolution future, mais ne pas cloner 020. Le biais rating reste borné et 24% des draws restent exploration-first.
 
-Le user rejette les boucles visibles cheap / respiration-bobbing de type `sin(time)` utilisées seulement pour faire bouger une œuvre.
+## REVIEW UI
+
+Le `PopupPanel` transparent/off-center est rejeté. REVIEW v3 = ligne compacte + modal in-app opaque/centré. Ne restaure jamais le popup natif.
+
+## Batch actuel 026–030
+
+La Gallery source doit compter 30 sketches.
+
+- 026 VOID TENSION — réseau contraint + territoires Voronoi, fracture/réparation, touch coupe les liens.
+- 027 GLASS TIDE — SDF glass + fronts d’onde asynchrones, touch altère la topologie optique.
+- 028 LUMEN MAZE — transport lumineux sur graphe, jam/release, obstacles persistants.
+- 029 FIBER FELT — fibres + masque de compaction, phase transition loose→felted.
+- 030 REACTOR SKIN — réaction-diffusion + membrane/mesh stress, fracture/réparation.
+
+Toutes les définitions ont `creative_seed` + `creative_signature`. Les signatures implémentées sont dans `knowledge/cross-domain/creative_draw_space.json`.
+
+## Qualité temporelle
+
+Le user rejette les loops visibles cheap / `sin(time)` décoratifs.
 
 Lire `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
 
-Règle préférée :
+Préférer :
 
 `time -> état/force/mémoire/événement -> système couplé -> rendu`
 
-plutôt que :
+À partir de 026, trigonométrie directe sur `sketch_time`, `u_time` ou shader `TIME` nécessite `TEMPORAL_INTENT:`.
 
-`time -> sin/cos -> position/scale/alpha/warp visible`.
-
-Une oscillation physique/conceptuelle reste autorisée. À partir de 026, toute trigonométrie directe sur `sketch_time`, `u_time` ou shader `TIME` doit porter `TEMPORAL_INTENT:`.
-
-CI : `scripts/ci/audit_temporal_motion.py`.
-
-Premier audit : 38 observations historiques dans <=025.
-
-Refactors actuels :
-
-- 021 ROSENSWEIG : target/dwell variable, plus de Lissajous/orbite temporelle directe.
-- 022 LIESEGANG : épuisement/repos/recharge, plus de front snap-reset visible.
-- 024 GRANULAR JAM : creep stress/vitesse/confinement/asymétrie, avalanche indexée événement.
-- 025 FARADAY : forcing périodique intentionnel, chirp stateful, ripple tactile décoratif retiré.
-
-## Important — prochain tirage créatif
+## Tirage créatif
 
 Utilise :
 
@@ -93,33 +88,32 @@ Utilise :
 - `knowledge/cross-domain/creative_draw_space.json`
 - `scripts/creative/draw_recipe.py`
 
-Il choisit carrier + 2 représentations de familles différentes + 2 opérateurs de familles différentes + modèle temporel + interaction + contrainte design + render path.
+Le moteur pénalise répétition historique/récente, impose distance/familles distinctes et applique seulement un biais borné des ratings. 24% exploration ignore les préférences.
 
-Il pénalise la répétition. Les notes peuvent biaiser légèrement, mais 24% des tirages ignorent entièrement le biais de préférence.
+Ne prends pas le tirage brut comme concept final : `draw -> prototype couplé -> observe -> interprète -> art-direct -> mutate`.
 
-Pour tout sketch 026+, `definition.json` doit contenir `creative_signature`. Ne stocke que les concepts effectivement implémentés/conservés.
-
-## Historique / non-régressions
+## Non-régressions
 
 - 005 reste visuellement **REGISTER TYPE**, jamais Pressure Lattice.
-- ne restaure pas le contour-glyph généralisé `6c20a094...` comme représentation maison.
+- ne restaure pas le contour-glyph généralisé comme représentation maison.
 - ne restaure pas le mur permanent de tags.
 - `ShaderSurface` plein-canvas obligatoire via `sketches/_shared/full_canvas_surface.gd`.
 - navigation ne stoppe pas PROGRAM ; TAKE LIVE, touch, live-sync et telemetry restent stables.
+- RATE modal reste in-app opaque/centré.
+- ne restaure pas le startup visible petit->fullscreen.
 - pas de faux Spout/NDI.
 
 ## Prochaine opération
 
 Test hôte prioritaire :
 
-1. lancer l’app : workstation doit remplir l’écran immédiatement avec tout le chrome UI;
-2. Restore puis re-expand : géométrie stable;
-3. ouvrir un sketch puis RATE : carte opaque et parfaitement centrée;
-4. Restore/resize puis RATE : toujours centrée;
-5. tester ×, Escape, clic/touch hors carte;
-6. changer/effacer plusieurs notes, rouvrir, vérifier persistance + badge Gallery;
-7. F11 puis Esc : retour au fullscreen workstation précédent;
-8. fermer normalement;
-9. ensuite telemetry-first sur session fraîche et HEAD testé.
+1. lancer : aucune petite fenêtre avant l’état final;
+2. fermer/reouvrir en fullscreen, maximized puis fenêtre déplacée/redimensionnée;
+3. vérifier RATE modal;
+4. confirmer 30 cartes;
+5. regarder 026–030 20–30 s idle puis interaction + mains retirées;
+6. noter 026–030;
+7. fermer normalement;
+8. telemetry-first : `workstation_window_state_restored`, `creative_preference_snapshot`, perf/surface events, HEAD testé.
 
-Après toute modification matérielle : terminer commits/docs, résoudre HEAD final, attendre CI du SHA exact, donner short SHA + CI et le PowerShell canonique de `OPERATIONS.md` si test Windows pertinent.
+Après toute modification matérielle : terminer commits/docs, résoudre HEAD final, attendre CI du SHA exact, donner short SHA + CI et PowerShell canonique de `OPERATIONS.md` si test Windows pertinent.
