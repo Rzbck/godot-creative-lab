@@ -228,6 +228,7 @@ Telemetry publication is asynchronous/queued. Console messages such as `CREATIVE
 - preview vs PROGRAM synchronization state/counts;
 - touch/mouse input received by PROGRAM and coordinate mapping;
 - Gallery/resize/output transitions;
+- adaptive Gallery filter rail/drawer state;
 - telemetry publisher state.
 
 ## PROGRAM / LIVE OUT host test
@@ -250,9 +251,13 @@ Navigation must not stop PROGRAM.
 - Cards show real render thumbnails.
 - Only hovered card animates.
 - No giant tooltip overlay obscures the card.
-- Search filters title/id/index/tags/engine/description.
-- Tags are generated from metadata.
-- Primary groups are automatic from the first tag.
+- Search filters title/id/index/tags/engine/description and still indexes every metadata tag.
+- Primary groups remain automatic from the first tag.
+- The permanent tag rail remains bounded: `ALL` plus at most six generated quick tags and optional `MORE`.
+- Universal tags that match the whole catalogue are not shown as useless filters.
+- Rare tags remain available through `MORE` and search.
+- Selecting a rare tag promotes it into the quick rail while active.
+- `MORE` is collapsed by default and can be reopened/closed cleanly.
 - Groups with no results disappear.
 - Resize keeps the layout clean.
 
