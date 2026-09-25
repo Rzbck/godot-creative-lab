@@ -1,0 +1,9 @@
+{
+  "id": "022_liesegang_front",
+  "index": "022",
+  "title": "LIESEGANG FRONT",
+  "scene": "res://sketches/022_liesegang_front/runtime/liesegang_front.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["PRECIPITATION", "DIFFUSION", "INTERACTIVE"],
+  "description": "Diffusing reservoirs cross supersaturation thresholds and leave precipitation bands, depletion gaps and slowly dissolving chemical memory."
+}

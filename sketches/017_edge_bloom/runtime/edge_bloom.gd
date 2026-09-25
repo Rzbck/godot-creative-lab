@@ -20,20 +20,23 @@ const SPORE := Color(0.055, 0.065, 0.055, 1.0)
 @export_range(0.0, 1.2, 0.01) var spore_deposit: float = 0.48
 @export_range(1.0, 7.0, 1.0) var seed_radius: float = 3.0
 
-var _charge: PackedFloat32Array = PackedFloat32Array()
-var _refractory: PackedFloat32Array = PackedFloat32Array()
-var _next_charge: PackedFloat32Array = PackedFloat32Array()
-var _next_refractory: PackedFloat32Array = PackedFloat32Array()
-
+var _charge := PackedFloat32Array()
+var _refractory := PackedFloat32Array()
+var _next_charge := PackedFloat32Array()
+var _next_refractory := PackedFloat32Array()
 var _spore_pos: Array[Vector2] = []
 var _spore_vel: Array[Vector2] = []
-var _accum: float = 0.0
-var _split_accum: float = 0.0
+var _accum := 0.0
+var _split_accum := 0.0
+var _field_image: Image
+var _field_texture: ImageTexture
 
 
 func _ready() -> void:
     super._ready()
+    texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
     _seed_system()
+    _refresh_field_texture()
 
 
 func get_parameter_schema() -> Array[Dictionary]:
@@ -85,11 +88,11 @@ func _idx(x: int, y: int) -> int:
 func _seed_system() -> void:
     if _charge.size() == COLS * ROWS:
         return
-
-    _charge.resize(COLS * ROWS)
-    _refractory.resize(COLS * ROWS)
-    _next_charge.resize(COLS * ROWS)
-    _next_refractory.resize(COLS * ROWS)
+    var count := COLS * ROWS
+    _charge.resize(count)
+    _refractory.resize(count)
+    _next_charge.resize(count)
+    _next_refractory.resize(count)
     _charge.fill(0.0)
     _refractory.fill(0.0)
     _next_charge.fill(0.0)
@@ -113,24 +116,30 @@ func _seed_system() -> void:
         _spore_pos.append(p)
         _spore_vel.append(Vector2.from_angle(hash01(float(i) * 9.7) * TAU) * spore_speed * 0.55)
 
+    _field_image = Image.create(COLS, ROWS, false, Image.FORMAT_RGBA8)
+    _field_texture = ImageTexture.create_from_image(_field_image)
+
 
 func _update_source_simulation(delta: float) -> void:
     _seed_system()
-
     if pointer_down:
         _seed_at(pointer_position, int(round(seed_radius)))
 
+    var stepped := false
     _accum += delta
     while _accum >= 1.0 / 30.0:
         _accum -= 1.0 / 30.0
         _step_cells(1.0 / 30.0)
+        stepped = true
 
     _update_spores(delta)
-
     _split_accum += delta
     if _split_accum >= 0.5:
         _split_accum = 0.0
         _try_split_spores()
+
+    if stepped:
+        _refresh_field_texture()
 
 
 func _seed_at(point: Vector2, radius_cells: int) -> void:
@@ -147,13 +156,11 @@ func _seed_at(point: Vector2, radius_cells: int) -> void:
 
 
 func _neighbour_average(x: int, y: int) -> float:
-    var total := 0.0
-    for oy: int in range(-1, 2):
-        for ox: int in range(-1, 2):
-            if ox == 0 and oy == 0:
-                continue
-            total += _charge[_idx(x + ox, y + oy)]
-    return total / 8.0
+    return (
+        _charge[_idx(x - 1, y - 1)] + _charge[_idx(x, y - 1)] + _charge[_idx(x + 1, y - 1)] +
+        _charge[_idx(x - 1, y)] + _charge[_idx(x + 1, y)] +
+        _charge[_idx(x - 1, y + 1)] + _charge[_idx(x, y + 1)] + _charge[_idx(x + 1, y + 1)]
+    ) * 0.125
 
 
 func _step_cells(dt: float) -> void:
@@ -169,20 +176,17 @@ func _step_cells(dt: float) -> void:
             if ref > 0.0:
                 _next_refractory[i] = maxf(0.0, ref - dt)
                 _next_charge[i] = maxf(0.0, current - decay * dt * 2.8)
-                continue
-
-            var drive := neighbour * coupling + edge_source
-            if current > 0.78:
-                _next_charge[i] = maxf(0.0, current - decay * dt * 6.0 - 0.055)
-                _next_refractory[i] = refractory_time
-            elif drive > threshold:
-                var excess := drive - threshold
-                _next_charge[i] = clampf(current + 0.19 + excess * 0.72, 0.0, 1.0)
-                _next_refractory[i] = 0.0
             else:
-                var residual := neighbour * coupling * 0.018
-                _next_charge[i] = clampf(current * (1.0 - decay * dt * 1.6) + residual, 0.0, 1.0)
-                _next_refractory[i] = 0.0
+                var drive := neighbour * coupling + edge_source
+                if current > 0.78:
+                    _next_charge[i] = maxf(0.0, current - decay * dt * 6.0 - 0.055)
+                    _next_refractory[i] = refractory_time
+                elif drive > threshold:
+                    _next_charge[i] = clampf(current + 0.19 + (drive - threshold) * 0.72, 0.0, 1.0)
+                    _next_refractory[i] = 0.0
+                else:
+                    _next_charge[i] = clampf(current * (1.0 - decay * dt * 1.6) + neighbour * coupling * 0.018, 0.0, 1.0)
+                    _next_refractory[i] = 0.0
 
     var temp_c := _charge
     _charge = _next_charge
@@ -193,17 +197,16 @@ func _step_cells(dt: float) -> void:
 
 
 func _sample_charge(point: Vector2) -> float:
-    var x := clampi(int(point.x / CELL_W), 0, COLS - 1)
-    var y := clampi(int(point.y / CELL_H), 0, ROWS - 1)
-    return _charge[_idx(x, y)]
+    return _charge[_idx(int(point.x / CELL_W), int(point.y / CELL_H))]
 
 
 func _sample_gradient(point: Vector2) -> Vector2:
     var x := clampi(int(point.x / CELL_W), 0, COLS - 1)
     var y := clampi(int(point.y / CELL_H), 0, ROWS - 1)
-    var gx := _charge[_idx(x + 1, y)] - _charge[_idx(x - 1, y)]
-    var gy := _charge[_idx(x, y + 1)] - _charge[_idx(x, y - 1)]
-    return Vector2(gx, gy)
+    return Vector2(
+        _charge[_idx(x + 1, y)] - _charge[_idx(x - 1, y)],
+        _charge[_idx(x, y + 1)] - _charge[_idx(x, y - 1)]
+    )
 
 
 func _update_spores(delta: float) -> void:
@@ -211,37 +214,31 @@ func _update_spores(delta: float) -> void:
         var p := _spore_pos[i]
         var gradient := _sample_gradient(p)
         var tangent := Vector2(-gradient.y, gradient.x)
-        var desired := (gradient * 0.78 + tangent * (0.22 + 0.18 * sin(sketch_time + float(i)))).normalized()
+        var desired := gradient * 0.78 + tangent * (0.22 + 0.18 * sin(sketch_time + float(i)))
         if desired.length_squared() < 0.001:
             desired = Vector2.from_angle(hash01(float(i) * 11.3 + floor(sketch_time)) * TAU)
-
+        else:
+            desired = desired.normalized()
         var v := _spore_vel[i].lerp(desired * spore_speed, clampf(delta * 1.8, 0.0, 1.0))
         p += v * delta
-
         if p.x < 8.0: p.x = 1272.0
         if p.x > 1272.0: p.x = 8.0
         if p.y < 8.0: p.y = 712.0
         if p.y > 712.0: p.y = 8.0
-
         _spore_pos[i] = p
         _spore_vel[i] = v
-
-        var cx := clampi(int(p.x / CELL_W), 0, COLS - 1)
-        var cy := clampi(int(p.y / CELL_H), 0, ROWS - 1)
-        var index := _idx(cx, cy)
+        var index := _idx(int(p.x / CELL_W), int(p.y / CELL_H))
         _charge[index] = clampf(_charge[index] + spore_deposit * delta * 0.8, 0.0, 1.0)
 
 
 func _try_split_spores() -> void:
     if _spore_pos.size() >= 72:
         return
-
     var original_count := _spore_pos.size()
     for i: int in range(original_count):
         if _spore_pos.size() >= 72:
             break
-        var local := _sample_charge(_spore_pos[i])
-        if local < 0.58:
+        if _sample_charge(_spore_pos[i]) < 0.58:
             continue
         var chance := hash01(float(i) * 23.9 + floor(sketch_time * 2.0))
         if chance > spore_split * 0.28:
@@ -251,14 +248,34 @@ func _try_split_spores() -> void:
         _spore_vel.append(_spore_vel[i].rotated(0.9 + chance * 0.7) * 0.92)
 
 
+func _refresh_field_texture() -> void:
+    if _field_image == null:
+        _field_image = Image.create(COLS, ROWS, false, Image.FORMAT_RGBA8)
+    for y: int in range(ROWS):
+        for x: int in range(COLS):
+            var i := _idx(x, y)
+            var value := _charge[i]
+            var ref := _refractory[i]
+            if value < 0.012 and ref <= 0.0:
+                _field_image.set_pixel(x, y, Color(0.0, 0.0, 0.0, 0.0))
+                continue
+            var t := smoothstep(0.02, 0.92, value)
+            var c := DORMANT.lerp(ALIVE, t).lerp(HOT, smoothstep(0.68, 1.0, value))
+            if ref > 0.0:
+                c = c.lerp(BG, clampf(ref / maxf(0.01, refractory_time), 0.0, 1.0) * 0.72)
+            c.a = 0.20 + t * 0.80
+            _field_image.set_pixel(x, y, c)
+    if _field_texture == null:
+        _field_texture = ImageTexture.create_from_image(_field_image)
+    else:
+        _field_texture.update(_field_image)
+
+
 func _get_custom_live_sync_state() -> Dictionary:
     return {
-        "charge": _charge.duplicate(),
-        "refractory": _refractory.duplicate(),
-        "spore_pos": _spore_pos.duplicate(),
-        "spore_vel": _spore_vel.duplicate(),
-        "accum": _accum,
-        "split_accum": _split_accum,
+        "charge": _charge.duplicate(), "refractory": _refractory.duplicate(),
+        "spore_pos": _spore_pos.duplicate(), "spore_vel": _spore_vel.duplicate(),
+        "accum": _accum, "split_accum": _split_accum,
     }
 
 
@@ -277,40 +294,22 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
     if sv is Array: _spore_vel.assign(sv)
     _accum = float(state.get("accum", _accum))
     _split_accum = float(state.get("split_accum", _split_accum))
+    _refresh_field_texture()
 
 
 func _get_custom_live_debug_state() -> Dictionary:
     var mass := 0.0
-    for value: float in _charge:
-        mass += value
-    return {"cell_mass": mass, "spores": _spore_pos.size()}
+    for value: float in _charge: mass += value
+    return {"cell_mass": mass, "spores": _spore_pos.size(), "render_mode":"field_texture"}
 
 
 func _draw() -> void:
     begin_design_draw(BG)
-
-    if _charge.size() == COLS * ROWS:
-        for y: int in range(ROWS):
-            for x: int in range(COLS):
-                var i := _idx(x, y)
-                var value := _charge[i]
-                var ref := _refractory[i]
-                if value < 0.018 and ref <= 0.0:
-                    continue
-                var t := smoothstep(0.02, 0.92, value)
-                var c := DORMANT.lerp(ALIVE, t)
-                c = c.lerp(HOT, smoothstep(0.68, 1.0, value))
-                if ref > 0.0:
-                    c = c.lerp(BG, clampf(ref / maxf(0.01, refractory_time), 0.0, 1.0) * 0.72)
-                c.a = 0.20 + t * 0.80
-                var centre := Vector2((float(x) + 0.5) * CELL_W, (float(y) + 0.5) * CELL_H)
-                var r := minf(CELL_W, CELL_H) * (0.16 + t * 0.35)
-                draw_circle(centre, r, c)
-
+    if _field_texture != null:
+        draw_texture_rect(_field_texture, Rect2(Vector2.ZERO, DESIGN_SIZE), false)
     for i: int in range(_spore_pos.size()):
         var p := _spore_pos[i]
         var v := _spore_vel[i].normalized()
         draw_circle(p, 2.3, SPORE)
         draw_line(p, p - v * 9.0, Color(SPORE.r, SPORE.g, SPORE.b, 0.42), 1.0, true)
-
     end_design_draw()

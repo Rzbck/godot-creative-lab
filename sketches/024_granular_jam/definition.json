@@ -1,0 +1,9 @@
+{
+  "id": "024_granular_jam",
+  "index": "024",
+  "title": "GRANULAR JAM",
+  "scene": "res://sketches/024_granular_jam/runtime/granular_jam.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["GRANULAR", "FORCE", "INTERACTIVE"],
+  "description": "A packed granular bed carries load through transient force chains. Touch applies pressure, rearranges contacts and can trigger delayed avalanches."
+}

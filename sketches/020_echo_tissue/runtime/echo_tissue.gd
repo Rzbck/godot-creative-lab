@@ -19,20 +19,25 @@ const HOT := Color(0.98, 0.88, 0.61, 1.0)
 @export_range(0.0, 1.5, 0.01) var morphology: float = 0.62
 @export_range(1.0, 8.0, 1.0) var seed_radius: float = 4.0
 
-var _activity: PackedFloat32Array = PackedFloat32Array()
-var _refractory: PackedFloat32Array = PackedFloat32Array()
-var _history_a: PackedFloat32Array = PackedFloat32Array()
-var _history_b: PackedFloat32Array = PackedFloat32Array()
-var _next_activity: PackedFloat32Array = PackedFloat32Array()
-var _next_refractory: PackedFloat32Array = PackedFloat32Array()
-var _accum: float = 0.0
-var _autoseed_clock: float = 0.0
-var _autoseed_index: int = 0
+var _activity := PackedFloat32Array()
+var _refractory := PackedFloat32Array()
+var _history_a := PackedFloat32Array()
+var _history_b := PackedFloat32Array()
+var _density := PackedFloat32Array()
+var _next_activity := PackedFloat32Array()
+var _next_refractory := PackedFloat32Array()
+var _accum := 0.0
+var _autoseed_clock := 0.0
+var _autoseed_index := 0
+var _field_image: Image
+var _field_texture: ImageTexture
 
 
 func _ready() -> void:
     super._ready()
+    texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
     _seed_system()
+    _refresh_field_texture()
 
 
 func get_parameter_schema() -> Array[Dictionary]:
@@ -84,24 +89,26 @@ func _idx(x: int, y: int) -> int:
 func _seed_system() -> void:
     if _activity.size() == COLS * ROWS:
         return
-
     var count := COLS * ROWS
     _activity.resize(count)
     _refractory.resize(count)
     _history_a.resize(count)
     _history_b.resize(count)
+    _density.resize(count)
     _next_activity.resize(count)
     _next_refractory.resize(count)
     _activity.fill(0.0)
     _refractory.fill(0.0)
     _history_a.fill(0.0)
     _history_b.fill(0.0)
+    _density.fill(0.0)
     _next_activity.fill(0.0)
     _next_refractory.fill(0.0)
-
     _seed_cell_cluster(16, 11, 4, 0.92)
     _seed_cell_cluster(41, 25, 5, 0.76)
     _seed_cell_cluster(59, 13, 3, 0.84)
+    _field_image = Image.create(COLS, ROWS, false, Image.FORMAT_RGBA8)
+    _field_texture = ImageTexture.create_from_image(_field_image)
 
 
 func _seed_cell_cluster(cx: int, cy: int, radius_cells: int, strength: float) -> void:
@@ -117,14 +124,11 @@ func _seed_cell_cluster(cx: int, cy: int, radius_cells: int, strength: float) ->
 
 
 func _seed_at(point: Vector2) -> void:
-    var cx := clampi(int(point.x / CELL_W), 0, COLS - 1)
-    var cy := clampi(int(point.y / CELL_H), 0, ROWS - 1)
-    _seed_cell_cluster(cx, cy, int(round(seed_radius)), 1.0)
+    _seed_cell_cluster(clampi(int(point.x / CELL_W), 0, COLS - 1), clampi(int(point.y / CELL_H), 0, ROWS - 1), int(round(seed_radius)), 1.0)
 
 
 func _update_source_simulation(delta: float) -> void:
     _seed_system()
-
     if pointer_down:
         _seed_at(pointer_position)
 
@@ -137,24 +141,36 @@ func _update_source_simulation(delta: float) -> void:
         _seed_cell_cluster(x, y, 2 + (_autoseed_index % 2), 0.54 + feedback * 0.18)
         _autoseed_index += 1
 
+    var stepped := false
     _accum += delta
     while _accum >= 1.0 / 30.0:
         _accum -= 1.0 / 30.0
         _step_tissue(1.0 / 30.0)
+        stepped = true
+    if stepped:
+        _refresh_field_texture()
 
 
 func _neighbour_stats(x: int, y: int) -> Vector2:
-    var total := 0.0
-    var active_count := 0.0
-    for oy: int in range(-1, 2):
-        for ox: int in range(-1, 2):
-            if ox == 0 and oy == 0:
-                continue
-            var value := _activity[_idx(x + ox, y + oy)]
-            total += value
-            if value > 0.42:
-                active_count += 1.0
-    return Vector2(total / 8.0, active_count / 8.0)
+    var v0 := _activity[_idx(x - 1, y - 1)]
+    var v1 := _activity[_idx(x, y - 1)]
+    var v2 := _activity[_idx(x + 1, y - 1)]
+    var v3 := _activity[_idx(x - 1, y)]
+    var v4 := _activity[_idx(x + 1, y)]
+    var v5 := _activity[_idx(x - 1, y + 1)]
+    var v6 := _activity[_idx(x, y + 1)]
+    var v7 := _activity[_idx(x + 1, y + 1)]
+    var total := v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7
+    var active := 0.0
+    active += 1.0 if v0 > 0.42 else 0.0
+    active += 1.0 if v1 > 0.42 else 0.0
+    active += 1.0 if v2 > 0.42 else 0.0
+    active += 1.0 if v3 > 0.42 else 0.0
+    active += 1.0 if v4 > 0.42 else 0.0
+    active += 1.0 if v5 > 0.42 else 0.0
+    active += 1.0 if v6 > 0.42 else 0.0
+    active += 1.0 if v7 > 0.42 else 0.0
+    return Vector2(total * 0.125, active * 0.125)
 
 
 func _step_tissue(dt: float) -> void:
@@ -166,30 +182,25 @@ func _step_tissue(dt: float) -> void:
             var stats := _neighbour_stats(x, y)
             var neighbour := stats.x
             var density := stats.y
+            _density[i] = density
             var delayed := _history_b[i]
-
             var next_value := current
             var next_ref := maxf(0.0, ref - dt)
 
             if ref > 0.0:
                 next_value = maxf(0.0, current - decay * dt * 2.8)
             else:
-                var drive := neighbour * coupling + delayed * feedback
-                drive += maxf(0.0, density - 0.25) * morphology * 0.24
-
+                var drive := neighbour * coupling + delayed * feedback + maxf(0.0, density - 0.25) * morphology * 0.24
                 if drive > threshold:
-                    var excess := drive - threshold
-                    next_value += excitation * (0.045 + excess * 0.16)
+                    next_value += excitation * (0.045 + (drive - threshold) * 0.16)
                 else:
                     next_value -= decay * dt * (0.9 + (1.0 - density) * 0.8)
-
                 if density >= 0.75:
                     next_value *= 1.0 - clampf(morphology * 0.055, 0.0, 0.22)
                 elif density >= 0.38:
                     next_value += morphology * 0.012
                 elif density <= 0.12 and current < 0.18:
                     next_value -= morphology * 0.006
-
                 if next_value > 0.96:
                     next_ref = refractory_time
 
@@ -209,15 +220,44 @@ func _step_tissue(dt: float) -> void:
     _next_refractory = temp_r
 
 
+func _refresh_field_texture() -> void:
+    if _field_image == null:
+        _field_image = Image.create(COLS, ROWS, false, Image.FORMAT_RGBA8)
+    for y: int in range(ROWS):
+        for x: int in range(COLS):
+            var i := _idx(x, y)
+            var value := _activity[i]
+            var echo := _history_b[i]
+            if value < 0.012 and echo < 0.018:
+                _field_image.set_pixel(x, y, Color(0.0, 0.0, 0.0, 0.0))
+                continue
+            var density := _density[i]
+            var t := smoothstep(0.02, 0.94, value)
+            var c := COLD.lerp(WARM, t).lerp(HOT, smoothstep(0.72, 1.0, value))
+            var connect := clampf(t + density * morphology * 0.28, 0.0, 1.0)
+            var echo_gain := maxf(0.0, echo - value)
+            c = c.lerp(HOT, clampf(echo_gain * 0.42, 0.0, 0.35))
+            c.a = 0.12 + maxf(connect, echo * 0.6) * 0.88
+            _field_image.set_pixel(x, y, c)
+    if _field_texture == null:
+        _field_texture = ImageTexture.create_from_image(_field_image)
+    else:
+        _field_texture.update(_field_image)
+
+
+func _rebuild_density() -> void:
+    if _density.size() != COLS * ROWS:
+        _density.resize(COLS * ROWS)
+    for y: int in range(ROWS):
+        for x: int in range(COLS):
+            _density[_idx(x, y)] = _neighbour_stats(x, y).y
+
+
 func _get_custom_live_sync_state() -> Dictionary:
     return {
-        "activity": _activity.duplicate(),
-        "refractory": _refractory.duplicate(),
-        "history_a": _history_a.duplicate(),
-        "history_b": _history_b.duplicate(),
-        "accum": _accum,
-        "autoseed_clock": _autoseed_clock,
-        "autoseed_index": _autoseed_index,
+        "activity": _activity.duplicate(), "refractory": _refractory.duplicate(),
+        "history_a": _history_a.duplicate(), "history_b": _history_b.duplicate(),
+        "accum": _accum, "autoseed_clock": _autoseed_clock, "autoseed_index": _autoseed_index,
     }
 
 
@@ -237,46 +277,18 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
     _accum = float(state.get("accum", _accum))
     _autoseed_clock = float(state.get("autoseed_clock", _autoseed_clock))
     _autoseed_index = int(state.get("autoseed_index", _autoseed_index))
+    _rebuild_density()
+    _refresh_field_texture()
 
 
 func _get_custom_live_debug_state() -> Dictionary:
     var mass := 0.0
-    for value: float in _activity:
-        mass += value
-    return {"tissue_mass": mass, "autoseeds": _autoseed_index}
+    for value: float in _activity: mass += value
+    return {"tissue_mass": mass, "autoseeds": _autoseed_index, "render_mode":"field_texture"}
 
 
 func _draw() -> void:
     begin_design_draw(BG)
-
-    if _activity.size() == COLS * ROWS:
-        for y: int in range(ROWS):
-            for x: int in range(COLS):
-                var i := _idx(x, y)
-                var value := _activity[i]
-                var echo := _history_b[i]
-                if value < 0.012 and echo < 0.018:
-                    continue
-
-                var stats := _neighbour_stats(x, y)
-                var density := stats.y
-                var t := smoothstep(0.02, 0.94, value)
-                var c := COLD.lerp(WARM, t)
-                c = c.lerp(HOT, smoothstep(0.72, 1.0, value))
-                c.a = 0.14 + maxf(t, echo * 0.65) * 0.86
-
-                var connect := clampf(t + density * morphology * 0.28, 0.0, 1.0)
-                var pad := lerpf(3.0, 0.25, connect)
-                var rect := Rect2(
-                    Vector2(float(x) * CELL_W + pad, float(y) * CELL_H + pad),
-                    Vector2(CELL_W - pad * 2.0, CELL_H - pad * 2.0)
-                )
-                draw_rect(rect, c, true)
-
-                if echo > value + 0.08:
-                    var ec := HOT
-                    ec.a = clampf((echo - value) * 0.32, 0.02, 0.18)
-                    var centre := Vector2((float(x) + 0.5) * CELL_W, (float(y) + 0.5) * CELL_H)
-                    draw_circle(centre, minf(CELL_W, CELL_H) * 0.34, ec, false, 0.8)
-
+    if _field_texture != null:
+        draw_texture_rect(_field_texture, Rect2(Vector2.ZERO, DESIGN_SIZE), false)
     end_design_draw()

@@ -1,0 +1,9 @@
+{
+  "id": "021_rosensweig_field",
+  "index": "021",
+  "title": "ROSENSWEIG FIELD",
+  "scene": "res://sketches/021_rosensweig_field/runtime/rosensweig_field.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["MAGNETIC", "FLUID", "INTERACTIVE"],
+  "description": "A magnetic-fluid surface that crosses a field threshold into ordered peaks. Touch behaves as a movable magnet and leaves viscous field memory after release."
+}
