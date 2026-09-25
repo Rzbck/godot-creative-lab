@@ -223,7 +223,7 @@ func _refresh_texture() -> void:
         for x: int in range(COLS):
             var i := _idx(x, y)
             var value := clampf(_energy[i] / 1.35, 0.0, 1.0)
-            var q := floor(value * float(levels - 1) + 0.5) / float(levels - 1)
+            var q: float = floor(value * float(levels - 1) + 0.5) / float(levels - 1)
             var pressure_value := clampf(_pressure[i] / maxf(0.1, release_threshold * 1.6), 0.0, 1.0)
             var c := LOW.lerp(MID, q).lerp(HIGH, smoothstep(0.58, 1.0, q))
             c = c.lerp(HIGH, pressure_value * 0.36)
