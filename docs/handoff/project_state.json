@@ -14,7 +14,11 @@
   "workstation": {
     "local_root": "E:\\_Project\\GodotCreativeLab",
     "godot_gui": "C:\\Godot\\Godot_v4.7.1-stable_win64.exe",
-    "godot_console": "C:\\Godot\\Godot_v4.7.1-stable_win64_console.exe"
+    "godot_console": "C:\\Godot\\Godot_v4.7.1-stable_win64_console.exe",
+    "startup_window_mode": "native_fullscreen",
+    "startup_fullscreen_preserves_workstation_ui": true,
+    "f11_remains_render_presentation": true,
+    "windowed_restore_rect_remembered_before_startup_fullscreen": true
   },
   "runtime": {
     "main_scene": "res://app/main/main_runtime.tscn",
@@ -41,8 +45,14 @@
     "runtime_compact_layer": "app/main/main_runtime_gallery_compact_review.gd",
     "reviews_path": "user://creative_lab_reviews.cfg",
     "review_axes": ["visual", "interaction", "originality", "aliveness", "controls", "performance"],
-    "review_ui": "compact_row_plus_popup",
+    "review_ui_revision": 3,
+    "review_ui": "compact_row_plus_centered_opaque_in_app_modal",
+    "native_popup_rejected_by_host": true,
+    "review_modal_backdrop": "dark_full_window",
+    "review_modal_centering": "CenterContainer_full_rect",
+    "review_modal_close_modes": ["close_button", "escape", "outside_mouse", "outside_touch"],
     "review_event": "sketch_review_changed",
+    "review_modal_event": "review_modal_changed",
     "preference_snapshot_event": "creative_preference_snapshot",
     "preference_snapshot_emitted_at_startup": true,
     "preference_snapshot_emitted_after_rating_change": true,
@@ -100,57 +110,28 @@
     "last_self_test_unique_count": 180,
     "record_only_implemented_signatures": true
   },
-  "creative_rules": {
-    "preferred_exploration_mode": "adaptive_collision_first",
-    "pipeline": ["adaptive_diversity_draw", "coupled_raw_prototype", "observe", "interpret", "art_direct", "mutate"],
-    "substantial_lab_parameter_target": [6, 9],
-    "at_least_half_controls_should_change_future_evolution": true,
-    "organic_cellular_work_requires_local_state_exchange": true,
-    "prefer_multiple_time_scales": true,
-    "raw_does_not_excuse_weak_default_visuals": true,
-    "random_stacking_without_state_coupling_is_rejected": true,
-    "real_world_references_preserve_causal_structure": true,
-    "performance_representation_must_match_scale": true,
-    "ratings_are_evidence_not_clone_instruction": true
-  },
-  "knowledge": {
-    "temporal_motion_quality": "knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md",
-    "adaptive_creative_draw": "knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md",
-    "creative_draw_space": "knowledge/cross-domain/creative_draw_space.json",
-    "technique_palette": "knowledge/cross-domain/TECHNIQUE_PALETTE.md",
-    "random_collision_engine": "knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md",
-    "collision_source_catalog": "knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md",
-    "physical_chemical_systems": "knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md",
-    "organic_coupling_and_controls": "knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md",
-    "realtime_performance_budget": "knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md",
-    "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
-    "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
-    "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md"
-  },
-  "historical_constraints": {
-    "005_pressure_lattice_visible_title": "REGISTER TYPE",
-    "do_not_restore_pressure_lattice": true,
-    "do_not_make_glyph_contours_default": true,
-    "do_not_restore_permanent_all_tags_wall": true
-  },
   "telemetry": {
     "remote_branch": "telemetry/runtime",
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "publication": "asynchronous_queued_sanitized",
-    "last_host_tested_runtime_head_before_current_changes": "2850e407511e",
     "telemetry_first_after_host_test": true,
-    "prefer_consolidated_preference_snapshot": true
+    "prefer_consolidated_preference_snapshot": true,
+    "last_checked_remote_head": "dd9194667593b7bdc2d8178ad34124fafbd70bcc",
+    "last_checked_remote_time": "2026-09-25T07:09:55Z",
+    "latest_was_empty_at_latest_popup_feedback": true,
+    "latest_popup_feedback_not_telemetry_validated": true,
+    "startup_fullscreen_event": "workstation_startup_fullscreen"
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
     "required_for_runtime_code": ["repository_policy", "temporal_motion_audit", "adaptive_creative_draw_self_test", "godot_4_7_1_headless_import", "main_scene_smoke_test", "tracked_file_cleanliness"],
-    "latest_code_head_before_docs": "bcc6ab37ac30e075a2492baa03dd04cdc4ab44f3",
-    "latest_code_ci_run": 268,
+    "latest_code_head_before_docs": "82e5fcd92d71a076268a4cc5ca5a01169950afad",
+    "latest_code_ci_run": 270,
     "latest_code_ci_passed": true,
     "final_exact_head_ci_must_be_resolved_after_docs": true,
-    "current_host_state": "COMPACT_REVIEW_TEMPORAL_REFACTOR_ADAPTIVE_DRAW_IMPLEMENTED_NOT_HOST_VALIDATED"
+    "current_host_state": "REVIEW_MODAL_V3_STARTUP_FULLSCREEN_IMPLEMENTED_NOT_HOST_VALIDATED"
   },
   "constraints": {
     "merge_main_requires_explicit_user_approval": true,
@@ -162,6 +143,7 @@
     "do_not_treat_local_purge_as_git_source_deletion": true,
     "do_not_use_generic_direct_clock_animation_as_default_aliveness": true,
     "ratings_bias_must_preserve_exploration": true,
+    "do_not_restore_native_transparent_offcenter_review_popup": true,
     "canonical_host_test_uses_exact_head_ci_wait": true
   }
 }

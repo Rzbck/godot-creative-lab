@@ -2,9 +2,9 @@
 
 Canonical restart point for a new human or AI session.
 
-**Always resolve the current remote branch HEAD and exact-head CI before trusting recorded SHAs. Repository state + matching runtime telemetry beat chat history.**
+Always resolve the real remote branch HEAD and exact-head CI before trusting recorded SHAs. Repository state + matching runtime telemetry beat chat history.
 
-Last material refresh: **2026-09-25**.
+Last material refresh: 2026-09-25.
 
 ## Repository / active work
 
@@ -23,6 +23,8 @@ DC//LAB is a Godot creative-coding workstation with data-driven Gallery discover
 
 PROGRAM canvas is artwork-only. Logical design coordinates are normally 1280×720, but render surfaces must adapt to actual viewport.
 
+The workstation now requests native fullscreen at startup. This is **not** F11 presentation: the complete workstation UI stays visible. F11 remains the render-presentation mode for an active sketch and should restore the prior workstation fullscreen mode on exit. The normal-window rectangle is remembered before startup fullscreen so the custom restore button can still return to windowed mode.
+
 ## Current top runtime
 
 `res://app/main/main_runtime_gallery_compact_review.gd`
@@ -40,64 +42,82 @@ main_runtime_gallery_compact_review.gd
 
 Always inspect actual code before editing the chain.
 
-## Gallery / review / curation
+## REVIEW UI — revision 3
 
-Adaptive filter contract remains:
+The previous native `PopupPanel` RATE UI was host-rejected: transparent/ugly and visibly off-center.
 
-- `ALL` always visible;
-- max six generated useful quick tags;
-- universal tags omitted;
-- rare/rest tags in collapsed `MORE`;
-- search indexes every tag;
-- first `definition.json` tag remains primary group.
+Do not restore that implementation.
 
-Review UI is now compact. Permanent parameter sidebar contains one row:
+Permanent parameter sidebar remains compact:
 
 `REVIEW <avg>/5  RATE  TRASH`
 
-`RATE` opens the six axes (visual, interaction, originality, aliveness, controls, performance). Scores persist in `user://creative_lab_reviews.cfg`; cards retain `R x.x` badges.
+`RATE` now opens an **in-app modal**, not a native popup:
 
-`creative_preference_snapshot` now publishes the **entire current explicit rating state** at startup and after edits. Future AI should read this snapshot before reconstructing fragmented rating clicks.
+- full-window darkened backdrop;
+- opaque raised-surface card using the workstation design system;
+- centered by `CenterContainer`, so resize/fullscreen cannot displace it;
+- title `RATE / <SKETCH>`;
+- six score rows, 1–5;
+- explicit close button;
+- Escape closes the modal before any Gallery navigation;
+- click/touch outside the card closes it;
+- score persistence and Gallery `R x.x` badges remain unchanged.
 
-Known explicit host evidence before this revision:
+Review state persists in `user://creative_lab_reviews.cfg`.
 
-- 020 ECHO TISSUE ~4.17/5 (4,4,4,4,4,5) — strongest known complete vector;
-- 022 LIESEGANG FRONT ~1.83/5 (1,2,2,1,2,3);
-- 025 FARADAY QUASI ~2.17/5 (3,2,2,1,2,3);
-- 001 SIGNAL FIELD ~2.33/5 (3,2,2,1,3,3);
-- host had 16 reviewed sketches total.
+`creative_preference_snapshot` still publishes the entire current explicit rating state at startup and after edits. Future AI should prefer it over reconstructing fragmented rating events.
 
-Do not convert this into a ranking/clone system. Use per-axis evidence as a bounded probability signal.
+Known explicit rating evidence before this revision:
 
-Trash stays local/reversible: 7/14/30-day retention, RESTORE, local PURGE/retirement. It never deletes Git source.
+- 020 ECHO TISSUE ~4.17/5 (4,4,4,4,4,5)
+- 022 LIESEGANG FRONT ~1.83/5 (1,2,2,1,2,3)
+- 025 FARADAY QUASI ~2.17/5 (3,2,2,1,2,3)
+- 001 SIGNAL FIELD ~2.33/5 (3,2,2,1,3,3)
+- host had 16 reviewed sketches total
+
+Ratings are evidence / bounded probability bias, never a command to clone the highest-rated work.
+
+Trash remains local/reversible and never deletes Git source.
+
+## Telemetry status after latest host feedback
+
+The user reported the RATE visual problem after testing, so telemetry was inspected first.
+
+Remote evidence was **not fresh enough** for that test:
+
+- `telemetry/runtime/latest.jsonl` was empty;
+- remote telemetry branch still ended at `dd919466...` / 2026-09-25 07:09:55Z;
+- that is older than the review-v2 code/head the user was testing.
+
+Therefore the modal visual criticism comes directly from explicit host feedback, not from falsely attributed telemetry evidence.
+
+After the next host test, inspect telemetry first again and verify the branch advances to the tested HEAD/session. New telemetry events include `review_modal_changed` and `workstation_startup_fullscreen`.
 
 ## Temporal-quality rule — important
 
 User explicitly rejected obvious cheap temporal loops / sine-like breathing/bobbing. Treat this as a durable creative constraint.
 
-Read:
+Read `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
 
-`knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
+Preferred:
 
-Core distinction:
+`time -> state/force/memory/event -> coupling -> render`
 
-`time -> state/force/memory/event -> coupling -> render` is preferred.
+Rejected by default:
 
-`time -> sin/cos -> visible position/scale/alpha/warp` is rejected by default.
+`time -> sin/cos -> visible position/scale/alpha/warp`
 
-Periodic forcing is allowed when it is truly the mechanism. For index 026+, direct `sketch_time` / `u_time` / shader `TIME` trigonometry requires a nearby `TEMPORAL_INTENT:` explanation.
+Periodic forcing is allowed only when it is truly the mechanism. For index 026+, direct `sketch_time` / `u_time` / shader `TIME` trigonometry requires nearby `TEMPORAL_INTENT:` justification.
 
-`scripts/ci/audit_temporal_motion.py` currently reports historical findings as warnings. The first full audit found 38 observations across <=025. Some are legitimate fixed simulation cadences, so do not treat every warning as a defect.
+`scripts/ci/audit_temporal_motion.py` found 38 historical observations in <=025. Some fixed-interval warnings are legitimate simulation/event cadence; do not blindly replace all with noise.
 
-Targeted current-batch changes:
+Current targeted temporal refactors remain:
 
-- 021: no Lissajous/orbiting auto magnet or shader clock wobble; variable target/dwell + hysteretic state.
-- 022: no visible front snap-reset; reagent exhaustion/rest/recharge generations.
-- 024: no sinusoidal global-time creep; material-state creep + avalanche event-index randomness.
-- 025: physical periodic forcing retained intentionally; chirp target is stateful/variable; decorative clock touch ripple removed.
-- 023 was already primarily state-driven.
-
-Historical direct-clock observations remain a measured backlog; prioritize with ratings/identity instead of blindly replacing all motion with noise.
+- 021 ROSENSWEIG FIELD: variable target/dwell + hysteretic state, no Lissajous/orbit clock choreography.
+- 022 LIESEGANG FRONT: reagent exhaustion/rest/recharge, no visible giant-front snap reset.
+- 024 GRANULAR JAM: stress/velocity/confinement/material-driven creep + event-indexed avalanche variation.
+- 025 FARADAY QUASI: valid physical forcing retained, stateful chirp, decorative clock touch ripple removed.
 
 ## Adaptive creative draw — important
 
@@ -107,70 +127,42 @@ Read:
 - `knowledge/cross-domain/creative_draw_space.json`
 - `scripts/creative/draw_recipe.py`
 
-Future work should start from the draw engine when exploring new sketch technology. It selects carrier, two distant representation families, two distant operator families, temporal model, interaction consequence, design constraint and render path.
+Future exploration should start from this diversity-aware draw engine. It selects carrier, two representation families, two operator families, temporal model, interaction consequence, design constraint and render path.
 
-Anti-repetition weighting penalizes historical/recent reuse and requires meaningful distance from recent signatures.
+Historical/recent reuse is penalized. Explicit REVIEW ratings can gently bias features, but 24% of draws deliberately ignore preference bias and remain exploration-first.
 
-Explicit REVIEW ratings may gently bias recorded features (~bounded ±24%), but **24% exploration share ignores preference bias**. This preserves discovery instead of converging into a single house style.
+For index 026+, `definition.json` requires non-empty `creative_signature`. Record only implemented/kept signatures.
 
-For index 026+, `definition.json` must include non-empty `creative_signature`. Record the signature only for implemented/kept work.
-
-CI runs a deterministic 180-draw self-test. First validated result: 180 unique / 180.
+CI self-tests 180 deterministic draws; first validated result was 180 unique / 180.
 
 ## Full-canvas render rule
 
-A scene node named `ShaderSurface` must use `res://sketches/_shared/full_canvas_surface.gd`. CI rejects legacy fixed 1280×720 surfaces. Host emits `sketch_surface_contract` coverage telemetry.
-
-This was added after 025 received a correct 1520×852 PREVIEW but its old fixed ColorRect exposed gray space.
+A scene node named `ShaderSurface` must use `res://sketches/_shared/full_canvas_surface.gd`. CI rejects legacy fixed 1280×720 surfaces. Host emits `sketch_surface_contract` telemetry.
 
 ## Historical creative constraints
 
 - 001 is technical foundation/reference.
-- 005 internal id remains `005_pressure_lattice`, visible artwork remains **REGISTER TYPE**; never restore rejected Pressure Lattice.
-- generalized glyph-contour pass `6c20a094...` across 006–010 was host-rejected; do not restore it as default representation.
+- 005 internal id remains `005_pressure_lattice`, visible artwork remains **REGISTER TYPE**; never restore Pressure Lattice.
+- generalized glyph-contour pass `6c20a094...` across 006–010 was host-rejected; do not restore as default representation.
 - 011–015 established collision-first diversity but were visually weak/under-parameterized.
 - 016–020 improved organic coupling; 017/020 have dense-field ImageTexture performance refactors.
 - 021–025 are physical/chemical mechanism labs.
 
-## Knowledge priority
-
-For current/new creative work read:
-
-1. `TEMPORAL_MOTION_QUALITY.md`
-2. `ADAPTIVE_CREATIVE_DRAW.md`
-3. `creative_draw_space.json`
-4. `TECHNIQUE_PALETTE.md`
-5. `RANDOM_COLLISION_ENGINE.md`
-6. `COLLISION_SOURCE_CATALOG.md`
-7. `PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
-8. `ORGANIC_COUPLING_AND_CONTROLS.md`
-9. `REALTIME_PERFORMANCE_BUDGET.md`
-10. relevant design/creative-coding atlases and IDEA_ENGINE/CROSS_DOMAIN_ATLAS.
-
 ## Next host validation
 
-1. Confirm sidebar REVIEW is compact; RATE popup opens without consuming permanent parameter height.
-2. Edit/clear scores, reopen and verify persistence + Gallery badge.
-3. Allow normal telemetry publication; next AI reads `creative_preference_snapshot` first.
-4. Watch 021 ~60s idle: no obvious analytic orbit/Lissajous loop.
-5. Watch 022 through exhaustion/recharge: no visible front snap reset.
-6. Watch 024 under load/release: creep/avalanche feels stress/event-driven, not harmonic.
-7. Watch 025: standing-wave periodicity is valid, but decorative traveling touch ripple/metronomic chirp is gone.
-8. Close normally and inspect fresh matching `telemetry/runtime` before asking for logs.
+1. Launch app and verify workstation opens directly in native fullscreen with all app chrome visible.
+2. Use the custom restore/maximize control once; confirm a normal window can still be restored and fullscreen/expanded behavior remains coherent.
+3. Open a sketch and press RATE.
+4. Verify backdrop is dark, card is fully opaque and **exactly centered** at startup fullscreen size.
+5. Resize/restore then reopen RATE; card must remain centered.
+6. Change/clear scores, close via ×, Escape and outside click/touch; verify persistence + Gallery `R x.x`.
+7. F11 an active sketch, exit with Esc, and verify workstation returns to its previous fullscreen state.
+8. Close normally so telemetry can publish; next AI inspects `creative_preference_snapshot`, `review_modal_changed`, `workstation_startup_fullscreen` and tested HEAD/session first.
+9. Continue temporal visual checks on 021/022/024/025 as previously documented.
 
 ## PROGRAM / LIVE OUT architecture
 
 Navigation is not transport. PROGRAM continues across Gallery/Settings/other PREVIEW. `TAKE LIVE` replaces it. Linked output follows source state; detached PROGRAM continues autonomously. Physical PROGRAM touch/mouse remains supported.
-
-## Telemetry-first debugging
-
-After every host runtime test:
-
-1. inspect `telemetry/runtime`;
-2. read `latest.jsonl` + relevant session;
-3. verify tested HEAD/session;
-4. prefer consolidated rating snapshot and runtime events over manual reconstruction;
-5. ask for logs/screenshots only when telemetry lacks evidence.
 
 ## Mandatory completion protocol
 
@@ -186,4 +178,4 @@ After every material repository change:
 
 ## Rejected regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, use synchronous telemetry Git work, resurrect failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, restore fixed 1280×720 ShaderSurface nodes, or use naked global-clock sine/cosine wobble as a generic substitute for behavior.
+Do not stop PROGRAM on navigation, create independent linked timelines, use synchronous telemetry Git work, resurrect failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, restore fixed 1280×720 ShaderSurface nodes, restore the transparent/off-center native RATE popup, or use naked global-clock sine/cosine wobble as a generic substitute for behavior.

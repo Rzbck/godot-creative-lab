@@ -22,6 +22,7 @@ Last refreshed: 2026-09-25.
 - logical artwork space usually `1280×720`, but render surfaces adapt to actual viewport.
 - PROGRAM is artwork-only.
 - local Trash never deletes Git source.
+- workstation now opens in native fullscreen by default; F11 remains sketch presentation, not app startup mode.
 
 ## Current top runtime
 
@@ -29,135 +30,112 @@ Last refreshed: 2026-09-25.
 
 It extends `main_runtime_gallery_feedback_trash.gd`, then adaptive filters / organizer / PROGRAM layers.
 
+## Latest host feedback and fix
+
+User host-tested REVIEW v2 and explicitly rejected the RATE popup because it was transparent, ugly and not centered.
+
+The old native `PopupPanel` implementation is rejected and must not return.
+
+Revision 3 now uses an in-app modal:
+
+- full-window dim backdrop;
+- opaque `PanelContainer` card with design-system raised surface + border;
+- true geometric centering through `CenterContainer`;
+- width 430 logical UI px;
+- title includes current sketch;
+- six 1–5 rows;
+- × close button;
+- Escape closes modal first;
+- outside mouse/touch closes modal;
+- score persistence and Gallery badge unchanged.
+
+New telemetry event: `review_modal_changed`.
+
+## Startup fullscreen
+
+The same top runtime now requests `DisplayServer.WINDOW_MODE_FULLSCREEN` after base `_ready()` has already remembered the normal 1280×720-ish restore rectangle.
+
+Intent:
+
+- app/workstation opens fullscreen with all workstation chrome visible;
+- this is distinct from F11 render presentation;
+- custom restore control can still return to remembered windowed rect;
+- F11 should restore the prior fullscreen workstation mode after presentation exit.
+
+Headless CI explicitly skips the startup mode request via `DisplayServer.get_name() == "headless"`.
+
+New telemetry event: `workstation_startup_fullscreen` with requested/actual mode, match flag and window size.
+
+## Telemetry evidence for this host feedback
+
+Telemetry was inspected first, but remote telemetry was stale:
+
+- `telemetry/runtime/latest.jsonl` empty;
+- telemetry branch HEAD `dd9194667593...` dated 2026-09-25 07:09:55Z;
+- therefore it does not represent the latest RATE host test.
+
+Do not claim telemetry validated the popup bug. The visual failure comes from direct user feedback. After next test, inspect telemetry again and require tested-head/session match.
+
 ## Explicit user-rating evidence
 
-Fresh host telemetry from the previous runtime reported **16 reviewed sketches**. Some complete known score vectors:
+Previously known complete vectors:
 
-- **020 ECHO TISSUE** — visual 4, interaction 4, originality 4, aliveness 4, controls 4, performance 5; average ~4.17.
-- **022 LIESEGANG FRONT** — 1,2,2,1,2,3; average ~1.83; especially weak visual/aliveness.
-- **025 FARADAY QUASI** — 3,2,2,1,2,3; average ~2.17; weak aliveness.
-- **001 SIGNAL FIELD** — 3,2,2,1,3,3; average ~2.33.
+- 020 ECHO TISSUE — 4,4,4,4,4,5; average ~4.17.
+- 022 LIESEGANG FRONT — 1,2,2,1,2,3; average ~1.83.
+- 025 FARADAY QUASI — 3,2,2,1,2,3; average ~2.17.
+- 001 SIGNAL FIELD — 3,2,2,1,3,3; average ~2.33.
+- last known reviewed count: 16.
 
-These are explicit host ratings, not inferred taste. Do not turn them into a simplistic “copy 020” rule.
-
-## Compact REVIEW revision
-
-The six criteria no longer occupy permanent parameter-sidebar height.
-
-The project inspector now shows one compact row:
-
-`REVIEW  <avg>/5  RATE  TRASH`
-
-`RATE` opens a popup with the existing six 1–5 axes. Persistence and Gallery `R x.x` badges remain intact.
-
-New consolidated telemetry event:
-
-`creative_preference_snapshot`
-
-It emits at startup and after rating edits and contains all current reviewed sketches, rating vectors, averages, axis averages, title/tags and `creative_signature` when available. Future sessions should prefer this snapshot over reconstructing dozens of click events.
+`creative_preference_snapshot` remains the preferred consolidated source after host telemetry advances.
 
 ## Temporal-loop audit
 
-User feedback: many historical sketches expose ugly predictable “loops” / sine-like bobbing. The issue is defined as **visible clock periodicity**, not programming loops in general.
-
-New rules live in:
-
-`knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
-
-Preferred temporal chain:
+User rejects visible cheap clock periodicity. Preferred:
 
 `time -> state/force/memory/event -> coupled dynamics -> render`
 
-Default rejection:
+Reject by default:
 
-`time -> sin/cos -> visible position/scale/alpha/warp`
+`time -> sin/cos -> visible position/scale/alpha/warp`.
 
-CI script:
+Rules: `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
 
-`scripts/ci/audit_temporal_motion.py`
+CI script: `scripts/ci/audit_temporal_motion.py`.
 
-Current audit found **38 historical observations** across the <=025 corpus. Important concentrations include 002, 003, 004, 006, 009, 011, 013, 014, 015, 016, 017, 019 and previously 024. Some fixed-interval warnings are legitimate simulation/event cadences, so they are diagnostic, not blanket failures.
+Historical audit found 38 observations across <=025. For 026+, direct clock trig requires `TEMPORAL_INTENT:`; `creative_signature` also mandatory.
 
-For 026+ direct clock trig requires `TEMPORAL_INTENT:` and a non-empty `creative_signature` is mandatory.
+Current targeted fixes remain:
 
-Do not blindly replace every historical oscillator with noise. Use ratings + visual identity to prioritize refactors.
-
-## Current temporal fixes
-
-### 021 ROSENSWEIG FIELD
-
-Removed predictable Lissajous/orbiting auto magnet and shader clock wobble. Autonomous magnet now chooses deterministic-random targets with variable dwell and viscosity; visible dynamics come from source motion + hysteretic instability state.
-
-### 022 LIESEGANG FRONT
-
-Removed visible “front grows huge then snaps back to small” behavior. Reservoirs now consume reagent charge, exhaust, rest for variable durations and recharge; bands persist/dissolve independently. Internal radius restart happens while reservoir is visually depleted.
-
-### 024 GRANULAR JAM
-
-Removed clock-driven sinusoidal creep. Creep direction now comes from actual lateral velocity, confinement position, stress and stable per-grain material asymmetry. Avalanche slip patterns use real avalanche event index rather than global clock time.
-
-### 025 FARADAY QUASI
-
-Physical periodic forcing remains intentionally. Added `TEMPORAL_INTENT:`. Chirp no longer uses `sin(sketch_time)`; it moves between variable-duration state targets. Removed decorative clock-driven touch ripple; touch injects a local pressure impulse and modal state carries the evolution.
-
-023 SPINODAL MARANGONI was already primarily state-driven and did not require a temporal rewrite.
+- 021 ROSENSWEIG: no analytic orbit/Lissajous auto motion.
+- 022 LIESEGANG: no visible front snap-reset.
+- 024 GRANULAR JAM: state-driven creep + event-indexed avalanche.
+- 025 FARADAY: intentional physical forcing only; stateful chirp; no decorative touch-clock ripple.
 
 ## Adaptive creative draw
 
-New system:
+Files:
 
 - `knowledge/cross-domain/creative_draw_space.json`
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 - `scripts/creative/draw_recipe.py`
 
-A draw selects carrier + two distant representation families + two distant operator families + temporal model + interaction + design constraint + render path.
-
-Anti-repetition:
-
-- historical frequency penalty;
-- stronger previous / last-3 / last-5 penalties;
-- minimum recent signature distance of 4 axes;
-- forced oscillator base penalty;
-- representation/operator pair families must differ.
-
-Preference learning:
-
-- optional explicit rating snapshot biases features only modestly (~±24% feature influence);
-- **24% exploration share ignores preference bias entirely** and uses diversity constraints only;
-- ratings are never permission to remove a technical family forever or clone the highest-rated sketch.
-
-CI self-test currently validates 180 deterministic draws; first validated run produced **180 unique / 180**.
+Anti-repetition remains historical/recent weighting + signature distance. REVIEW bias is bounded and 24% exploration ignores preferences. CI self-test: 180 unique / 180 on first validated run.
 
 ## Full-canvas contract
 
 `ShaderSurface` must use `sketches/_shared/full_canvas_surface.gd`; CI rejects legacy fixed 1280×720 surfaces. Host `sketch_surface_contract` telemetry remains the dynamic coverage check.
 
-## Knowledge priority
-
-For next creative work read:
-
-1. `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
-2. `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
-3. `knowledge/cross-domain/creative_draw_space.json`
-4. `TECHNIQUE_PALETTE.md`
-5. `RANDOM_COLLISION_ENGINE.md`
-6. `COLLISION_SOURCE_CATALOG.md`
-7. `PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
-8. `ORGANIC_COUPLING_AND_CONTROLS.md`
-9. `REALTIME_PERFORMANCE_BUDGET.md`
-10. relevant design/creative-coding atlases.
-
 ## Required next host test
 
-1. Verify parameter sidebar is compact: REVIEW average + RATE + TRASH only.
-2. Open RATE popup, change/clear several scores, reopen and verify persistence; return Gallery and verify `R x.x`.
-3. On a normal launch/close, allow telemetry publication; next AI must inspect `creative_preference_snapshot` first to recover all current ratings.
-4. Watch 021 idle for ~60 s: no obvious Lissajous/orbiting loop.
-5. Watch 022 through depletion/rest/recharge: no visible giant-front snap reset.
-6. Watch 024 under load/release: creep/avalanche should feel state/stress-driven, not harmonic side-to-side motion.
-7. Watch 025: periodic standing-wave behavior is conceptually valid, but decorative traveling touch ripple / metronomic chirp should be gone.
-8. Continue rating artwork honestly; use low/high per-axis scores rather than only aggregate judgement.
-9. Close normally, then inspect fresh `telemetry/runtime` and require matching tested HEAD/session before conclusions.
+1. Launch: verify full workstation opens fullscreen immediately.
+2. Restore to windowed and re-expand; verify no broken geometry.
+3. Open any sketch and click RATE.
+4. Verify RATE card is opaque, visually consistent and dead-center.
+5. Restore/resize app and reopen RATE; it must stay centered.
+6. Test ×, Escape, outside click/touch.
+7. Change/clear a score, reopen, return Gallery and verify badge.
+8. F11 active sketch then Esc; workstation should return to previous fullscreen mode.
+9. Close normally, then inspect fresh `telemetry/runtime` first and require matching tested HEAD/session.
 
 ## Mandatory AI completion
 
@@ -165,4 +143,4 @@ After every material repository change: finish commits, update durable docs/stat
 
 ## Non-regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, block UI with telemetry Git work, restore failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, reintroduce fixed 1280×720 ShaderSurface nodes, or use naked global-clock wobble as the default way to make a sketch feel alive.
+Do not stop PROGRAM on navigation, create independent linked timelines, block UI with telemetry Git work, restore failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, reintroduce fixed 1280×720 ShaderSurface nodes, restore native transparent RATE popup, or use naked global-clock wobble as default aliveness.

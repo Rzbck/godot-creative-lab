@@ -12,25 +12,59 @@ Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924
 6. `docs/ARCHITECTURE.md`
 7. `docs/SKETCH_CONTRACT.md`
 
-Après un test hôte, inspecte `telemetry/runtime` avant de demander logs/captures. Vérifie que la session correspond au HEAD testé.
+Après un test hôte, inspecte `telemetry/runtime` avant de demander logs/captures et vérifie que la session correspond au HEAD testé.
+
+## Important — RATE UI
+
+Le user a host-rejeté le `PopupPanel` RATE v2 : transparent, moche, pas centré. Ne le restaure pas.
+
+`app/main/main_runtime_gallery_compact_review.gd` est maintenant REVIEW UI revision 3 :
+
+- sidebar compact `REVIEW <avg>/5  RATE  TRASH`;
+- RATE = modal **in-app** plein écran, pas popup natif;
+- backdrop sombre;
+- carte opaque design-system;
+- centrage `CenterContainer`;
+- × / Escape / clic ou touch hors carte pour fermer;
+- notes persistantes + badge Gallery inchangés.
+
+Après le prochain test, inspecte `review_modal_changed` si la télémétrie a bien avancé.
+
+## Important — démarrage fullscreen
+
+L’application doit maintenant ouvrir le **workstation complet en native fullscreen** dès `_ready()` du top runtime.
+
+Ce n’est pas F11 :
+
+- UI Gallery/paramètres/chrome reste visible au lancement;
+- F11 reste présentation render d’un sketch;
+- le rect windowed normal est mémorisé avant le passage fullscreen pour permettre Restore;
+- après F11/Esc, le workstation doit revenir au mode fullscreen précédent.
+
+Événement télémétrie : `workstation_startup_fullscreen`.
+
+## Important — état télémétrie du feedback précédent
+
+Lors de la critique du popup, telemetry-first a été fait mais la branche distante était stale :
+
+- `latest.jsonl` vide;
+- `telemetry/runtime` encore à `dd9194667593...` (2026-09-25 07:09:55Z), antérieur au test.
+
+Donc ne prétends pas que ce feedback popup était telemetry-validated. Il vient directement du user.
 
 ## Important — notes utilisateur
 
-Le REVIEW est maintenant compact via `app/main/main_runtime_gallery_compact_review.gd` : une ligne REVIEW/average/RATE/TRASH, avec les six axes dans un popup.
+Lis en priorité `creative_preference_snapshot` lorsqu’il existe dans une session fraîche. Il contient l’état consolidé des notes explicites.
 
-Lis en priorité l’événement `creative_preference_snapshot`, qui contient l’état consolidé des notes explicites. Ne reconstruis pas inutilement les préférences depuis des clics fragmentés si ce snapshot existe.
-
-Les notes servent de **preuve et de biais modéré**, pas de classement à cloner. Conserve une vraie exploration.
+Les notes servent de preuve et de biais modéré, pas de classement à cloner. Conserve une vraie exploration.
 
 ## Important — qualité temporelle
 
-Le user rejette explicitement les boucles visibles cheap / respiration-bobbing de type `sin(time)` utilisées seulement pour faire bouger une œuvre.
+Le user rejette les boucles visibles cheap / respiration-bobbing de type `sin(time)` utilisées seulement pour faire bouger une œuvre.
 
-Lire :
+Lire `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
 
-`knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
-
-Règle :
+Règle préférée :
 
 `time -> état/force/mémoire/événement -> système couplé -> rendu`
 
@@ -38,22 +72,22 @@ plutôt que :
 
 `time -> sin/cos -> position/scale/alpha/warp visible`.
 
-Une oscillation physique/conceptuelle reste autorisée (Faraday par exemple). À partir de 026, tout trigonométrie directe sur `sketch_time`, `u_time` ou shader `TIME` doit porter un commentaire `TEMPORAL_INTENT:` expliquant pourquoi.
+Une oscillation physique/conceptuelle reste autorisée. À partir de 026, toute trigonométrie directe sur `sketch_time`, `u_time` ou shader `TIME` doit porter `TEMPORAL_INTENT:`.
 
 CI : `scripts/ci/audit_temporal_motion.py`.
 
-Le premier audit complet a trouvé 38 observations historiques dans <=025. Certaines périodes fixes sont seulement des cadences de simulation : ne traite pas tout warning comme un défaut visuel.
+Premier audit : 38 observations historiques dans <=025.
 
 Refactors actuels :
 
-- 021 ROSENSWEIG : auto-magnet target/dwell variable, plus de Lissajous/orbite temporelle directe.
-- 022 LIESEGANG : épuisement/repos/recharge de réservoir, plus de gros front qui snap-reset visiblement.
-- 024 GRANULAR JAM : creep selon stress/vitesse/confinement/asymétrie, avalanche indexée par événement.
-- 025 FARADAY : forcing périodique intentionnel conservé, chirp stateful variable, ripple tactile décoratif temporel retiré.
+- 021 ROSENSWEIG : target/dwell variable, plus de Lissajous/orbite temporelle directe.
+- 022 LIESEGANG : épuisement/repos/recharge, plus de front snap-reset visible.
+- 024 GRANULAR JAM : creep stress/vitesse/confinement/asymétrie, avalanche indexée événement.
+- 025 FARADAY : forcing périodique intentionnel, chirp stateful, ripple tactile décoratif retiré.
 
 ## Important — prochain tirage créatif
 
-Utilise le nouveau système adaptatif :
+Utilise :
 
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 - `knowledge/cross-domain/creative_draw_space.json`
@@ -61,11 +95,9 @@ Utilise le nouveau système adaptatif :
 
 Il choisit carrier + 2 représentations de familles différentes + 2 opérateurs de familles différentes + modèle temporel + interaction + contrainte design + render path.
 
-Il pénalise la répétition historique/récente. Les notes explicites peuvent biaiser légèrement les probabilités, mais 24% des tirages ignorent entièrement le biais de préférence pour préserver la découverte.
+Il pénalise la répétition. Les notes peuvent biaiser légèrement, mais 24% des tirages ignorent entièrement le biais de préférence.
 
-Pour tout sketch 026+, `definition.json` doit contenir `creative_signature`. Ne stocke dans l’historique que les concepts effectivement implémentés/conservés.
-
-Ne prends jamais le tirage brut comme concept final : `draw -> prototype couplé -> observe -> interprète -> art-direct -> mutate`.
+Pour tout sketch 026+, `definition.json` doit contenir `creative_signature`. Ne stocke que les concepts effectivement implémentés/conservés.
 
 ## Historique / non-régressions
 
@@ -78,16 +110,16 @@ Ne prends jamais le tirage brut comme concept final : `draw -> prototype couplé
 
 ## Prochaine opération
 
-Test hôte :
+Test hôte prioritaire :
 
-1. vérifier que REVIEW ne prend plus la hauteur du panneau paramètres ;
-2. RATE ouvre le popup, notes persistantes + badge Gallery ;
-3. fermer normalement pour publier `creative_preference_snapshot` complet ;
-4. regarder 021 ~60 s pour vérifier disparition du mouvement analytique répétitif ;
-5. suivre 022 pendant épuisement/repos/recharge ;
-6. charger/relâcher 024 et juger creep/avalanche ;
-7. tester 025 et distinguer oscillation Faraday légitime de l’ancien habillage périodique ;
-8. continuer à noter les œuvres selon chaque axe ;
-9. ensuite telemetry-first et décider quels warnings historiques méritent un refactor selon notes + identité.
+1. lancer l’app : workstation doit remplir l’écran immédiatement avec tout le chrome UI;
+2. Restore puis re-expand : géométrie stable;
+3. ouvrir un sketch puis RATE : carte opaque et parfaitement centrée;
+4. Restore/resize puis RATE : toujours centrée;
+5. tester ×, Escape, clic/touch hors carte;
+6. changer/effacer plusieurs notes, rouvrir, vérifier persistance + badge Gallery;
+7. F11 puis Esc : retour au fullscreen workstation précédent;
+8. fermer normalement;
+9. ensuite telemetry-first sur session fraîche et HEAD testé.
 
 Après toute modification matérielle : terminer commits/docs, résoudre HEAD final, attendre CI du SHA exact, donner short SHA + CI et le PowerShell canonique de `OPERATIONS.md` si test Windows pertinent.
