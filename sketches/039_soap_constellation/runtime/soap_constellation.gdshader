@@ -1,6 +1,8 @@
 shader_type canvas_item;
 render_mode unshaded;
 
+const float DESIGN_ASPECT = 1.7777778;
+
 uniform vec4 u_b0 = vec4(0.31,0.34,0.118,0.72);
 uniform vec4 u_b1 = vec4(0.45,0.27,0.096,0.54);
 uniform vec4 u_b2 = vec4(0.61,0.34,0.132,0.78);
@@ -23,7 +25,7 @@ float hash21(vec2 p) {
 
 vec2 ap(vec2 uv) {
     vec2 p = uv - 0.5;
-    p.x *= SCREEN_PIXEL_SIZE.y / max(SCREEN_PIXEL_SIZE.x, 0.000001);
+    p.x *= DESIGN_ASPECT;
     return p;
 }
 
@@ -64,7 +66,7 @@ void fragment() {
     vec3 interference = 0.5 + 0.5*cos(vec3(1.0,1.31,1.67)*optical_phase + vec3(0.0,2.0,4.1));
     interference = pow(interference,vec3(1.25));
 
-    vec2 pixel = UV / max(SCREEN_PIXEL_SIZE,vec2(0.000001));
+    vec2 pixel = floor(FRAGCOORD.xy);
     float grain = hash21(floor(pixel*(0.42+u_micro*0.16)));
     float pearly = smoothstep(0.70,0.98,grain) * u_micro;
 

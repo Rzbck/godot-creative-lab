@@ -1,6 +1,8 @@
 shader_type canvas_item;
 render_mode unshaded;
 
+const float DESIGN_ASPECT = 1.7777778;
+
 uniform sampler2D u_state : filter_linear, repeat_disable;
 uniform vec2 u_texel = vec2(0.0125,0.0222222);
 uniform float u_knife_angle = 0.34;
@@ -30,7 +32,7 @@ void fragment(){
     schlieren=clamp(schlieren,0.0,1.0);
     float edge=smoothstep(0.008,0.12,g);
 
-    vec2 pixel=UV/max(SCREEN_PIXEL_SIZE,vec2(0.000001));
+    vec2 pixel=floor(FRAGCOORD.xy);
     float grain=hash21(floor(pixel*(0.33+u_micro*0.18)));
     float wisps=hash21(floor(pixel*0.075)+floor(d*31.0));
 
@@ -48,7 +50,7 @@ void fragment(){
     color+=(wisps-0.5)*0.018*u_micro*d;
 
     vec2 p=UV-0.5;
-    p.x*=SCREEN_PIXEL_SIZE.y/max(SCREEN_PIXEL_SIZE.x,0.000001);
+    p.x*=DESIGN_ASPECT;
     float vignette=smoothstep(1.12,0.32,length(p));
     color*=mix(0.38,1.0,vignette);
     color=vec3(1.0)-exp(-color*1.42);

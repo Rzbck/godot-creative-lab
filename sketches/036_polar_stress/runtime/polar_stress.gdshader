@@ -1,6 +1,8 @@
 shader_type canvas_item;
 render_mode unshaded;
 
+const float DESIGN_ASPECT = 1.7777778;
+
 uniform vec4 u_load0 = vec4(0.24, 0.31, 0.62, 0.13);
 uniform vec4 u_load1 = vec4(0.73, 0.24, 0.48, 0.37);
 uniform vec4 u_load2 = vec4(0.66, 0.74, 0.58, 0.63);
@@ -21,13 +23,13 @@ float hash21(vec2 p) {
 
 vec2 aspect_space(vec2 uv) {
     vec2 p = uv - 0.5;
-    p.x *= SCREEN_PIXEL_SIZE.y / max(SCREEN_PIXEL_SIZE.x, 0.000001);
+    p.x *= DESIGN_ASPECT;
     return p;
 }
 
 vec2 aspect_load(vec2 uv) {
     vec2 p = uv - 0.5;
-    p.x *= SCREEN_PIXEL_SIZE.y / max(SCREEN_PIXEL_SIZE.x, 0.000001);
+    p.x *= DESIGN_ASPECT;
     return p;
 }
 
@@ -81,7 +83,7 @@ void fragment() {
     color += pearl * edge * (0.18 + 0.42 * cross_polar);
     color += mix(vec3(cross_polar * 0.26), spectral * (0.28 + 0.92 * cross_polar), u_spectral_mix);
 
-    vec2 pixel = floor(UV / max(SCREEN_PIXEL_SIZE, vec2(0.000001)));
+    vec2 pixel = floor(FRAGCOORD.xy);
     float grain = hash21(pixel + floor(stress * 37.0));
     color += (grain - 0.5) * 0.028 * (0.25 + edge);
 

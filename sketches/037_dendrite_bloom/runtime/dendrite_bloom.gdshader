@@ -1,6 +1,8 @@
 shader_type canvas_item;
 render_mode unshaded;
 
+const float DESIGN_ASPECT = 1.7777778;
+
 uniform sampler2D u_state : filter_linear, repeat_disable;
 uniform vec2 u_texel = vec2(0.0104167, 0.0185185);
 uniform float u_tint = 0.58;
@@ -40,7 +42,7 @@ void fragment() {
     float rim = pow(1.0 - max(0.0, n.z), 2.2);
     float counter = max(0.0, dot(n, light_b));
 
-    vec2 pixel = UV / max(SCREEN_PIXEL_SIZE, vec2(0.000001));
+    vec2 pixel = floor(FRAGCOORD.xy);
     float micro = crystal_noise(pixel * (0.085 + u_micro * 0.055));
     float facet = 0.5 + 0.5 * sin((n.x * 19.0 + n.y * 23.0 + micro * 5.0) * 2.1);
     facet = smoothstep(0.37, 0.78, facet);
@@ -64,7 +66,7 @@ void fragment() {
     color += hot_edge * halo;
 
     vec2 p = UV - 0.5;
-    p.x *= SCREEN_PIXEL_SIZE.y / max(SCREEN_PIXEL_SIZE.x, 0.000001);
+    p.x *= DESIGN_ASPECT;
     float vignette = smoothstep(1.05, 0.30, length(p));
     color *= mix(0.46, 1.0, vignette);
     color = vec3(1.0) - exp(-color * 1.45);
