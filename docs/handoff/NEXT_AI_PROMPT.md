@@ -15,91 +15,80 @@ Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924
 5. `docs/handoff/project_state.json`
 6. `docs/ARCHITECTURE.md`
 
-Inspecte la PR #7 et l'architecture runtime avant toute modification du host. Pour un retour après test, consulte d'abord `telemetry/runtime`.
+Pour un retour après test, inspecte d'abord `telemetry/runtime`. N'attribue jamais des FPS à un sketch si la télémétrie ne correspond pas au HEAD/session testé.
 
-## Direction créative actuelle
+## Direction créative
 
-Le labo utilise en priorité la méthode **collision-first** :
+Méthode actuelle : **collision-first**.
 
-`tirage technique aveugle -> prototype couplé -> observation -> interprétation -> direction artistique -> mutation`
+`tirage technique / phénomène -> prototype couplé -> observation -> interprétation -> direction artistique -> mutation`
 
-Lis d'abord :
+Lire en priorité :
 
 - `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
 - `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
 - `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
+- `knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
 - `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
-- les atlases design/creative-coding pertinents
-- `knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md`
-- `knowledge/cross-domain/IDEA_ENGINE.md`
+- `knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md`
+- atlases design/creative-coding pertinents
+- `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` quand un mécanisme mérite une vraie identité.
 
-Une ancienne passe contours généralisée (`6c20a094...`) sur 006–010 a été rejetée. Ne la restaure pas. `005_pressure_lattice` doit rester visuellement **REGISTER TYPE**, pas Pressure Lattice.
+Règles : 6–9 contrôles indépendants pour un lab substantiel lorsque pertinent; vraie propagation/couplage local pour l'organique; plusieurs échelles de temps; default visuel regardable; interaction = condition physique/état futur; pas de titre/index/debug dans le canvas; pas de technique maison par défaut.
 
-## Retour hôte important sur 011–015
+Une ancienne passe contours généralisée `6c20a094...` sur 006–010 est rejetée. `005_pressure_lattice` reste visuellement **REGISTER TYPE**, jamais Pressure Lattice.
 
-La première batch collision-first était techniquement/creativement plus intéressante, mais :
+## Retour hôte 016–020
 
-- visuellement encore trop faible ;
-- 3 paramètres par sketch ne suffisent pas ;
-- les systèmes raster/cellulaires ne faisaient pas assez réellement travailler les pixels/cellules entre eux.
+Le user juge 016–020 **clairement meilleurs / commence à être pas mal**, mais veut encore plus de matière réelle, d'interactivité et de beauté. Il a aussi observé certains sketches sous son très haut baseline de fluidité (~330 FPS).
 
-La télémétrie du test montrait 15 previews chargées sur le runtime correspondant, donc le retour est principalement créatif/systemique.
+Telemetry-first a été fait, mais le remote est stale : dernier publish `82114646068521140f1727b7d323803f7de51e58`, runtime `6dd4b307...`, 15 previews. Donc aucune attribution exacte de FPS à 016–020 n'est actuellement justifiée.
 
-### Nouvelles règles durables
+Code audit a néanmoins trouvé deux hotspots évidents :
 
-Pour un lab substantiel :
+- 017 : ~2304 primitives Canvas potentielles par frame;
+- 020 : ~2880 cellules + voisinage recalculé pendant `_draw()`.
 
-- viser **6–9 contrôles indépendants** quand le mécanisme le permet ;
-- au moins la moitié des contrôles doivent modifier l'évolution future, pas seulement le rendu courant ;
-- un système dit organique/cellulaire doit avoir de vrais échanges locaux : diffusion, excitation/réfractaire, ressources, pression, phase, délai, contraintes, réparation, etc. ;
-- préférer plusieurs échelles de temps ;
-- collision-first n'excuse pas un default visuellement négligé : palette, masse/vides et frozen frames doivent déjà être cohérents ;
-- pas de titre/index/tag/debug dans le canvas PROGRAM.
+Ils ont été optimisés : champ dense -> `ImageTexture` mise à jour à cadence de simulation + un draw; 020 cache la densité.
 
-## Batch actuelle 016–020
+## Nouvelle banque physique/chimie
 
-Graine du tirage : `202609242031`.
+`PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md` ajoute notamment : BZ, Liesegang, spinodal/Cahn–Hilliard, Bénard–Marangoni, Faraday, Rosensweig/ferrofluides, DLA, jamming/force chains, Rayleigh–Taylor, Kelvin–Helmholtz et Saffman–Taylor.
 
-Cinq nouveaux labs sont implémentés :
+Principe obligatoire : conserver au moins une vraie causalité/seuil du phénomène, pas uniquement son look.
 
-- `016_predator_vein` / **PREDATOR VEIN** — réseau de nutriments + diffusion + hystérésis + champ cellulaire + prédateurs persistants/scars; 8 paramètres.
-- `017_edge_bloom` / **EDGE BLOOM** — tissu excitable 64×36 + huit voisins + réfractaire + edge feed + spores gradient/deposit/split; 9 paramètres.
-- `018_current_memory` / **CURRENT MEMORY** — membrane d'onde 52×30 + mémoire retardée + courant de particules + reconnexion + void asymétrique; 9 paramètres.
-- `019_soft_flock` / **SOFT FLOCK** — boids + membrane Verlet + abrasion/réparation des liens + obstacle persistant; 9 paramètres; deux couleurs seulement.
-- `020_echo_tissue` / **ECHO TISSUE** — tissu excitable 72×40 + voisinage + morphologie densité + réfractaire + feedback retardé + reseeding autonome; 9 paramètres.
+## Batch actuelle 021–025
 
-Commit runtime : `e2ff8328532a4eab057c63b8bd1d361bc706ba15`.
-CI #221 a validé import Godot 4.7.1, smoke main-scene et propreté Git pour ce commit runtime.
+Graine : `202609250742`.
 
-**Toujours résoudre le HEAD final réel après les commits de docs.**
+- `021_rosensweig_field` / **ROSENSWEIG FIELD** — seuil magnétique, pics couplés, viscosité/hystérésis; movable magnet; 8 params; shader plein écran.
+- `022_liesegang_front` / **LIESEGANG FRONT** — réservoirs, front diffusif, supersaturation, bandes précipitées, déplétion/dissolution; 8 params.
+- `023_spinodal_marangoni` / **SPINODAL MARANGONI** — phase-field conservé-ish + quench thermique + advection tension de surface; 9 params; texture basse résolution.
+- `024_granular_jam` / **GRANULAR JAM** — grains packés, contacts/friction/load, chaînes de force, creep, avalanche retardée; 9 params; graphe de contact calculé une seule fois par step.
+- `025_faraday_quasi` / **FARADAY QUASI** — quatre modes CPU + résonance paramétrique/mode competition + shader plein écran; 8 params.
+
+Commit runtime : `50e7d9f9296768a09a56c7a8f7ac421a4d823389`.
+CI #224 a validé policy, import Godot 4.7.1, smoke et cleanliness pour ce commit runtime.
+
+Toujours résoudre le **HEAD final docs inclus** et sa CI avant test.
 
 ## Prochaine opération
 
-Le prochain travail est le **test hôte 016–020**, pas la génération automatique d'une nouvelle batch.
+Test hôte :
 
-1. Gallery doit montrer 20 sketches.
-2. Juger d'abord le default visuel sans toucher aux paramètres.
-3. Laisser chaque sketch vivre 20–30 secondes.
-4. Faire une interaction, retirer la main et regarder propagation/réparation/migration.
-5. Ensuite explorer les 8–9 contrôles et vérifier qu'ils créent vraiment des régimes différents.
+1. Gallery doit afficher **25 sketches**.
+2. Tester 017 + 020 d'abord pour comparer la fluidité après optimisation.
+3. Regarder 021–025 20–30 secondes aux defaults.
+4. Interagir, relâcher, regarder les conséquences physiques/chimiques continuer.
+5. Explorer ensuite les contrôles.
 6. Tester les meilleurs sur PROGRAM/touch.
-7. Lire la télémétrie juste après le test.
-8. Décider lesquels pousser, muter ou tuer.
+7. Fermer normalement puis lire immédiatement la télémétrie fraîche.
+8. Exiger que la télémétrie corresponde au HEAD testé avant d'attribuer une chute FPS.
 
 Préserve Gallery/PREVIEW/PROGRAM, TAKE LIVE, persistence, touch, live-sync et telemetry. Ne merge jamais `main` sans accord explicite.
 
 ## Règle obligatoire de fin de tâche
 
-Après toute modification matérielle du repo, sans attendre que l'utilisateur le rappelle :
-
-1. termine tous les commits/pushs prévus sur la branche active ;
-2. mets à jour `CURRENT_WORK.md`, `HANDOFF.md`, `project_state.json`, ce prompt et `OPERATIONS.md` là où l'état durable/workflow a changé ;
-3. résous le HEAD distant final **après** tous ces commits ;
-4. attends et inspecte la CI de ce SHA exact ;
-5. donne le short SHA exact + résultat CI ;
-6. si un test Windows est pertinent, fournis automatiquement le PowerShell canonique de `OPERATIONS.md`, qui synchronise et ne lance Godot qu'après succès CI du SHA exact ;
-7. après le test utilisateur, lis `telemetry/runtime` avant de demander des logs manuels.
-
-Ne valide jamais un HEAD récent avec une ancienne CI verte.
+Après toute modification matérielle : finir les commits/pushs, mettre à jour la continuité durable, résoudre le HEAD distant final après tous les commits, attendre la CI de ce SHA exact, donner short SHA + CI, fournir automatiquement le PowerShell canonique de `OPERATIONS.md` si un test Windows est pertinent, puis telemetry-first après le test.
 
 ---
