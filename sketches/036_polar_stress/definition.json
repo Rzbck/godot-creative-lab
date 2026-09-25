@@ -1,0 +1,26 @@
+{
+  "id": "036_polar_stress",
+  "index": "036",
+  "title": "POLAR STRESS",
+  "scene": "res://sketches/036_polar_stress/runtime/polar_stress.tscn",
+  "engine": "GODOT / OPTICAL STRESS",
+  "tags": ["OPTICS", "MATERIAL", "INTERACTIVE"],
+  "description": "Photoelastic glass rendered at full resolution: persistent loads redistribute through an analytic stress field, producing polarized interference fringes, sharp caustic edges and fine static glass grain.",
+  "creative_seed": 36091,
+  "creative_signature": {
+    "carrier": "glass",
+    "representations": ["analytic_shader_field", "data_structure"],
+    "operators": ["accumulate", "couple_neighbours"],
+    "temporal_model": "hysteresis",
+    "interaction": "pressure_load",
+    "constraint": "large_negative_space",
+    "render_path": "fullscreen_shader"
+  },
+  "visual_finish": {
+    "composition": "four asymmetric stress anchors around a quiet optical basin",
+    "material_model": "photoelastic birefringent glass with polarized interference",
+    "final_render": "full_resolution_analytic_optical_shader",
+    "detail_scales": ["stress basin", "interference fringes", "micro glass grain"],
+    "interaction_stateful": true
+  }
+}

@@ -1,0 +1,16 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://sketches/036_polar_stress/runtime/polar_stress.gd" id="1_ctrl"]
+[ext_resource type="Script" path="res://sketches/_shared/full_canvas_surface.gd" id="2_surface"]
+[ext_resource type="Shader" path="res://sketches/036_polar_stress/runtime/polar_stress.gdshader" id="3_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_polar"]
+shader = ExtResource("3_shader")
+
+[node name="PolarStress" type="Node2D"]
+script = ExtResource("1_ctrl")
+
+[node name="ShaderSurface" type="ColorRect" parent="."]
+mouse_filter = 2
+material = SubResource("ShaderMaterial_polar")
+script = ExtResource("2_surface")

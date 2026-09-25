@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -35,6 +36,7 @@ ALLOWED_CONVENTIONAL_FILENAMES = {
 }
 
 FULL_CANVAS_SURFACE_SCRIPT = "res://sketches/_shared/full_canvas_surface.gd"
+VISUAL_FINISH_CONTRACT_INDEX = 36
 
 # Sketch identity belongs to the workstation/gallery UI, never to the rendered
 # visual surface. This catches the common accidental burn-in form "002 / TITLE"
@@ -78,6 +80,7 @@ def validate_required_files() -> None:
         ".gitattributes",
         "docs/ARCHITECTURE.md",
         "sketches/_shared/full_canvas_surface.gd",
+        "knowledge/cross-domain/VISUAL_FINISH_GATE.md",
     )
 
     for relative in required:
@@ -122,7 +125,6 @@ def validate_project_owned_names() -> None:
 
             relative = path.relative_to(ROOT)
 
-            # Third-party addons are intentionally excluded from this policy.
             for component in relative.parts:
                 if " " in component:
                     fail(f"space in project-owned path: {relative}")
@@ -130,7 +132,6 @@ def validate_project_owned_names() -> None:
                 if component.startswith("."):
                     continue
 
-                # Conventional documentation filenames keep their standard casing.
                 if path.is_file() and component == path.name and component in ALLOWED_CONVENTIONAL_FILENAMES:
                     continue
 
@@ -174,13 +175,7 @@ def validate_no_burned_in_sketch_titles(files: list[str]) -> None:
 
 
 def validate_full_canvas_shader_surfaces(files: list[str]) -> None:
-    """Prevent fixed-size shader surfaces from reappearing in sketches.
-
-    A node named ShaderSurface is a semantic contract: it is the artwork's full
-    render surface. It must use the shared viewport-sizing component and must not
-    contain legacy 1280x720 offsets. This static gate complements the runtime
-    host fallback and catches regressions before host testing.
-    """
+    """Prevent fixed-size shader surfaces from reappearing in sketches."""
 
     for relative in files:
         normalized = relative.replace("\\", "/")
@@ -213,6 +208,51 @@ def validate_full_canvas_shader_surfaces(files: list[str]) -> None:
                 fail(f"ShaderSurface missing sizing script assignment: {normalized}")
 
 
+def _sketch_index(definition: Path) -> int:
+    try:
+        return int(definition.parent.name.split("_", 1)[0])
+    except (ValueError, IndexError):
+        return -1
+
+
+def validate_visual_finish_profiles() -> None:
+    """Require explicit finish intent for post-reset creative work.
+
+    CI cannot decide whether artwork is beautiful. It can stop a future agent from
+    silently skipping the finish stage and shipping an unart-directed technical
+    prototype. Since 036 every kept sketch must declare composition/material,
+    three or more detail scales and the actual high-resolution final render path.
+    """
+
+    for definition in sorted((ROOT / "sketches").glob("[0-9][0-9][0-9]_*/definition.json")):
+        index = _sketch_index(definition)
+        if index < VISUAL_FINISH_CONTRACT_INDEX:
+            continue
+        try:
+            data = json.loads(definition.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            fail(f"invalid definition JSON: {definition.relative_to(ROOT)}: {exc}")
+
+        profile = data.get("visual_finish")
+        if not isinstance(profile, dict):
+            fail(f"sketch {index:03d}+ must declare visual_finish: {definition.relative_to(ROOT)}")
+
+        for key in ("composition", "material_model", "final_render", "detail_scales"):
+            if key not in profile:
+                fail(f"visual_finish missing {key}: {definition.relative_to(ROOT)}")
+
+        detail_scales = profile.get("detail_scales")
+        if not isinstance(detail_scales, list) or len(detail_scales) < 3:
+            fail(f"visual_finish requires at least 3 detail scales: {definition.relative_to(ROOT)}")
+
+        final_render = str(profile.get("final_render", "")).lower()
+        if not final_render or "coarse" in final_render or "nearest_upscale" in final_render:
+            fail(f"visual_finish final_render is not acceptable: {definition.relative_to(ROOT)}")
+
+        if not bool(profile.get("interaction_stateful", False)):
+            fail(f"visual_finish interaction_stateful must be true: {definition.relative_to(ROOT)}")
+
+
 def main() -> None:
     print("Creative Lab repository policy")
 
@@ -226,6 +266,7 @@ def main() -> None:
     validate_project_config()
     validate_no_burned_in_sketch_titles(files)
     validate_full_canvas_shader_surfaces(files)
+    validate_visual_finish_profiles()
 
     print(f"Tracked files checked: {len(files)}")
     print("Repository policy: PASS")

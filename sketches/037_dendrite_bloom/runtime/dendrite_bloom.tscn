@@ -1,0 +1,16 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://sketches/037_dendrite_bloom/runtime/dendrite_bloom.gd" id="1_ctrl"]
+[ext_resource type="Script" path="res://sketches/_shared/full_canvas_surface.gd" id="2_surface"]
+[ext_resource type="Shader" path="res://sketches/037_dendrite_bloom/runtime/dendrite_bloom.gdshader" id="3_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dendrite"]
+shader = ExtResource("3_shader")
+
+[node name="DendriteBloom" type="Node2D"]
+script = ExtResource("1_ctrl")
+
+[node name="ShaderSurface" type="ColorRect" parent="."]
+mouse_filter = 2
+material = SubResource("ShaderMaterial_dendrite")
+script = ExtResource("2_surface")

@@ -1,12 +1,12 @@
 extends "res://app/main/main_runtime_gallery_compact_review.gd"
 
-# Persist the workstation's native window state and restore it before the first
-# rendered frame. Revision 2 also stops treating the custom maximize control as
-# a real fullscreen transition on Windows: an expanded workstation remains a
-# borderless WINDOWED client that fills the usable display with a 2 px guard.
-# F11/PROGRAM presentation stays completely separate.
+# Persist the workstation native window state and apply it as early as Godot
+# allows. Revision 3 deliberately does NOT toggle visibility on the main Window:
+# Godot 4.7.1 rejects changing visibility of the main window. Applying geometry
+# and mode in _enter_tree() is early enough to affect the first rendered scene
+# frame without generating the host error seen on Windows.
 
-const WINDOW_MEMORY_REVISION: int = 2
+const WINDOW_MEMORY_REVISION: int = 3
 const WINDOW_STATE_PATH: String = "user://creative_lab_window_state.cfg"
 const WINDOW_STATE_SECTION: String = "window"
 const WINDOW_STATE_SETTLE_SECONDS: float = 0.45
@@ -24,8 +24,6 @@ func _enter_tree() -> void:
         _startup_window_restore_active = false
         return
 
-    var root_window := get_window()
-    root_window.visible = false
     _apply_saved_window_state(_load_saved_window_state())
 
 
@@ -70,7 +68,6 @@ func _finish_startup_window_restore() -> void:
     await get_tree().process_frame
 
     var root_window := get_window()
-    root_window.visible = true
     root_window.grab_focus()
     _startup_window_restore_active = false
     _sync_window_controls()
@@ -88,7 +85,7 @@ func _finish_startup_window_restore() -> void:
         "logical_mode": str(state.get("mode", "windowed")),
         "expanded_windowed": _workstation_expanded,
         "state": state,
-        "visible_after_restore": root_window.visible,
+        "startup_visibility_strategy": "apply_before_first_scene_frame",
     })
 
 
@@ -118,7 +115,7 @@ func _load_saved_window_state() -> Dictionary:
     # "fullscreen" state came from the custom maximize button. Migrate that
     # state to the stable borderless expanded window instead of resurrecting the
     # Windows fullscreen/maximize ambiguity seen in host telemetry.
-    if revision < WINDOW_MEMORY_REVISION and str(state.get("mode", "")) == "fullscreen":
+    if revision < 2 and str(state.get("mode", "")) == "fullscreen":
         state["mode"] = "maximized"
     return state
 
@@ -151,9 +148,6 @@ func _apply_saved_window_state(state: Dictionary) -> void:
             DisplayServer.window_set_size(size)
             DisplayServer.window_set_position(position)
         "fullscreen":
-            # Kept for forward compatibility if a future explicit workstation
-            # fullscreen control is added. The current maximize control never
-            # writes this state.
             DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
         _:
             _workstation_expanded = true
@@ -262,9 +256,9 @@ func _array_to_vec2i(value: Variant, fallback: Vector2i) -> Vector2i:
     return fallback
 
 
-# On close, do not rely only on the deferred publish queued by _telemetry_event:
-# the SceneTree is about to stop and that deferred call can be lost. Start one
-# final sanitized publisher process immediately after flushing the complete file.
+# Final close publication must see a closed, immutable JSONL file. Flush the
+# last record, release the FileAccess handle, then spawn the publisher. This
+# avoids the previous race where the close publisher could hash an empty file.
 func _close_window() -> void:
     _telemetry_event("session_close_request", {
         "window_memory_revision": WINDOW_MEMORY_REVISION,
@@ -272,6 +266,7 @@ func _close_window() -> void:
     })
     if _telemetry_file != null:
         _telemetry_file.flush()
+        _telemetry_file = null
     _spawn_final_telemetry_publisher()
     get_tree().quit()
 
@@ -287,6 +282,7 @@ func _spawn_final_telemetry_publisher() -> void:
     var telemetry_path := ProjectSettings.globalize_path(_telemetry_path)
     var arguments := PackedStringArray([
         "-NoProfile",
+        "-WindowStyle", "Hidden",
         "-ExecutionPolicy", "Bypass",
         "-File", script_path,
         "-RepoRoot", repo_root,
