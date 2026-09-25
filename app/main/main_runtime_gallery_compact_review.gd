@@ -2,30 +2,69 @@ extends "res://app/main/main_runtime_gallery_feedback_trash.gd"
 
 # Compact review UI + consolidated preference telemetry.
 # The six rating axes stay available without permanently consuming parameter
-# inspector height. Explicit user ratings are published as a complete snapshot
-# so future creative work can learn from the current preference state directly.
+# inspector height. The review editor is an in-app modal instead of a native
+# popup so it remains opaque, centered and visually consistent at every window
+# size. Explicit user ratings are published as a complete snapshot so future
+# creative work can learn from the current preference state directly.
 
-const REVIEW_UI_REVISION: int = 2
+const ReviewDesignSystem = preload("res://app/ui/design_system/theme/design_system.gd")
 
-var _review_popup: PopupPanel = null
-var _review_popup_summary: Label = null
-var _review_popup_sketch_id: String = ""
+const REVIEW_UI_REVISION: int = 3
+const REVIEW_MODAL_WIDTH: float = 430.0
+
+var _review_modal: Control = null
+var _review_modal_summary: Label = null
+var _review_modal_sketch_id: String = ""
 
 
 func _ready() -> void:
     super._ready()
+    _enter_startup_workstation_fullscreen()
     call_deferred("_emit_preference_snapshot", "startup")
+
+
+func _input(event: InputEvent) -> void:
+    if is_instance_valid(_review_modal) and _review_modal.visible:
+        if event is InputEventKey:
+            var key_event := event as InputEventKey
+            if key_event.pressed and not key_event.echo and key_event.keycode == KEY_ESCAPE:
+                _close_review_modal()
+                get_viewport().set_input_as_handled()
+                return
+    super._input(event)
+
+
+func _enter_startup_workstation_fullscreen() -> void:
+    # Keep F11 render presentation separate from the workstation's native mode.
+    # The base runtime has already remembered a normal window rect before this
+    # layer runs, so the title-bar restore control can still return to windowed.
+    if DisplayServer.get_name().to_lower() == "headless":
+        return
+    if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_FULLSCREEN:
+        DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+    _sync_window_controls()
+    call_deferred("_report_startup_workstation_fullscreen")
+
+
+func _report_startup_workstation_fullscreen() -> void:
+    await get_tree().process_frame
+    _telemetry_event("workstation_startup_fullscreen", {
+        "requested_mode": DisplayServer.WINDOW_MODE_FULLSCREEN,
+        "actual_mode": DisplayServer.window_get_mode(),
+        "matched": DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN,
+        "window_size": [DisplayServer.window_get_size().x, DisplayServer.window_get_size().y],
+    })
 
 
 func _append_review_controls(sketch_id: String) -> void:
     _review_score_buttons.clear()
     _review_average_label = null
-    _review_popup_summary = null
-    _review_popup_sketch_id = sketch_id
+    _review_modal_summary = null
+    _review_modal_sketch_id = sketch_id
 
-    if is_instance_valid(_review_popup):
-        _review_popup.queue_free()
-        _review_popup = null
+    if is_instance_valid(_review_modal):
+        _review_modal.queue_free()
+        _review_modal = null
 
     parameter_list.add_child(HSeparator.new())
 
@@ -48,7 +87,7 @@ func _append_review_controls(sketch_id: String) -> void:
     rate_button.focus_mode = Control.FOCUS_NONE
     rate_button.theme_type_variation = &"ToolButton"
     rate_button.tooltip_text = "Open the six creative rating axes."
-    rate_button.pressed.connect(_on_open_review_popup.bind(sketch_id))
+    rate_button.pressed.connect(_on_open_review_modal.bind(sketch_id))
     row.add_child(rate_button)
 
     var trash_button := Button.new()
@@ -60,56 +99,102 @@ func _append_review_controls(sketch_id: String) -> void:
     row.add_child(trash_button)
 
     parameter_list.add_child(row)
-    _build_review_popup(sketch_id)
+    _build_review_modal(sketch_id)
     _refresh_active_review_summary(sketch_id)
 
 
-func _build_review_popup(sketch_id: String) -> void:
-    _review_popup = PopupPanel.new()
-    _review_popup.name = "ReviewPopup"
-    add_child(_review_popup)
+func _build_review_modal(sketch_id: String) -> void:
+    _review_modal = Control.new()
+    _review_modal.name = "ReviewModal"
+    _review_modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    _review_modal.mouse_filter = Control.MOUSE_FILTER_STOP
+    _review_modal.z_index = 4096
+    _review_modal.visible = false
+    add_child(_review_modal)
+
+    var backdrop := ColorRect.new()
+    backdrop.name = "Backdrop"
+    backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    var backdrop_color := ReviewDesignSystem.COLOR_CANVAS
+    backdrop_color.a = 0.86
+    backdrop.color = backdrop_color
+    backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+    backdrop.gui_input.connect(_on_review_backdrop_input)
+    _review_modal.add_child(backdrop)
+
+    var center := CenterContainer.new()
+    center.name = "Center"
+    center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _review_modal.add_child(center)
+
+    var card := PanelContainer.new()
+    card.name = "ReviewCard"
+    card.custom_minimum_size = Vector2(REVIEW_MODAL_WIDTH, 0.0)
+    card.mouse_filter = Control.MOUSE_FILTER_STOP
+    card.add_theme_stylebox_override("panel", _review_card_style())
+    center.add_child(card)
 
     var margin := MarginContainer.new()
-    margin.add_theme_constant_override("margin_left", 12)
-    margin.add_theme_constant_override("margin_right", 12)
-    margin.add_theme_constant_override("margin_top", 10)
-    margin.add_theme_constant_override("margin_bottom", 10)
-    _review_popup.add_child(margin)
+    margin.add_theme_constant_override("margin_left", 18)
+    margin.add_theme_constant_override("margin_right", 18)
+    margin.add_theme_constant_override("margin_top", 16)
+    margin.add_theme_constant_override("margin_bottom", 16)
+    card.add_child(margin)
 
     var box := VBoxContainer.new()
-    box.custom_minimum_size = Vector2(304.0, 0.0)
-    box.add_theme_constant_override("separation", 5)
+    box.add_theme_constant_override("separation", 8)
     margin.add_child(box)
 
     var header := HBoxContainer.new()
+    header.add_theme_constant_override("separation", 8)
+
     var title := Label.new()
     title.theme_type_variation = &"AccentLabel"
-    title.text = "REVIEW"
+    var definition_variant: Variant = _all_catalog_definitions.get(sketch_id, {})
+    var visible_title := sketch_id
+    if definition_variant is Dictionary:
+        visible_title = str((definition_variant as Dictionary).get("title", sketch_id))
+    title.text = "RATE / %s" % visible_title.to_upper()
     title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
     header.add_child(title)
 
-    _review_popup_summary = Label.new()
-    _review_popup_summary.theme_type_variation = &"MicroLabel"
-    header.add_child(_review_popup_summary)
+    _review_modal_summary = Label.new()
+    _review_modal_summary.theme_type_variation = &"MicroLabel"
+    _review_modal_summary.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+    header.add_child(_review_modal_summary)
+
+    var close_button := Button.new()
+    close_button.text = "×"
+    close_button.custom_minimum_size = Vector2(28.0, 26.0)
+    close_button.focus_mode = Control.FOCUS_NONE
+    close_button.theme_type_variation = &"ToolButton"
+    close_button.tooltip_text = "Close rating panel"
+    close_button.pressed.connect(_close_review_modal)
+    header.add_child(close_button)
     box.add_child(header)
+
+    box.add_child(HSeparator.new())
 
     var review := _review_for(sketch_id)
     for criterion: String in REVIEW_CRITERIA:
         var criterion_row := HBoxContainer.new()
-        criterion_row.add_theme_constant_override("separation", 4)
+        criterion_row.add_theme_constant_override("separation", 5)
 
         var criterion_label := Label.new()
-        criterion_label.theme_type_variation = &"MicroLabel"
+        criterion_label.theme_type_variation = &"CaptionLabel"
         criterion_label.text = criterion.to_upper()
-        criterion_label.custom_minimum_size = Vector2(96.0, 0.0)
+        criterion_label.custom_minimum_size = Vector2(124.0, 28.0)
         criterion_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        criterion_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         criterion_row.add_child(criterion_label)
 
         var row_buttons: Array[Button] = []
         for score: int in range(1, 6):
             var button := Button.new()
             button.text = str(score)
-            button.custom_minimum_size = Vector2(27.0, 22.0)
+            button.custom_minimum_size = Vector2(38.0, 28.0)
             button.focus_mode = Control.FOCUS_NONE
             button.toggle_mode = true
             button.theme_type_variation = &"ToolButton"
@@ -120,19 +205,63 @@ func _build_review_popup(sketch_id: String) -> void:
         _review_score_buttons[criterion] = row_buttons
         box.add_child(criterion_row)
 
+    box.add_child(HSeparator.new())
+
     var hint := Label.new()
     hint.theme_type_variation = &"MicroLabel"
-    hint.text = "CLICK THE ACTIVE SCORE AGAIN TO CLEAR"
-    hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+    hint.text = "1 LOW  ·  5 HIGH  ·  CLICK ACTIVE SCORE TO CLEAR"
+    hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     box.add_child(hint)
 
 
-func _on_open_review_popup(sketch_id: String) -> void:
-    if not is_instance_valid(_review_popup):
-        _build_review_popup(sketch_id)
-    _review_popup_sketch_id = sketch_id
+func _review_card_style() -> StyleBoxFlat:
+    var style := StyleBoxFlat.new()
+    style.bg_color = ReviewDesignSystem.COLOR_SURFACE_RAISED
+    style.border_color = ReviewDesignSystem.COLOR_BORDER
+    style.border_width_left = 1
+    style.border_width_top = 1
+    style.border_width_right = 1
+    style.border_width_bottom = 1
+    style.corner_radius_top_left = 4
+    style.corner_radius_top_right = 4
+    style.corner_radius_bottom_right = 4
+    style.corner_radius_bottom_left = 4
+    return style
+
+
+func _on_open_review_modal(sketch_id: String) -> void:
+    if not is_instance_valid(_review_modal):
+        _build_review_modal(sketch_id)
+    _review_modal_sketch_id = sketch_id
     _refresh_active_review_summary(sketch_id)
-    _review_popup.popup_centered(Vector2i(330, 252))
+    _review_modal.visible = true
+    _telemetry_event("review_modal_changed", {
+        "open": true,
+        "sketch_id": sketch_id,
+    })
+
+
+func _close_review_modal() -> void:
+    if not is_instance_valid(_review_modal) or not _review_modal.visible:
+        return
+    _review_modal.visible = false
+    _telemetry_event("review_modal_changed", {
+        "open": false,
+        "sketch_id": _review_modal_sketch_id,
+    })
+
+
+func _on_review_backdrop_input(event: InputEvent) -> void:
+    if event is InputEventMouseButton:
+        var mouse_event := event as InputEventMouseButton
+        if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
+            _close_review_modal()
+            get_viewport().set_input_as_handled()
+    elif event is InputEventScreenTouch:
+        var touch_event := event as InputEventScreenTouch
+        if touch_event.pressed:
+            _close_review_modal()
+            get_viewport().set_input_as_handled()
 
 
 func _on_review_score_pressed(sketch_id: String, criterion: String, score: int) -> void:
@@ -151,8 +280,8 @@ func _refresh_active_review_summary(sketch_id: String) -> void:
     var compact_text := "—" if rated == 0 else "%.1f/5" % average
     if is_instance_valid(_review_average_label):
         _review_average_label.text = compact_text
-    if is_instance_valid(_review_popup_summary):
-        _review_popup_summary.text = "%s  %d/6" % [compact_text, rated]
+    if is_instance_valid(_review_modal_summary):
+        _review_modal_summary.text = "%s  ·  %d/6" % [compact_text, rated]
 
 
 func _emit_preference_snapshot(reason: String) -> void:
