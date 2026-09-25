@@ -11,109 +11,104 @@ Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924
 5. `docs/handoff/project_state.json`
 6. `docs/ARCHITECTURE.md`
 7. `docs/SKETCH_CONTRACT.md`
+8. `knowledge/cross-domain/VISUAL_FINISH_GATE.md`
+9. `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
+10. `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 
-Après un test hôte, inspecte `telemetry/runtime` avant de demander logs/captures et vérifie que la session correspond au HEAD testé.
+Après un test hôte, inspecte `telemetry/runtime` **avant** de demander logs/captures. Vérifie toujours que la session correspond au HEAD testé et qu'elle n'est pas vide.
 
-## Priorité 1 — startup window memory
+## État créatif actuel
 
-Le user a rejeté le démarrage visible `1280×720 windowed -> fullscreen`. La télémétrie fraîche a confirmé ce jump (~730 ms).
+Le user a explicitement rejeté **026–030** comme globalement faibles visuellement. Ne traite pas ce batch comme une réussite du moteur adaptatif et n'invente pas les notes numériques 026–030 : le dernier publish de fermeture a écrit un `latest.jsonl` / session vide.
 
-Top runtime actuel :
+Le moteur adaptatif est seulement un générateur de collisions techniques. Le pipeline obligatoire devient :
 
-`app/main/main_runtime_window_memory.gd`
+`draw -> prototype -> observe -> mutate -> art-direct -> VISUAL_FINISH_GATE -> keep/reject`
 
-État persisté :
+Le user attend des œuvres fortes à grande résolution : frozen frame composé, plusieurs échelles de détail, matériau/lumière crédibles, interaction qui modifie réellement l'état, aucun aspect de petite simulation agrandie.
 
-`user://creative_lab_window_state.cfg`
+## Corrections runtime à valider sur l'hôte
 
-Le root Window est caché dans `_enter_tree()`, le dernier mode/screen/position/size/restore rect est appliqué, puis l’app n’est révélée qu’après settle. Premier lancement = fullscreen par défaut.
+### Fenêtre workstation — revision 2
 
-F11 reste la présentation du sketch et ne doit pas écraser la préférence de fenêtre du workstation.
+Top runtime : `app/main/main_runtime_window_memory.gd`.
 
-Événement attendu : `workstation_window_state_restored`.
+La télémétrie du pass précédent a prouvé que le custom Maximize faisait passer le client borderless en native fullscreen. Le chemin natif Maximize est rejeté.
 
-État : **IMPLEMENTED_NOT_HOST_VALIDATED**. Après test Windows, vérifie spécifiquement absence du flash et restauration fullscreen/maximized/windowed.
+Revision 2 :
 
-## Priorité 2 — notes utilisateur
+- restaure l'état avant le premier frame visible ;
+- représente `maximized` comme une fenêtre borderless **WINDOWED** occupant le usable rect avec garde basse de 2 px ;
+- garde un restore rect séparé ;
+- migre l'ancien état fullscreen issu du vieux Maximize vers ce logical-maximized ;
+- F11 reste indépendant ;
+- la fermeture flush puis démarre explicitement le publisher final avant `quit`.
 
-Lis d’abord `creative_preference_snapshot` d’une session fraîche.
+État : **REPO_VALIDATED / HOST_VALIDATION_REQUIRED**.
 
-Dernier snapshot complet connu : `session_5e0960d4c3e0c6a7.jsonl`, 16 sketches notés.
+### 025 FARADAY QUASI
 
-Moyennes axes : visual 2.25, interaction 2.125, originality 2.125, aliveness 1.8125, controls 2.0, performance 3.0625.
+Le cut était réel : une phase de forcing wrapée à `2π` était multipliée par des coefficients fractionnaires dans le shader, donc l'image devenait mathématiquement discontinue au wrap. Le clic ajoutait aussi un bump local direct au rendu.
 
-Signaux forts :
+Correction actuelle :
 
-- 020 ECHO TISSUE ~4.17;
-- 012 CHEMICAL BLOCKS ~3.33;
-- 017 EDGE BLOOM ~2.83.
+- forcing phase interne seulement ;
+- phases modales visuelles continues/non-wrapées ;
+- shader ne reçoit plus la phase wrapée ;
+- clic/drag modifie énergie/détuning modal, pas une bosse visuelle superposée ;
+- surface full-resolution avec normales/material shading continus.
 
-Faibles : 014 = 1.0, 016 ~1.5, 024 ~1.67, 022 ~1.83.
+État : **REPO_VALIDATED / HOST_VALIDATION_REQUIRED**.
 
-Interprétation : favoriser couplage local, propagation, mémoire et interaction qui change l’évolution future, mais ne pas cloner 020. Le biais rating reste borné et 24% des draws restent exploration-first.
+## Nouveau batch 031–035
 
-## REVIEW UI
+Gallery source attendue : **35 sketches**.
 
-Le `PopupPanel` transparent/off-center est rejeté. REVIEW v3 = ligne compacte + modal in-app opaque/centré. Ne restaure jamais le popup natif.
+- **031 FOLD CHAMBER** — relief Delaunay vectoriel ~150 points, contraintes/springs, shading par facette, pression = refolding.
+- **032 LUMEN SWARM** — jusqu'à ~900 streaks lumineux via MultiMesh, halo/core séparés, advection spatiale, source inertielle déplaçable.
+- **033 OBSIDIAN CATHEDRAL** — architecture SDF raymarch full-resolution, AO/normales/facettes/specular, fractures persistantes au touch, aucun shader TIME.
+- **034 PHOSPHOR SAND** — solver mémoire 128×72 caché ; rendu final shader full-resolution avec relief, gradients, grain micro, particules et réponse spectrale.
+- **035 DUNE CHOIR** — vraie PDE d'onde amortie ; rendu final en topographie vectorielle perspective antialiasée avec seams et glints de courbure.
 
-## Batch actuel 026–030
+Le batch code `3ff965f...` a déjà passé CI #287. Les commits de documentation postérieurs exigent néanmoins une CI finale sur le HEAD exact.
 
-La Gallery source doit compter 30 sketches.
+## Visual finish gate — règle permanente
 
-- 026 VOID TENSION — réseau contraint + territoires Voronoi, fracture/réparation, touch coupe les liens.
-- 027 GLASS TIDE — SDF glass + fronts d’onde asynchrones, touch altère la topologie optique.
-- 028 LUMEN MAZE — transport lumineux sur graphe, jam/release, obstacles persistants.
-- 029 FIBER FELT — fibres + masque de compaction, phase transition loose→felted.
-- 030 REACTOR SKIN — réaction-diffusion + membrane/mesh stress, fracture/réparation.
+Lire `knowledge/cross-domain/VISUAL_FINISH_GATE.md` avant toute nouvelle œuvre substantielle.
 
-Toutes les définitions ont `creative_seed` + `creative_signature`. Les signatures implémentées sont dans `knowledge/cross-domain/creative_draw_space.json`.
+Exigences : frozen frame fort, composition/negative space intentionnels, identité persistante, au moins plusieurs échelles de détail quand pertinent, final visuellement haute résolution, solver coarse seulement comme état caché, matériau/lumière cohérents avec le carrier, aucun phase-wrap/reset/respawn wall visible, interaction intégrée au système plutôt qu'effet curseur.
 
 ## Qualité temporelle
 
-Le user rejette les loops visibles cheap / `sin(time)` décoratifs.
-
-Lire `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
+Le user rejette les loops visibles cheap et le `sin(time)` décoratif.
 
 Préférer :
 
 `time -> état/force/mémoire/événement -> système couplé -> rendu`
 
-À partir de 026, trigonométrie directe sur `sketch_time`, `u_time` ou shader `TIME` nécessite `TEMPORAL_INTENT:`.
-
-## Tirage créatif
-
-Utilise :
-
-- `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
-- `knowledge/cross-domain/creative_draw_space.json`
-- `scripts/creative/draw_recipe.py`
-
-Le moteur pénalise répétition historique/récente, impose distance/familles distinctes et applique seulement un biais borné des ratings. 24% exploration ignore les préférences.
-
-Ne prends pas le tirage brut comme concept final : `draw -> prototype couplé -> observe -> interprète -> art-direct -> mutate`.
+À partir de 026, trigonométrie directe sur `sketch_time`, `u_time` ou shader `TIME` nécessite `TEMPORAL_INTENT:`. Même avec un mécanisme périodique valide, tout wrap visible reste interdit.
 
 ## Non-régressions
 
 - 005 reste visuellement **REGISTER TYPE**, jamais Pressure Lattice.
 - ne restaure pas le contour-glyph généralisé comme représentation maison.
+- 026–030 restent en source/historique mais sont créativement rejetés.
 - ne restaure pas le mur permanent de tags.
 - `ShaderSurface` plein-canvas obligatoire via `sketches/_shared/full_canvas_surface.gd`.
 - navigation ne stoppe pas PROGRAM ; TAKE LIVE, touch, live-sync et telemetry restent stables.
 - RATE modal reste in-app opaque/centré.
-- ne restaure pas le startup visible petit->fullscreen.
 - pas de faux Spout/NDI.
+- ne jamais inventer des ratings absents de la télémétrie.
 
-## Prochaine opération
+## Prochaine opération hôte
 
-Test hôte prioritaire :
+1. lancer : aucun petit-window/fullscreen hop visible ;
+2. custom Maximize/Restore plusieurs fois : rester native windowed, sans basculer fullscreen ;
+3. fermer/réouvrir une fois expanded puis une fois windowed déplacée/redimensionnée ;
+4. FARADAY : idle ~30 s puis press/drag/release répétés, aucune coupure globale ;
+5. ouvrir 031–035 en grand PREVIEW puis PROGRAM/F11 ; juger d'abord le frozen frame, puis idle, interaction et recovery ;
+6. noter 031–035 ;
+7. fermer normalement ;
+8. next AI = telemetry-first, en exigeant un publish final non vide avant de lire les nouvelles notes.
 
-1. lancer : aucune petite fenêtre avant l’état final;
-2. fermer/reouvrir en fullscreen, maximized puis fenêtre déplacée/redimensionnée;
-3. vérifier RATE modal;
-4. confirmer 30 cartes;
-5. regarder 026–030 20–30 s idle puis interaction + mains retirées;
-6. noter 026–030;
-7. fermer normalement;
-8. telemetry-first : `workstation_window_state_restored`, `creative_preference_snapshot`, perf/surface events, HEAD testé.
-
-Après toute modification matérielle : terminer commits/docs, résoudre HEAD final, attendre CI du SHA exact, donner short SHA + CI et PowerShell canonique de `OPERATIONS.md` si test Windows pertinent.
+Après toute modification matérielle : terminer commits/docs, résoudre HEAD final, attendre CI du SHA exact, donner short SHA + CI et le PowerShell canonique de `OPERATIONS.md` si test Windows pertinent.
