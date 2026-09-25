@@ -29,7 +29,7 @@
     "gallery_search": true,
     "logical_design_size": [1280, 720],
     "artwork_canvas_excludes_project_metadata": true,
-    "expected_gallery_sketch_count": 20
+    "expected_gallery_sketch_count": 25
   },
   "creative_rules": {
     "preferred_exploration_mode": "collision-first",
@@ -41,13 +41,19 @@
     "prefer_multiple_time_scales": true,
     "raw_does_not_excuse_weak_default_visuals": true,
     "random_stacking_without_state_coupling_is_rejected": true,
+    "real_world_phenomena_must_preserve_causal_structure": true,
+    "performance_architecture_is_creative_constraint": true,
+    "dense_cpu_fields_prefer_texture_or_shader_rendering": true,
+    "do_not_repeat_neighbour_or_contact_search_in_draw": true,
     "no_sketch_metadata_inside_artwork_canvas": true
   },
   "knowledge": {
     "technique_palette": "knowledge/cross-domain/TECHNIQUE_PALETTE.md",
     "random_collision_engine": "knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md",
     "collision_source_catalog": "knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md",
+    "physical_chemical_systems_atlas": "knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md",
     "organic_coupling_and_controls": "knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md",
+    "realtime_performance_budget": "knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md",
     "cross_domain_atlas": "knowledge/cross-domain/CROSS_DOMAIN_ATLAS.md",
     "idea_engine": "knowledge/cross-domain/IDEA_ENGINE.md",
     "design_review": "knowledge/design/DESIGN_REVIEW_CHECKLIST.md"
@@ -63,41 +69,56 @@
     {"id":"008_palimpsest","visible_title":"PALIMPSEST","role":"gallery-sketch"},
     {"id":"009_chorus_drift","visible_title":"CHORUS DRIFT","role":"gallery-sketch"},
     {"id":"010_fault_register","visible_title":"FAULT REGISTER","role":"gallery-sketch"},
-    {"id":"011_swarm_relay","visible_title":"SWARM RELAY","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"012_chemical_blocks","visible_title":"CHEMICAL BLOCKS","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"013_cut_cell","visible_title":"CUT CELL","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"014_ribbon_morph","visible_title":"RIBBON MORPH","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"015_phase_pack","visible_title":"PHASE PACK","role":"collision-first-lab","host_feedback":"technically_better_visually_weak_under_parameterized"},
-    {"id":"016_predator_vein","visible_title":"PREDATOR VEIN","role":"organic-collision-lab","primary_representation":"nutrient_graph_plus_cell_field","parameter_count":8,"interaction_consequence":"inject_persistent_predator","tags":["ECOSYSTEM","NETWORK","INTERACTIVE"]},
-    {"id":"017_edge_bloom","visible_title":"EDGE BLOOM","role":"organic-collision-lab","primary_representation":"excitable_cellular_tissue_plus_spores","parameter_count":9,"interaction_consequence":"seed_excitation","tags":["CELLULAR","GROWTH","INTERACTIVE"]},
-    {"id":"018_current_memory","visible_title":"CURRENT MEMORY","role":"organic-collision-lab","primary_representation":"wave_lattice_plus_particle_current","parameter_count":9,"interaction_consequence":"redirect_flow_and_inject_wave","tags":["FLOW","WAVE","INTERACTIVE"]},
-    {"id":"019_soft_flock","visible_title":"SOFT FLOCK","role":"organic-collision-lab","primary_representation":"boids_plus_verlet_constraint_mesh","parameter_count":9,"interaction_consequence":"create_persistent_obstacle","tags":["PHYSICS","FLOCK","INTERACTIVE"]},
-    {"id":"020_echo_tissue","visible_title":"ECHO TISSUE","role":"organic-collision-lab","primary_representation":"excitable_cells_plus_delayed_feedback","parameter_count":9,"interaction_consequence":"seed_activity","tags":["TISSUE","MEMORY","INTERACTIVE"]}
+    {"id":"011_swarm_relay","visible_title":"SWARM RELAY","role":"collision-first-lab"},
+    {"id":"012_chemical_blocks","visible_title":"CHEMICAL BLOCKS","role":"collision-first-lab"},
+    {"id":"013_cut_cell","visible_title":"CUT CELL","role":"collision-first-lab"},
+    {"id":"014_ribbon_morph","visible_title":"RIBBON MORPH","role":"collision-first-lab"},
+    {"id":"015_phase_pack","visible_title":"PHASE PACK","role":"collision-first-lab"},
+    {"id":"016_predator_vein","visible_title":"PREDATOR VEIN","role":"organic-collision-lab","parameter_count":8},
+    {"id":"017_edge_bloom","visible_title":"EDGE BLOOM","role":"organic-collision-lab","parameter_count":9,"performance_refinement":"dense_field_rendered_as_image_texture"},
+    {"id":"018_current_memory","visible_title":"CURRENT MEMORY","role":"organic-collision-lab","parameter_count":9},
+    {"id":"019_soft_flock","visible_title":"SOFT FLOCK","role":"organic-collision-lab","parameter_count":9},
+    {"id":"020_echo_tissue","visible_title":"ECHO TISSUE","role":"organic-collision-lab","parameter_count":9,"performance_refinement":"cached_density_plus_image_texture"},
+    {"id":"021_rosensweig_field","visible_title":"ROSENSWEIG FIELD","role":"physical-chemical-collision-lab","parameter_count":8,"primary_representation":"single_pass_magnetic_fluid_shader","interaction_consequence":"move_magnetic_field_source"},
+    {"id":"022_liesegang_front","visible_title":"LIESEGANG FRONT","role":"physical-chemical-collision-lab","parameter_count":8,"primary_representation":"persistent_precipitation_band_geometry","interaction_consequence":"create_or_move_reagent_reservoir"},
+    {"id":"023_spinodal_marangoni","visible_title":"SPINODAL MARANGONI","role":"physical-chemical-collision-lab","parameter_count":9,"primary_representation":"conserved_phase_field_texture","interaction_consequence":"thermal_quench"},
+    {"id":"024_granular_jam","visible_title":"GRANULAR JAM","role":"physical-chemical-collision-lab","parameter_count":9,"primary_representation":"packed_grains_plus_cached_contact_graph","interaction_consequence":"apply_load"},
+    {"id":"025_faraday_quasi","visible_title":"FARADAY QUASI","role":"physical-chemical-collision-lab","parameter_count":8,"primary_representation":"modal_state_plus_single_pass_wave_shader","interaction_consequence":"local_phase_impulse"}
   ],
   "current_batch": {
-    "ids": ["016_predator_vein","017_edge_bloom","018_current_memory","019_soft_flock","020_echo_tissue"],
-    "random_seed": "202609242031",
+    "ids": ["021_rosensweig_field","022_liesegang_front","023_spinodal_marangoni","024_granular_jam","025_faraday_quasi"],
+    "random_seed": "202609250742",
     "status": "IMPLEMENTED_HOST_NOT_VALIDATED",
-    "implementation_commit": "e2ff8328532a4eab057c63b8bd1d361bc706ba15",
-    "runtime_ci_run": 221,
+    "implementation_commit": "50e7d9f9296768a09a56c7a8f7ac421a4d823389",
+    "runtime_ci_run": 224,
     "runtime_ci_passed": true
+  },
+  "previous_batch_host_feedback": {
+    "ids": ["016_predator_vein","017_edge_bloom","018_current_memory","019_soft_flock","020_echo_tissue"],
+    "summary": "clearly better and starting to be interesting; still missing real-world physical/chemical richness; some sketches observed below the user's high smooth FPS baseline",
+    "exact_perf_attribution_available": false,
+    "reason": "remote telemetry did not publish the 016-020 host session"
   },
   "telemetry": {
     "remote_branch": "telemetry/runtime",
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "publication": "asynchronous_queued_sanitized",
-    "last_observed_runtime_head": "6dd4b307724d",
-    "last_observed_gallery_preview_count": 15,
-    "last_host_feedback_source": "011_015_test",
+    "latest_remote_commit": "82114646068521140f1727b7d323803f7de51e58",
+    "latest_observed_runtime_head": "6dd4b307724d",
+    "latest_observed_gallery_preview_count": 15,
+    "fresh_for_016_020_test": false,
     "telemetry_first_after_host_test": true
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
     "local_script": "scripts/check.ps1",
     "required_for_runtime_code": ["repository_policy","godot_4_7_1_headless_import","main_scene_smoke_test","tracked_file_cleanliness"],
+    "current_runtime_commit": "50e7d9f9296768a09a56c7a8f7ac421a4d823389",
+    "current_runtime_ci_run": 224,
+    "current_runtime_ci_passed": true,
     "final_exact_head_ci_must_be_resolved_from_github": true,
-    "current_host_state": "016_020_HOST_NOT_VALIDATED"
+    "current_host_state": "021_025_HOST_NOT_VALIDATED"
   },
   "ai_completion_protocol": {
     "mandatory": true,
