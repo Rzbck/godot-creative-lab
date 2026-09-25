@@ -32,6 +32,12 @@ jobs:
       - name: Validate repository
         run: python scripts/ci/validate_repository.py
 
+      - name: Audit temporal motion
+        run: python scripts/ci/audit_temporal_motion.py
+
+      - name: Self-test adaptive creative draw
+        run: python scripts/creative/draw_recipe.py --self-test --seed 20260925
+
   godot-headless:
     name: Godot 4.7.1 headless
     runs-on: ubuntu-latest
