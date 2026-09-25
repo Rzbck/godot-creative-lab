@@ -35,7 +35,7 @@ Contrat :
 - la recherche indexe toujours tous les tags ;
 - les groupes continuent à venir du premier tag de `definition.json`.
 
-Le prochain test hôte doit vérifier ce comportement à 25 sketches et au resize.
+Runtime de ce changement validé par CI #233 (policy + import Godot 4.7.1 + smoke + cleanliness). Le host doit encore valider l'UX/resize.
 
 ## Direction créative
 
