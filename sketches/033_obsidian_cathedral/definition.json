@@ -1,0 +1,19 @@
+{
+  "id": "033_obsidian_cathedral",
+  "index": "033",
+  "title": "OBSIDIAN CATHEDRAL",
+  "scene": "res://sketches/033_obsidian_cathedral/runtime/obsidian_cathedral.tscn",
+  "engine": "GODOT / RAYMARCH",
+  "tags": ["VOLUME", "CRYSTAL", "INTERACTIVE"],
+  "description": "A full-resolution raymarched crystalline architecture with micro-facets, spectral grazing light and persistent stress fractures that torque the structure instead of overlaying a cursor effect.",
+  "creative_seed": 31033,
+  "creative_signature": {
+    "carrier": "crystal",
+    "representations": ["raymarch_volume", "data_structure"],
+    "operators": ["fracture", "fold"],
+    "temporal_model": "spring_inertia",
+    "interaction": "change_material_property",
+    "constraint": "large_negative_space",
+    "render_path": "fullscreen_shader"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "034_phosphor_sand",
+  "index": "034",
+  "title": "PHOSPHOR SAND",
+  "scene": "res://sketches/034_phosphor_sand/runtime/phosphor_sand.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["FEEDBACK", "MATERIAL", "INTERACTIVE"],
+  "description": "A hidden temporal field stores gesture and autonomous phase events, then a full-resolution resin-and-grain material turns that memory into sharp ridges, particulate gold and spectral grazing light.",
+  "creative_seed": 31034,
+  "creative_signature": {
+    "carrier": "granular_matter",
+    "representations": ["framebuffer_feedback", "cellular_field"],
+    "operators": ["phase_switch", "feedback"],
+    "temporal_model": "excitable_refractory",
+    "interaction": "write_memory",
+    "constraint": "single_material",
+    "render_path": "fullscreen_shader"
+  }
+}
