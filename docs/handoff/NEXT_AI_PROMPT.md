@@ -1,10 +1,6 @@
 # Prompt for the next AI session
 
-Copy/paste the block below into a fresh AI conversation with GitHub access.
-
----
-
-Reprends le projet **DC//LAB / Godot Creative Lab** depuis `Rzbck/godot-creative-lab`.
+Reprends **DC//LAB / Godot Creative Lab** depuis `Rzbck/godot-creative-lab`.
 
 Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924` et sa CI exacte, puis lis :
 
@@ -16,119 +12,82 @@ Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924
 6. `docs/ARCHITECTURE.md`
 7. `docs/SKETCH_CONTRACT.md`
 
-Après tout retour de test, inspecte d'abord `telemetry/runtime` et vérifie que HEAD/session correspondent au test avant d'attribuer FPS ou layout.
+Après un test hôte, inspecte `telemetry/runtime` avant de demander logs/captures. Vérifie que la session correspond au HEAD testé.
 
-## Architecture produit actuelle
+## Important — notes utilisateur
 
-Top runtime :
+Le REVIEW est maintenant compact via `app/main/main_runtime_gallery_compact_review.gd` : une ligne REVIEW/average/RATE/TRASH, avec les six axes dans un popup.
 
-`app/main/main_runtime_gallery_feedback_trash.gd`
+Lis en priorité l’événement `creative_preference_snapshot`, qui contient l’état consolidé des notes explicites. Ne reconstruis pas inutilement les préférences depuis des clics fragmentés si ce snapshot existe.
 
-Il étend :
+Les notes servent de **preuve et de biais modéré**, pas de classement à cloner. Conserve une vraie exploration.
 
-`gallery_feedback_trash -> gallery_adaptive_filters -> gallery_organizer -> program_output -> gallery_persistence -> live_output -> ...`
+## Important — qualité temporelle
 
-Préserve PREVIEW/PROGRAM, TAKE LIVE, PROGRAM persistant pendant navigation, touch physical output, live-sync, persistence et télémétrie async.
+Le user rejette explicitement les boucles visibles cheap / respiration-bobbing de type `sin(time)` utilisées seulement pour faire bouger une œuvre.
 
-## Contrat plein-canvas — obligatoire
+Lire :
 
-Un bug hôte sur 025 FARADAY QUASI a montré un PREVIEW 1520×852 correct mais un `ShaderSurface` fixé à 1280×720, laissant du gris à droite/en bas.
+`knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
 
-Règle maintenant obligatoire :
+Règle :
 
-- une surface nommée `ShaderSurface` doit utiliser `res://sketches/_shared/full_canvas_surface.gd`;
-- la taille logique 1280×720 ne doit jamais devenir une taille physique fixe de surface;
-- `scripts/ci/validate_repository.py` bloque les scènes `ShaderSurface` sans composant partagé ou avec offsets fixes 1280/720;
-- le host a aussi un fallback runtime et émet `sketch_surface_contract` avec coverage/pass.
+`time -> état/force/mémoire/événement -> système couplé -> rendu`
 
-Ne contourne pas cette règle sketch par sketch. Si un futur rendu plein-canvas utilise un autre nom/representation, ajoute un contrat/test équivalent plutôt que réintroduire une surface fixe.
+plutôt que :
 
-## REVIEW — préférence utilisateur structurée
+`time -> sin/cos -> position/scale/alpha/warp visible`.
 
-Chaque sketch ouvert expose six notes 1–5 :
+Une oscillation physique/conceptuelle reste autorisée (Faraday par exemple). À partir de 026, tout trigonométrie directe sur `sketch_time`, `u_time` ou shader `TIME` doit porter un commentaire `TEMPORAL_INTENT:` expliquant pourquoi.
 
-- VISUAL
-- INTERACTION
-- ORIGINALITY
-- ALIVENESS
-- CONTROLS
-- PERFORMANCE
+CI : `scripts/ci/audit_temporal_motion.py`.
 
-Persistées dans `user://creative_lab_reviews.cfg`.
+Le premier audit complet a trouvé 38 observations historiques dans <=025. Certaines périodes fixes sont seulement des cadences de simulation : ne traite pas tout warning comme un défaut visuel.
 
-Chaque changement émet `sketch_review_changed` avec les scores et la moyenne; les cartes notées affichent `R x.x`.
+Refactors actuels :
 
-**Utilise ces notes comme données créatives prioritaires** pour améliorer les sketches existants et orienter les prochains tirages/concepts. Si la télémétrie contient des ratings explicites, ne remplace pas ces données par une intuition vague sur les goûts du user.
+- 021 ROSENSWEIG : auto-magnet target/dwell variable, plus de Lissajous/orbite temporelle directe.
+- 022 LIESEGANG : épuisement/repos/recharge de réservoir, plus de gros front qui snap-reset visiblement.
+- 024 GRANULAR JAM : creep selon stress/vitesse/confinement/asymétrie, avalanche indexée par événement.
+- 025 FARADAY : forcing périodique intentionnel conservé, chirp stateful variable, ripple tactile décoratif temporel retiré.
 
-## TRASH / curation
+## Important — prochain tirage créatif
 
-`MOVE TO TRASH` masque immédiatement un sketch de la Gallery locale.
+Utilise le nouveau système adaptatif :
 
-- config : `user://creative_lab_curation.cfg`;
-- `TRASH n` apparaît si nécessaire;
-- RESTORE disponible;
-- rétention 7/14/30 jours, default 30;
-- expiration ou PURGE -> état local `retired`.
+- `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
+- `knowledge/cross-domain/creative_draw_space.json`
+- `scripts/creative/draw_recipe.py`
 
-Important : PURGE ne supprime **pas** les fichiers source Git. Le runtime ne doit pas supprimer `res://sketches/...`. Une vraie suppression du repo reste une action Git explicite après décision humaine.
+Il choisit carrier + 2 représentations de familles différentes + 2 opérateurs de familles différentes + modèle temporel + interaction + contrainte design + render path.
 
-Ne ressuscite pas automatiquement les sketches localement retired dans l'UI.
+Il pénalise la répétition historique/récente. Les notes explicites peuvent biaiser légèrement les probabilités, mais 24% des tirages ignorent entièrement le biais de préférence pour préserver la découverte.
 
-## Gallery tags
+Pour tout sketch 026+, `definition.json` doit contenir `creative_signature`. Ne stocke dans l’historique que les concepts effectivement implémentés/conservés.
 
-Ne restaure pas le mur de tags.
+Ne prends jamais le tirage brut comme concept final : `draw -> prototype couplé -> observe -> interprète -> art-direct -> mutate`.
 
-- ALL toujours visible;
-- max 6 quick tags générés;
-- universels masqués;
-- rares/restants sous MORE;
-- rare actif promu;
-- recherche indexe tous les tags;
-- groupe primaire = premier tag de definition.json.
+## Historique / non-régressions
 
-## Direction créative
-
-Méthode courante : collision-first.
-
-Lire en priorité :
-
-- `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
-- `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
-- `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
-- `knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
-- `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
-- `knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md`
-- atlases design/creative-coding pertinents.
-
-Règles : diversité technique réelle; coupling interne; 6–9 contrôles indépendants quand pertinent; plusieurs échelles de temps; default visuel cohérent; interaction qui modifie le futur du système; science utilisée par causalité, pas seulement par look; performance pensée dès la représentation.
-
-005 reste REGISTER TYPE, jamais Pressure Lattice. La passe contours généralisée `6c20a094...` est rejetée.
-
-## Corpus actuel
-
-Source catalogue : 25 sketches.
-
-021–025 : ROSENSWEIG FIELD, LIESEGANG FRONT, SPINODAL MARANGONI, GRANULAR JAM, FARADAY QUASI.
-
-017 et 020 ont déjà été optimisés via champs ImageTexture/cached neighbour data.
+- 005 reste visuellement **REGISTER TYPE**, jamais Pressure Lattice.
+- ne restaure pas le contour-glyph généralisé `6c20a094...` comme représentation maison.
+- ne restaure pas le mur permanent de tags.
+- `ShaderSurface` plein-canvas obligatoire via `sketches/_shared/full_canvas_surface.gd`.
+- navigation ne stoppe pas PROGRAM ; TAKE LIVE, touch, live-sync et telemetry restent stables.
+- pas de faux Spout/NDI.
 
 ## Prochaine opération
 
-Test hôte des nouvelles briques produit + poursuite du test créatif :
+Test hôte :
 
-1. ouvrir 025 en workstation maximisée : aucune zone grise; le render couvre le PREVIEW 1520×852;
-2. resize/maximize + tester 025, 021, 005;
-3. F11 sur shader plein-canvas;
-4. noter plusieurs critères d'un sketch, revenir Gallery, vérifier badge et persistance;
-5. déplacer un sketch non critique dans Trash, vérifier disparition + TRASH, puis RESTORE;
-6. poursuivre jugement artistique/perf de 021–025;
-7. fermer normalement;
-8. lire immédiatement télémétrie fraîche : `sketch_surface_contract`, `sketch_review_changed`, trash events, perf/session.
+1. vérifier que REVIEW ne prend plus la hauteur du panneau paramètres ;
+2. RATE ouvre le popup, notes persistantes + badge Gallery ;
+3. fermer normalement pour publier `creative_preference_snapshot` complet ;
+4. regarder 021 ~60 s pour vérifier disparition du mouvement analytique répétitif ;
+5. suivre 022 pendant épuisement/repos/recharge ;
+6. charger/relâcher 024 et juger creep/avalanche ;
+7. tester 025 et distinguer oscillation Faraday légitime de l’ancien habillage périodique ;
+8. continuer à noter les œuvres selon chaque axe ;
+9. ensuite telemetry-first et décider quels warnings historiques méritent un refactor selon notes + identité.
 
-## Règle obligatoire de fin de tâche
-
-Après toute modification matérielle : finir commits/pushs, mettre à jour continuité durable, résoudre HEAD final après tous les commits, attendre la CI de ce SHA exact, donner short SHA + CI, fournir automatiquement le PowerShell canonique de `OPERATIONS.md` si test Windows pertinent, puis telemetry-first après le test.
-
-Ne merge jamais `main` sans accord explicite.
-
----
+Après toute modification matérielle : terminer commits/docs, résoudre HEAD final, attendre CI du SHA exact, donner short SHA + CI et le PowerShell canonique de `OPERATIONS.md` si test Windows pertinent.

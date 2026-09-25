@@ -19,184 +19,150 @@ Last refreshed: 2026-09-25.
 - `TAKE LIVE`, physical display selection and PROGRAM touch/mouse forwarding.
 - Linked PREVIEW/PROGRAM state synchronization.
 - Async sanitized telemetry on `telemetry/runtime`.
-- logical artwork coordinate system usually `1280×720`, but render surfaces must adapt to actual viewport.
-- PROGRAM is artwork-only: no title/index/tag/debug chrome unless artistically intentional.
+- logical artwork space usually `1280×720`, but render surfaces adapt to actual viewport.
+- PROGRAM is artwork-only.
+- local Trash never deletes Git source.
 
-## Host finding — fixed-size shader surfaces
+## Current top runtime
 
-On host test of **025 FARADAY QUASI**, maximized workstation PREVIEW showed the shader only in a 1280×720 region with gray host space to the right/bottom.
+`app/main/main_runtime_gallery_compact_review.gd`
 
-Telemetry for that exact session matched runtime head `03917e676fce...` and showed:
+It extends `main_runtime_gallery_feedback_trash.gd`, then adaptive filters / organizer / PROGRAM layers.
 
-- workstation root: 1920×1080;
-- project PREVIEW container: 1520×852;
-- sketch `SubViewport`: 1520×852;
-- viewport texture: 1520×852.
+## Explicit user-rating evidence
 
-Therefore host sizing was correct. The defect was inside the sketch scene: `ShaderSurface` was a fixed 1280×720 `ColorRect`.
+Fresh host telemetry from the previous runtime reported **16 reviewed sketches**. Some complete known score vectors:
 
-### Durable correction
+- **020 ECHO TISSUE** — visual 4, interaction 4, originality 4, aliveness 4, controls 4, performance 5; average ~4.17.
+- **022 LIESEGANG FRONT** — 1,2,2,1,2,3; average ~1.83; especially weak visual/aliveness.
+- **025 FARADAY QUASI** — 3,2,2,1,2,3; average ~2.17; weak aliveness.
+- **001 SIGNAL FIELD** — 3,2,2,1,3,3; average ~2.33.
 
-Added:
+These are explicit host ratings, not inferred taste. Do not turn them into a simplistic “copy 020” rule.
 
-`sketches/_shared/full_canvas_surface.gd`
+## Compact REVIEW revision
 
-A node named `ShaderSurface` is now a semantic full-canvas surface. It follows the actual `SubViewport` in thumbnail, resized/maximized PREVIEW, F11 and PROGRAM.
+The six criteria no longer occupy permanent parameter-sidebar height.
 
-Converted existing named full-canvas surfaces in:
+The project inspector now shows one compact row:
 
-- 005 REGISTER TYPE;
-- 021 ROSENSWEIG FIELD;
-- 025 FARADAY QUASI.
+`REVIEW  <avg>/5  RATE  TRASH`
 
-The host also sizes named `ShaderSurface` nodes as a runtime fallback and emits `sketch_surface_contract` telemetry with viewport/surface coverage.
+`RATE` opens a popup with the existing six 1–5 axes. Persistence and Gallery `R x.x` badges remain intact.
 
-### CI guard
+New consolidated telemetry event:
 
-`scripts/ci/validate_repository.py` now fails if a runtime `.tscn` contains `ShaderSurface` but:
+`creative_preference_snapshot`
 
-- does not reference `res://sketches/_shared/full_canvas_surface.gd`;
-- contains legacy fixed `offset_right = 1280`;
-- contains legacy fixed `offset_bottom = 720`;
-- has no script assignment on the `ShaderSurface` block.
+It emits at startup and after rating edits and contains all current reviewed sketches, rating vectors, averages, axis averages, title/tags and `creative_signature` when available. Future sessions should prefer this snapshot over reconstructing dozens of click events.
 
-This is a hard non-regression rule. Do not reintroduce fixed-size shader surfaces.
+## Temporal-loop audit
 
-## User creative review system
+User feedback: many historical sketches expose ugly predictable “loops” / sine-like bobbing. The issue is defined as **visible clock periodicity**, not programming loops in general.
 
-New top runtime layer:
+New rules live in:
 
-`app/main/main_runtime_gallery_feedback_trash.gd`
+`knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
 
-It extends the adaptive-filter layer.
+Preferred temporal chain:
 
-Every opened sketch now receives a `REVIEW` block in the workstation inspector, after its creative parameters.
+`time -> state/force/memory/event -> coupled dynamics -> render`
 
-Current 1–5 axes:
+Default rejection:
 
-1. `VISUAL`
-2. `INTERACTION`
-3. `ORIGINALITY`
-4. `ALIVENESS`
-5. `CONTROLS`
-6. `PERFORMANCE`
+`time -> sin/cos -> visible position/scale/alpha/warp`
 
-Behavior:
+CI script:
 
-- scores persist in `user://creative_lab_reviews.cfg`;
-- pressing the selected score again clears that criterion;
-- active inspector shows aggregate average and rated-axis count;
-- rated Gallery cards show compact `R x.x` badge;
-- changes emit `sketch_review_changed` telemetry with numeric ratings + average.
+`scripts/ci/audit_temporal_motion.py`
 
-Future AI sessions should inspect these explicit user ratings as first-class evidence when deciding what creative traits to repeat, improve, mutate or avoid. Do not infer ratings from unrelated conversation if the structured host data exists.
+Current audit found **38 historical observations** across the <=025 corpus. Important concentrations include 002, 003, 004, 006, 009, 011, 013, 014, 015, 016, 017, 019 and previously 024. Some fixed-interval warnings are legitimate simulation/event cadences, so they are diagnostic, not blanket failures.
 
-## Local Trash / deletion workflow
+For 026+ direct clock trig requires `TEMPORAL_INTENT:` and a non-empty `creative_signature` is mandatory.
 
-`MOVE TO TRASH` is available from each open sketch.
+Do not blindly replace every historical oscillator with noise. Use ratings + visual identity to prioritize refactors.
 
-Local curation persists in:
+## Current temporal fixes
 
-`user://creative_lab_curation.cfg`
+### 021 ROSENSWEIG FIELD
 
-Behavior:
+Removed predictable Lissajous/orbiting auto magnet and shader clock wobble. Autonomous magnet now chooses deterministic-random targets with variable dwell and viscosity; visible dynamics come from source motion + hysteretic instability state.
 
-- moving to Trash immediately hides the sketch from normal Gallery catalogue;
-- when non-empty, Gallery shows `TRASH n`;
-- Trash drawer supports `RESTORE`;
-- retention choices: 7 / 14 / 30 days, default 30;
-- expired Trash entries become locally `retired`;
-- `PURGE` retires locally immediately.
+### 022 LIESEGANG FRONT
 
-Safety boundary: the workstation never deletes version-controlled `res://sketches/...` source files. Local purge means “permanently removed from this workstation Gallery”, while actual source deletion remains an explicit Git operation. This keeps accidental deletion recoverable from repo history and works in read-only/exported builds.
+Removed visible “front grows huge then snaps back to small” behavior. Reservoirs now consume reagent charge, exhaust, rest for variable durations and recharge; bands persist/dissolve independently. Internal radius restart happens while reservoir is visually depleted.
 
-Telemetry events include `sketch_trashed`, `sketch_restored`, `sketch_purged`, drawer state and retention changes.
+### 024 GRANULAR JAM
 
-## Gallery adaptive filters
+Removed clock-driven sinusoidal creep. Creep direction now comes from actual lateral velocity, confinement position, stress and stable per-grain material asymmetry. Avalanche slip patterns use real avalanche event index rather than global clock time.
 
-The permanent tag wall is rejected.
+### 025 FARADAY QUASI
 
-Current contract:
+Physical periodic forcing remains intentionally. Added `TEMPORAL_INTENT:`. Chirp no longer uses `sin(sketch_time)`; it moves between variable-duration state targets. Removed decorative clock-driven touch ripple; touch injects a local pressure impulse and modal state carries the evolution.
 
-- `ALL` always visible;
-- at most six useful generated quick tags;
-- universal tags omitted;
-- remaining tags in collapsed `MORE`;
-- selected rare tag promoted while active;
-- search indexes all tags;
-- first definition tag remains automatic primary group.
+023 SPINODAL MARANGONI was already primarily state-driven and did not require a temporal rewrite.
 
-## Current creative body
+## Adaptive creative draw
 
-Gallery source catalogue currently contains 25 sketches.
+New system:
 
-Historical constraints:
+- `knowledge/cross-domain/creative_draw_space.json`
+- `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
+- `scripts/creative/draw_recipe.py`
 
-- 005 internal id remains `005_pressure_lattice` but visible artwork is REGISTER TYPE; never restore Pressure Lattice.
-- generalized glyph-contour pass `6c20a094...` was host-rejected and must not become the default representation.
-- 011–015 established collision-first diversity but were visually weak/under-parameterized.
-- 016–020 improved organic coupling and expose 8–9 controls.
-- 021–025 add physical/chemical causal mechanisms: Rosensweig, Liesegang, spinodal/Marangoni, granular jamming and Faraday resonance.
+A draw selects carrier + two distant representation families + two distant operator families + temporal model + interaction + design constraint + render path.
 
-017 and 020 already received dense-field performance refactors to low-resolution `ImageTexture` rendering; 020 also caches neighbour density rather than rescanning in `_draw()`.
+Anti-repetition:
+
+- historical frequency penalty;
+- stronger previous / last-3 / last-5 penalties;
+- minimum recent signature distance of 4 axes;
+- forced oscillator base penalty;
+- representation/operator pair families must differ.
+
+Preference learning:
+
+- optional explicit rating snapshot biases features only modestly (~±24% feature influence);
+- **24% exploration share ignores preference bias entirely** and uses diversity constraints only;
+- ratings are never permission to remove a technical family forever or clone the highest-rated sketch.
+
+CI self-test currently validates 180 deterministic draws; first validated run produced **180 unique / 180**.
+
+## Full-canvas contract
+
+`ShaderSurface` must use `sketches/_shared/full_canvas_surface.gd`; CI rejects legacy fixed 1280×720 surfaces. Host `sketch_surface_contract` telemetry remains the dynamic coverage check.
 
 ## Knowledge priority
 
-For current creative work read:
+For next creative work read:
 
-1. `knowledge/cross-domain/TECHNIQUE_PALETTE.md`
-2. `knowledge/cross-domain/RANDOM_COLLISION_ENGINE.md`
-3. `knowledge/cross-domain/COLLISION_SOURCE_CATALOG.md`
-4. `knowledge/cross-domain/PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
-5. `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
-6. `knowledge/cross-domain/REALTIME_PERFORMANCE_BUDGET.md`
-7. relevant design/creative-coding atlases
-8. `CROSS_DOMAIN_ATLAS.md` / `IDEA_ENGINE.md` for art-direction promotion.
-
-## Validation status
-
-Runtime/code implementation commits:
-
-- `6471a875...` — full-canvas contract + review/trash layer;
-- `e8c1a826...` — fix GDScript constant parse issue.
-
-CI #256 passed on exact code head `e8c1a826...`:
-
-- Repository policy: success;
-- Godot 4.7.1 import: success;
-- main-scene smoke: success;
-- tracked-file cleanliness: success.
-
-Always resolve a new exact-head CI after the documentation commits in this session.
+1. `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
+2. `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
+3. `knowledge/cross-domain/creative_draw_space.json`
+4. `TECHNIQUE_PALETTE.md`
+5. `RANDOM_COLLISION_ENGINE.md`
+6. `COLLISION_SOURCE_CATALOG.md`
+7. `PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
+8. `ORGANIC_COUPLING_AND_CONTROLS.md`
+9. `REALTIME_PERFORMANCE_BUDGET.md`
+10. relevant design/creative-coding atlases.
 
 ## Required next host test
 
-1. Gallery source count should still be 25 before local trash actions.
-2. Open 025 in the same maximized workstation layout that previously failed: artwork must cover the full 1520×852 PREVIEW, with no gray right/bottom gap.
-3. Resize the workstation and test 025, 021 and 005; full-canvas shader surfaces must continue to cover PREVIEW.
-4. Press F11 on a shader sketch and confirm the render remains full-canvas.
-5. Rate at least one sketch across several REVIEW criteria; return to Gallery and confirm `R x.x`; reopen and confirm scores persist.
-6. Move one disposable/noncritical sketch to Trash; confirm Gallery hides it and `TRASH 1` appears.
-7. Restore it and confirm it returns.
-8. Optionally test retention selector; do not source-delete anything from Git as part of this UI test.
-9. Continue 021–025 artistic/performance evaluation.
-10. Close normally so telemetry publishes.
-11. On next response inspect fresh `telemetry/runtime` first; verify matching tested HEAD/session and inspect `sketch_surface_contract`, rating and trash events before requesting manual logs.
-
-## Evaluation axes going forward
-
-- **mechanism** — state coupling/emergence;
-- **art direction** — default beauty/composition;
-- **interaction** — meaningful influence and delayed consequence;
-- **controls** — depth and distinct regimes;
-- **performance architecture** — representation appropriate for realtime;
-- **catalogue UX** — scalable discovery/curation;
-- **explicit host preference** — structured REVIEW scores.
+1. Verify parameter sidebar is compact: REVIEW average + RATE + TRASH only.
+2. Open RATE popup, change/clear several scores, reopen and verify persistence; return Gallery and verify `R x.x`.
+3. On a normal launch/close, allow telemetry publication; next AI must inspect `creative_preference_snapshot` first to recover all current ratings.
+4. Watch 021 idle for ~60 s: no obvious Lissajous/orbiting loop.
+5. Watch 022 through depletion/rest/recharge: no visible giant-front snap reset.
+6. Watch 024 under load/release: creep/avalanche should feel state/stress-driven, not harmonic side-to-side motion.
+7. Watch 025: periodic standing-wave behavior is conceptually valid, but decorative traveling touch ripple / metronomic chirp should be gone.
+8. Continue rating artwork honestly; use low/high per-axis scores rather than only aggregate judgement.
+9. Close normally, then inspect fresh `telemetry/runtime` and require matching tested HEAD/session before conclusions.
 
 ## Mandatory AI completion
 
-After every material repository change: finish commits, update durable docs/state, resolve final remote HEAD, wait exact-head CI, report exact short SHA + CI, provide canonical CI-waiting PowerShell when host test is relevant, then telemetry-first after user test.
+After every material repository change: finish commits, update durable docs/state, resolve final remote HEAD, wait exact-head CI, report exact short SHA + CI, include canonical CI-waiting PowerShell when host validation is relevant, then telemetry-first after user test.
 
 ## Non-regressions
 
-Do not stop PROGRAM on navigation, create independent linked timelines, block UI with telemetry Git work, resurrect failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, or reintroduce fixed 1280×720 `ShaderSurface` nodes.
+Do not stop PROGRAM on navigation, create independent linked timelines, block UI with telemetry Git work, restore failed cross-window texture sampling, fake Spout/NDI, restore Pressure Lattice, burn project metadata into artwork, make glyph contours the default representation, restore a permanent all-tags wall, reintroduce fixed 1280×720 ShaderSurface nodes, or use naked global-clock wobble as the default way to make a sketch feel alive.

@@ -2,71 +2,75 @@
 
 ## Purpose
 
-GitHub Actions is the remote validation layer for Creative Lab. Local development remains fast while repetitive repository/runtime regressions are automated.
+GitHub Actions is the remote validation layer for DC//LAB. It checks repository structure, temporal-quality failure modes, adaptive creative-draw diversity and the pinned Godot runtime.
 
-## Current checks
+## Repository policy
 
-### Repository policy
-
-Cross-platform Python validator:
-
-`scripts/ci/validate_repository.py`
-
-Checks include:
+`scripts/ci/validate_repository.py` checks:
 
 - required repository files;
 - forbidden generated/local paths;
 - large tracked files;
-- project-owned path naming policy;
-- expected Godot project identity/version family;
-- no obvious sketch index/title burn-in in runtime drawing code;
-- **full-canvas shader-surface contract**.
+- project-owned naming policy;
+- expected Godot identity/version;
+- no obvious sketch index/title burn-in;
+- full-canvas `ShaderSurface` contract.
 
-### Full-canvas shader-surface gate
+A node named `ShaderSurface` must reference `res://sketches/_shared/full_canvas_surface.gd`; legacy fixed `offset_right = 1280` / `offset_bottom = 720` are rejected.
 
-A runtime scene node named `ShaderSurface` is treated as a full artwork surface.
+## Temporal-motion audit
 
-CI requires it to reference:
+`scripts/ci/audit_temporal_motion.py`
 
-`res://sketches/_shared/full_canvas_surface.gd`
+The audit reports direct clock trigonometry (`sin/cos` driven by `sketch_time`, `u_time` or shader `TIME`) and heuristic fixed-interval state branches.
 
-and rejects legacy fixed surface sizing such as:
+Historical sketches <=025 are reported as observations so the existing catalogue can be refined with host/rating evidence instead of being blindly rewritten.
 
-```text
-offset_right = 1280
-offset_bottom = 720
-```
+For index 026+:
 
-This rule exists because the logical design coordinate system may be 1280×720 while PREVIEW/PROGRAM surfaces can be larger or differently sized. A sketch must never expose unrendered host gray simply because its own ColorRect stayed fixed-size.
+- direct clock trigonometry fails CI unless the runtime file contains `TEMPORAL_INTENT:` explaining the conceptual/physical oscillator;
+- `definition.json` must include a non-empty `creative_signature`.
 
-The host additionally emits runtime `sketch_surface_contract` telemetry; CI is the static prevention layer, telemetry/host testing is the dynamic evidence layer.
+The audit does not claim that a fixed simulation cadence is artistically bad. It surfaces patterns for review; only the narrow direct-clock/new-signature rules are hard gates.
 
-### Godot headless
+## Adaptive creative-draw self-test
 
-CI installs pinned Godot `4.7.1` and runs headless import plus main-scene smoke testing.
+`scripts/creative/draw_recipe.py --self-test --seed 20260925`
 
-The job also fails if Godot modifies tracked repository files during import.
+CI draws 180 deterministic synthetic recipes and verifies:
+
+- representation pairs come from different technical families;
+- operator pairs come from different families;
+- each draw stays sufficiently distant from recent implemented signatures;
+- signature diversity does not collapse;
+- forced oscillators do not dominate;
+- one render path does not dominate the sample.
+
+This validates the **selection system**, not the artistic quality of generated work. Host review and explicit ratings remain necessary.
+
+## Godot headless
+
+CI pins Godot `4.7.1`, then performs:
+
+- version verification;
+- headless import;
+- main-scene smoke test;
+- tracked-file cleanliness check after Godot.
 
 ## Local equivalent
 
-Run:
+`scripts/check.ps1` remains the standard local repository/Godot check. GitHub CI additionally runs the temporal audit and adaptive draw self-test.
 
-`.\scripts\check.ps1`
-
-This performs repository preflight/policy, exact Godot version validation, headless import, smoke validation and post-import Git cleanliness.
-
-## GitHub workflow
+## Workflow
 
 `.github/workflows/ci.yml`
 
-Runs for pull-request work and the repository's configured workflow triggers.
+Runs for pull-request work and configured push/manual triggers.
 
-## Version policy
+## Philosophy
 
-Do not use unpinned `latest` Godot in CI. CI must match the validated development engine until an explicit upgrade is host/repo validated.
+Move a rule into CI when source structure can determine it reliably: fixed shader surfaces, missing creative provenance, unexplained direct-clock animation, or diversity-engine invariants.
 
-## CI philosophy
+Do **not** replace visual judgment with brittle screenshot scoring. Explicit host REVIEW data, telemetry and visual inspection are the artistic evidence layer.
 
-A rule should move into static CI when the repository can determine it reliably from source structure, as with fixed `ShaderSurface` sizing. Visual quality itself still requires host/render evidence and should not be replaced by brittle screenshot heuristics without a demonstrated need.
-
-Do not weaken a repository policy gate merely to make a new sketch pass. Fix the violating representation or intentionally revise the contract with documented evidence.
+Never weaken a CI gate merely to make a new sketch pass; fix the representation or intentionally revise the documented contract with evidence.
