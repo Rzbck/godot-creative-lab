@@ -1,5 +1,7 @@
 extends "res://sketches/_shared/design_sketch_base.gd"
 
+# TEMPORAL_INTENT: clock phase only shapes decaying stored impulse ringing; hinge angles evolve from coupled inertia, direct manipulation, and stochastic impulses.
+
 const OSCILLATORS: int = 64
 const SAFE := Rect2(72.0, 62.0, 1136.0, 596.0)
 
