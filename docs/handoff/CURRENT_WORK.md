@@ -8,81 +8,80 @@ Last refreshed: 2026-09-26.
 - draft PR: #7
 - base: `feat/gallery-project-workflow-20260923`
 - never merge/change `main` without explicit user approval
-- source catalogue: **001–045**
+- source catalogue: **001–050**
 - top runtime: `app/main/main_runtime_gallery_host_fixes.gd`
 
-## Latest host test
+## Feedback evidence consumed before 046–050
 
-The user tested HEAD `a55c65c6...` and reported:
+The latest usable preference telemetry is no longer numeric-only. Session `67a6e7499c4524cf` / runtime HEAD `ceecb6be59a9` verified that startup republish works and that real written `note` strings are present under `creative_preference_snapshot.reviews.<sketch>.note`.
 
-- LIST revision 1 is too large; rows must stay compact and use preview imagery as background decoration rather than a large left thumbnail.
-- ProjectView needs direct previous/next sketch browsing.
-- written RATE feedback has been entered extensively and must become automatic evidence for future repairs/creative generation.
-- 041 TENSION ORGAN repeatedly emitted `Invalid polygon data, triangulation failed` from `_draw()`.
+Current axis averages over the available reviewed set:
+- visual ~2.06
+- interaction ~1.72
+- originality ~1.92
+- aliveness ~1.64
+- controls ~1.56
+- performance ~2.42
 
-Terminal also showed successful asynchronous `review_checkpoint` publisher processes.
+The weakest recurring axes are therefore **controls, aliveness and interaction**.
 
-## Telemetry-first findings
+Strong bounded references:
+- 020 ECHO TISSUE: avg ~4.17 across the six axes;
+- 012 CHEMICAL BLOCKS: avg ~3.33;
+- 038 ELECTRIC LACE: avg ~2.67, with visual 4 / originality 4.
 
-Raw GitHub telemetry proves the current session is non-empty. Session: `5cb124f1822c2ee4`.
+Written feedback that directly shaped the new batch:
+- 041 TENSION ORGAN: too basic for the subject, physics not strongly felt, visual bugs when pulled too far;
+- 042 MYCELIUM RELAY: promising, but missing interaction; parameters feel ineffective instead of creating a genuinely different result;
+- 043 SLIT MEMORY: incomprehensible, not real-time interactive, clicks have no felt response, visually rejected;
+- 044 EXCITABLE GLASS: too pixelated, no reset, parameters do too little;
+- 045 RIFT VOLUME: strongly rejected visually and semantically; result is not understandable.
 
-The old sanitizer preserved:
-- numeric `sketch_review_changed` events;
-- `creative_preference_snapshot` ratings;
-- `sketch_review_note_changed.note_length`.
+Durable interpretation: parameters are only useful when they create **visible regime/composition changes**. Interaction must be immediate enough to understand, stateful enough to matter after release, and coupled to the material/system rather than being a superficial pointer overlay. Hidden coarse simulation is acceptable; visibly enlarged solver pixels are not finished artwork.
 
-But it **removed the actual written `note` string**. Therefore the user did not need to paste the notes because the app stored them locally, but the current remote copy cannot yet reveal their contents. Never claim otherwise.
+## New feedback-driven batch 046–050
 
-Latest visible numeric evidence includes:
-- 036 ~1.83
-- 037 ~2.33
-- 038 ~2.67 (visual 4 / originality 4; strongest recent signal)
-- 039 ~2.17
-- 040 2.0
-- 043 1.0
-- 044 2.0
-- 045 1.0
+This batch deliberately avoids copying ECHO TISSUE or ELECTRIC LACE. It reuses only their positive qualities: readable causality, strong direct manipulation and meaningful state change.
 
-Do not invent missing 041/042 values or text comments.
+### 046 INK SHEAR
 
-## Implementation completed before docs
+- persistent vector ink filaments, not an enlarged fluid grid;
+- user gesture writes persistent eddies into the flow;
+- viscosity, vorticity, filament count, pigment split, wet bleed, brush force/radius and eddy memory alter different aspects of the resulting regime;
+- interaction survives release through decaying vortex memory.
 
-### Gallery host layer revision 2 — `21d31984...`
+### 047 MOIRE APERTURE
 
-- LIST row height = **68 px**.
-- real SubViewport preview is reused as a low-alpha right-side background layer.
-- compact index/title/engine/tags remain overlaid.
-- existing ReviewBadge remains above the decoration.
-- PREV/NEXT buttons are inserted after `< GALLERY` in ProjectToolbar.
-- adjacency uses numeric source order, skips locally removed sketches, disables at edges, no wrap.
-- `_open_sketch()` remains the switching path, preserving PROGRAM semantics.
-- startup schedules `review_checkpoint_startup_republish` so saved user notes can be republished automatically.
+- full-resolution analytic interference field;
+- draggable apertures/anchors locally lens and shear the registration structure;
+- line density, layer angle, shear, lens power, aperture radius and contrast change the family of interference rather than merely changing an amount;
+- no visible coarse simulation texture.
 
-### 041 safe tessellation — `df9710ae...`
+### 048 ACTIVE NEMATIC
 
-The failure was not random: deforming spring cells can become concave, inverted or near-degenerate, while `draw_colored_polygon([p0,p1,p2,p3])` asks the renderer to triangulate them.
+- hidden coupled director/flow solver;
+- visible artwork is a MultiMesh field of **880 oriented filaments**, not solver cells;
+- direct gesture writes orientation/spin into the field;
+- alignment, activity, defect birth and flow memory are intended to create genuinely different active-matter regimes.
 
-Fix:
-- remove dynamic quad polygon triangulation;
-- choose the shorter diagonal per cell;
-- draw two explicit triangle primitives;
-- skip triangles below a small area threshold;
-- leave physical spring simulation unchanged.
+### 049 TEMPER SKIN
 
-### Written-review telemetry — `0c360c35...`
+- thermally reactive metal skin with local heat, conduction, cooling and oxide memory;
+- state-dependent interaction: a cold region is heated, while interacting with an already-hot region quenches/cools it;
+- parameters control thermal lifetime, coupling and retained material memory rather than cosmetic brightness alone.
 
-`publish-telemetry-diagnostics.ps1` now:
-- allows only one bounded free-text field: `note`;
-- caps it at 2000 chars;
-- strips disallowed control characters;
-- preserves safe creative identifiers/tags/signature strings;
-- rejects zero-byte sanitized output.
+### 050 FERRO TRACE
 
-Because notes are persisted in `user://creative_lab_reviews.cfg`, the next startup checkpoint should republish existing comments without retyping them.
+- **1100 MultiMesh iron filings** oriented by a magnetic field;
+- 2–4 directly draggable poles/sources;
+- orientation hysteresis gives the field temporal memory instead of instant stateless following;
+- preserves the positive source legibility of 038 without copying its electric-lace surface.
 
-## Validation
+`knowledge/cross-domain/creative_draw_space.json` now records 046–050 in creative history so future draws can avoid accidental collisions.
 
-Implementation HEAD `0c360c358e4b08fc456ba158fd35d6f62e18a253` passed **CI #312** completely before documentation:
+## Validation already completed
+
+Implementation HEAD `96471494f10c8c292ab8b0c0c04ea6dcf2828034` passed **CI #340** completely before the durable-doc bundle:
 - Repository policy — success
 - temporal audit — success
 - adaptive creative draw self-test — success
@@ -90,44 +89,48 @@ Implementation HEAD `0c360c358e4b08fc456ba158fd35d6f62e18a253` passed **CI #312*
 - main scene smoke — success
 - tracked cleanliness — success
 
-Host validation is still required for dynamic 041 stress, compact list appearance, PREV/NEXT UX and actual remote note contents.
+The first smoke attempt correctly caught two implementation issues before host delivery:
+- 046 GDScript type inference ambiguity;
+- 047 shader redefinition of built-in `PI`.
 
-## Durable feedback rule
+Both were fixed before CI #340 went green.
 
-Written RATE comments are first-class creative evidence. After every host test, before generating or repairing sketches, future AI must inspect the latest remote preference snapshot and read **numeric ratings plus text notes**. The user should not need to repeat an existing RATE comment in chat.
+Important: **046–050 are repo/CI validated, not yet host-rated or artistically accepted.** Do not infer visual success from technical diversity or CI success.
 
-Use the comments for:
-- direct bug/interaction repairs;
-- understanding why a score is low/high;
-- extracting recurring visual/interaction preferences;
-- bounded bias in future creative recipes;
-- updating durable creative rules when feedback repeats.
-
-Do not turn one positive review into a cloning rule; keep exploration active.
-
-## Existing contracts to preserve
+## Existing host/product contracts to preserve
 
 - PROGRAM persists across navigation; TAKE LIVE explicitly replaces it.
 - physical PROGRAM touch/mouse works.
 - linked PREVIEW/PROGRAM share one timeline/state.
 - per-sketch params persist.
 - real Gallery thumbnails; idle frozen, hover live.
+- adaptive tag rail stays bounded; never restore the permanent all-tags wall.
 - TRASH is exclusive and local only; never delete Git source.
 - Gallery supports INDEX ↑/↓, TITLE, FAMILY, GRID/LIST and grid size.
-- LIST must stay dense; preview is decorative background, not large thumbnail.
+- LIST stays dense (~68 px); preview is decorative background, not a large left thumbnail.
+- PREV/NEXT switches PREVIEW by numeric source order and must not replace PROGRAM.
 - ShaderMaterial mutable state is local to scene instances.
 - full-canvas shader surface rule remains enforced.
 - RATE remains centered/opaque/in-app.
+- written RATE comments are first-class evidence and must be consumed automatically.
 - no fake Spout/NDI.
 
 ## Next host validation
 
-1. Sync exact final HEAD and wait exact CI.
-2. Verify LIST density/background preview at several window sizes.
-3. Open e.g. 037 -> 038 -> 039 using NEXT, then PREV; PROGRAM must not change unless TAKE LIVE is pressed.
-4. Stress 041 by dragging central nodes and changing tension/elasticity/damping; terminal must remain free of triangulation errors.
-5. On startup, allow automatic review checkpoint to publish; next AI inspects `telemetry/runtime` and confirms real `note` strings appear in `creative_preference_snapshot`.
-6. Continue normal written RATE feedback; never require chat duplication.
+After exact final HEAD CI is green:
+
+1. Confirm Gallery now shows **50 source sketches**.
+2. Recheck LIST compactness and PREV/NEXT/PROGRAM persistence while reviewing 046–050.
+3. Watch each 046–050 at defaults for ~20–30 seconds before touching controls; judge whether it has autonomous life without generic clock wobble.
+4. Interact, release, and verify the gesture has an immediate readable response plus a persistent/delayed consequence.
+5. Move every parameter through a large range. A parameter that appears to do nothing or only changes intensity is a failure signal.
+6. 046: write several opposite eddies and verify ink actually shears/retains the intervention.
+7. 047: drag apertures and push density/angle/shear/lens to clearly different interference regimes.
+8. 048: disturb the nematic field and verify the filament field—not pixels—shows defects, flow and memory.
+9. 049: heat cold metal, then act on an already-hot area and verify state-dependent quench/cooling; test conduction/cooling/oxide-memory extremes.
+10. 050: drag magnetic poles and verify filings rotate/reorganize with hysteresis; vary pole count/field-related controls and look for genuinely different field organizations.
+11. Continue RATE numeric + written feedback normally; do not duplicate those notes in chat.
+12. Close normally so telemetry publishes; next AI must inspect fresh `telemetry/runtime` first and verify the tested runtime HEAD/session before attributing scores or performance.
 
 ## Mandatory completion
 
