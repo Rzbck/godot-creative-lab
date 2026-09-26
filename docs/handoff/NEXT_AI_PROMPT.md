@@ -1,127 +1,97 @@
-# Prompt for the next AI session
+# NEXT AI PROMPT — DC//LAB
 
-Reprends **DC//LAB / Godot Creative Lab** depuis `Rzbck/godot-creative-lab`.
+Resume from the repository, not from assumptions.
 
-Avant toute conclusion, résous le HEAD réel de `feat/creative-sketches-002-004-20260924` et la CI de ce SHA exact, puis lis :
+## Repository position
 
-1. `AGENTS.md`
-2. `HANDOFF.md`
-3. `docs/handoff/CURRENT_WORK.md`
-4. `docs/handoff/OPERATIONS.md`
-5. `docs/handoff/project_state.json`
-6. `docs/ARCHITECTURE.md`
-7. `docs/SKETCH_CONTRACT.md`
+- repo: `Rzbck/godot-creative-lab`
+- active branch: `feat/creative-sketches-002-004-20260924`
+- draft PR: #7
+- base: `feat/gallery-project-workflow-20260923`
+- never merge/change `main` without explicit user approval
+- expected source catalogue: **001–055**
 
-Après tout test hôte, inspecte `telemetry/runtime` **avant** de demander logs/captures et avant de réparer ou créer un nouveau batch.
+Read `docs/handoff/CURRENT_WORK.md` and `docs/handoff/project_state.json` first.
 
-## Etat actuel
+## Mandatory first action after the user's host test
 
-Catalogue source : **001–050**.
+Inspect fresh `telemetry/runtime` before repairing or generating anything. Written RATE comments are first-class evidence and the user should not have to repeat them in chat.
 
-Le batch **046–050** a été construit après lecture croisée des notes numériques + written reviews disponibles. Il est techniquement validé mais **pas encore accepté visuellement par le user**.
+The latest observed checkpoint before 051–055 was built was on telemetry HEAD `c8681daea3d1566c95b522658ad348a8d07415b4`, session `6b82f797db3cfd8d`. The session blob was too large for the connector to reconstruct every 047–050 review during the generation pass. Do not invent missing ratings or notes.
 
-Implementation HEAD avant docs : `96471494f10c8c292ab8b0c0c04ea6dcf2828034`.
-CI code **#340** : GREEN complet (policy, temporal audit, creative draw self-test, Godot import, main smoke, cleanliness).
+Confirmed evidence at that boundary:
+- user said 046–050 were already better and asked to advance to the next series;
+- 046 INK SHEAR = visual 4 / interaction 2 / originality 4 / aliveness 2 / controls 2 / performance 1;
+- earlier durable failures: weak physical feel, unreadable interaction, controls that appear ineffective, visible coarse pixels, missing reset, incomprehensible/weak visual concepts.
 
-Ne confonds jamais ce succès CI avec un succès artistique.
+## Current new batch awaiting host rating
 
-## Evidence utilisateur désormais vérifiée
+### 051 CAPILLARY BRIDGE
+84 droplets, persistent pointer-written wet zones, bounded capillary attraction. Test isolated beads vs bridges/clusters with surface tension, wetting, evaporation, reach, feed and inertia.
 
-La pipeline written-review est maintenant réellement vérifiée. Session `67a6e7499c4524cf`, runtime `ceecb6be59a9` : les notes existent sous `creative_preference_snapshot.reviews.<sketch>.note` et le startup republish fonctionne.
+### 052 FIBER MEMORY
+42 x 13 fiber field. Pointer combs directly and writes persistent directional memory; twist couples neighboring strands. Clock terms are only low-amplitude autonomous-current modulation, documented with `TEMPORAL_INTENT`.
 
-Axes moyens visibles :
-- visual ~2.06
-- interaction ~1.72
-- originality ~1.92
-- aliveness ~1.64
-- controls ~1.56
-- performance ~2.42
+### 053 AVALANCHE BED
+Continuous 96-column granular ridge. Pointer above surface adds mass; pointer in/below surface excavates. Repose, cohesion and compaction should visibly change flow vs stable steep cuts.
 
-Donc les trois faiblesses dominantes à corriger sont : **controls, aliveness, interaction**.
+### 054 HINGE CHOIR
+8 x 8 coupled mechanical levers. Direct manipulation stores angular energy and propagates through neighbors. Clock phase only shapes decaying stored impulse ringing and is documented with `TEMPORAL_INTENT`.
 
-Signaux positifs bornés :
-- 020 ECHO TISSUE ~4.17 : causalité/lisibilité/contrôle forts, mais ne pas le cloner;
-- 012 CHEMICAL BLOCKS ~3.33;
-- 038 ELECTRIC LACE ~2.67, visual 4 + originality 4 : sources compréhensibles, mais interaction/controls restaient faibles.
+### 055 SNAP LATTICE
+16 x 9 large bistable folded facets. Pointer injects local snap-through; barrier/coupling/bias/damping should move behavior from isolated snaps to cascades and persistent domains.
 
-Written reviews utiles :
-- 041 : trop basic pour le sujet, physique peu ressentie, bugs visuels quand on tire trop;
-- 042 : plutôt pas mal mais manque d'interaction; paramètres semblent ne rien faire au lieu de créer un résultat réellement différent;
-- 043 : incompréhensible, pas interactif temps réel, clic sans sensation, rejet visuel;
-- 044 : trop pixelisé, pas de reset, paramètres faibles;
-- 045 : rejet visuel/semantic très fort, résultat incompréhensible.
+All five use `canvas_geometry`; there are zero new fullscreen shaders in 051–055. This is deliberate to prioritize tangible causality and runtime cost after 046's performance score of 1.
 
-Règle durable : **un paramètre est valide s'il change visiblement le régime/composition/comportement**, pas s'il fait seulement varier un “amount”. Une interaction doit être immédiatement lisible et laisser une conséquence stateful/différée.
+## Validation state
 
-## Batch 046–050
+Implementation/fix HEAD before durable docs: `25cb01539d0b4b767140dab79ee9215e739d1a44`.
+CI #348 passed completely on that exact implementation HEAD:
+- repository policy;
+- temporal audit;
+- adaptive creative draw self-test;
+- Godot 4.7.1 import;
+- main-scene smoke;
+- tracked cleanliness.
 
-### 046 INK SHEAR
-- filaments d'encre vectoriels persistants;
-- le geste écrit des eddies persistants;
-- viscosité/vorticité/bleed/pigment/brush/memory doivent produire des changements réellement lisibles;
-- aucun coarse fluid grid visible.
+An earlier run #346 failed only because 052/054 direct clock trigonometry lacked explicit `TEMPORAL_INTENT`; that was fixed before #348.
 
-### 047 MOIRE APERTURE
-- champ analytique full-resolution;
-- apertures/anchors directement dragables;
-- density/angle/shear/lens doivent basculer vers des familles d'interférence distinctes;
-- pas de texture de solver grossière.
+The final documentation HEAD is newer than the implementation HEAD and must also have exact-head CI green before handoff is considered complete.
 
-### 048 ACTIVE NEMATIC
-- solver direction/flow discret caché;
-- rendu final = 880 filaments MultiMesh;
-- geste écrit orientation/spin;
-- alignment/activity/defect birth/flow memory doivent produire des régimes active-matter différents.
+## What to judge in the next host session
 
-### 049 TEMPER SKIN
-- métal thermique avec conduction/cooling/oxide memory;
-- interaction dépend de l'état : zone froide chauffée, zone déjà chaude quench/refroidie;
-- paramètres = durée thermique, couplage et mémoire matériau, pas simple brightness.
+1. Gallery source count must be 55.
+2. Watch each 051–055 for ~20–30 seconds at defaults.
+3. Interaction must be immediately understandable.
+4. Release must leave meaningful material/system state where intended.
+5. Move every parameter through a large range. If it appears to do nothing, treat it as a failure.
+6. Compare materially different regimes rather than cosmetic intensity.
+7. Pay close attention to runtime/performance.
+8. Reset must return to a usable state.
+9. Keep PREVIEW/PROGRAM persistence and all existing Gallery contracts intact.
+10. Let the user RATE + write WHY/NOTES normally; consume telemetry automatically afterward.
 
-### 050 FERRO TRACE
-- 1100 limaille/filings MultiMesh;
-- 2–4 pôles directement déplaçables;
-- hystérésis d'orientation;
-- reprendre la lisibilité de sources de 038 sans reprendre son esthétique.
+## Product contracts that must not regress
 
-`knowledge/cross-domain/creative_draw_space.json` contient maintenant 046–050 dans l'historique collision-avoidance.
+- PROGRAM persists across navigation; TAKE LIVE explicitly replaces it.
+- linked PREVIEW/PROGRAM share timeline/state.
+- physical PROGRAM touch/mouse works.
+- per-sketch parameters persist.
+- real Gallery thumbnails; idle frozen, hover live.
+- adaptive bounded tag rail; no permanent all-tags wall.
+- TRASH is exclusive/local only and never deletes Git source.
+- GRID/LIST, sorting, grid size and compact ~68 px LIST remain.
+- PREV/NEXT changes PREVIEW only and must not silently replace PROGRAM.
+- mutable ShaderMaterial state stays local per scene instance.
+- RATE is opaque/centered/in-app and written notes are first-class evidence.
+- no fake Spout/NDI.
 
-## Host test prioritaire
+## Creative rules
 
-Quand le user teste :
+Do not clone a high-scoring sketch. Reuse qualities, not surfaces. Controls must create visible regime/composition changes. Interaction must be immediate and stateful. Hidden coarse simulation is acceptable; visible solver pixels are not finished artwork. Technical diversity is not proof of visual quality. Generic direct-clock wobble is rejected as default aliveness.
 
-1. confirmer Gallery = 50;
-2. laisser chaque 046–050 vivre 20–30 s au default avant manipulation;
-3. interaction -> release -> vérifier réponse immédiate + mémoire/consequence;
-4. pousser tous les paramètres sur de grands écarts et relever ceux qui semblent inutiles;
-5. vérifier 046 eddies opposés et persistance;
-6. vérifier 047 regimes d'interférence très différents;
-7. vérifier 048 defects/flow visibles via filaments, jamais via pixels grossiers;
-8. vérifier 049 heat puis quench state-dependent + extremes conduction/cooling/oxide;
-9. vérifier 050 poles dragables + réorganisation/hystérésis des filings;
-10. RATE numeric + WHY/NOTES normalement, sans demander au user de recopier les notes dans le chat;
-11. fermeture normale, puis **telemetry-first** sur le tour suivant;
-12. n'attribuer FPS/ratings qu'après vérification que telemetry correspond au HEAD/session réellement testé.
+`knowledge/cross-domain/creative_draw_space.json` includes history through 055; use it to avoid accidental collisions.
 
-## Contrats à préserver
+## Completion contract
 
-- 005 visible = **REGISTER TYPE**; ne jamais restaurer Pressure Lattice.
-- pas de contour-glyph généralisé.
-- pas de mur permanent de tags.
-- LIST reste compacte ~68 px, preview en background décoratif.
-- PREV/NEXT ne remplace jamais PROGRAM; TAKE LIVE reste explicite.
-- PROGRAM persiste à travers Gallery/Settings/navigation.
-- linked PREVIEW/PROGRAM = même timeline/state.
-- physical PROGRAM touch/mouse fonctionne.
-- ShaderSurface plein canvas.
-- ShaderMaterial mutable toujours local à la scène.
-- RATE opaque/centré/in-app.
-- pas de `Window.visible=false/true` au startup.
-- pas de faux Spout/NDI.
-- pas de generic direct-clock wobble comme aliveness.
-- pas de solver coarse exposé comme finition artistique.
-- written reviews = source de premier rang, mais ne jamais transformer un bon score en règle de clonage.
-
-## Completion obligatoire
-
-Après toute modification matérielle : code/push -> docs/state -> résoudre HEAD final -> attendre CI exacte -> inspecter tous les jobs -> rapporter SHA/CI -> PowerShell canonique si test hôte pertinent -> telemetry-first après test.
+Any material change must follow: code/push -> durable docs/state -> exact remote HEAD -> exact-head CI -> report SHA/result. Keep PR #7 draft unless the user explicitly asks otherwise. Never merge/change `main` without explicit approval.
