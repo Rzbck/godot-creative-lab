@@ -1,0 +1,26 @@
+{
+  "id": "044_excitable_glass",
+  "index": "044",
+  "title": "EXCITABLE GLASS",
+  "scene": "res://sketches/044_excitable_glass/runtime/excitable_glass.tscn",
+  "engine": "GODOT / EXCITABLE MEDIA",
+  "tags": ["CELLULAR", "GLASS", "INTERACTIVE"],
+  "description": "A discrete excitable medium sends wave fronts through refractory state, but the coarse simulation is never shown directly. A full-resolution glass material reconstructs pressure fronts, relief and caustic edges. Touch intelligently ignites quiet material or quenches active material.",
+  "creative_seed": 44881,
+  "creative_signature": {
+    "carrier": "glass_medium",
+    "representations": ["cellular_automaton", "raster_state"],
+    "operators": ["excite", "refract"],
+    "temporal_model": "excitable_wave",
+    "interaction": "seed_or_quench",
+    "constraint": "discrete_state_hidden",
+    "render_path": "fullscreen_shader"
+  },
+  "visual_finish": {
+    "composition": "overlapping autonomous wave fronts cross a dark glass plate with large calm fields between events",
+    "material_model": "thick illuminated glass with refractory colour memory, caustic front edges and fine etched grain",
+    "final_render": "hidden_excitable_grid_to_full_resolution_glass_reconstruction",
+    "detail_scales": ["wave-front composition", "refractory interference bands", "micro etched glass grain"],
+    "interaction_stateful": true
+  }
+}

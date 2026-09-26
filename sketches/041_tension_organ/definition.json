@@ -1,0 +1,26 @@
+{
+  "id": "041_tension_organ",
+  "index": "041",
+  "title": "TENSION ORGAN",
+  "scene": "res://sketches/041_tension_organ/runtime/tension_organ.tscn",
+  "engine": "GODOT / SOFT BODY",
+  "tags": ["SOFTBODY", "MESH", "INTERACTIVE"],
+  "description": "A hand-tuned elastic membrane whose cells exchange stress through structural and diagonal constraints. The autonomous drive moves through the material itself; grabbing a node directly deforms the whole surface and leaves residual energy behind.",
+  "creative_seed": 41713,
+  "creative_signature": {
+    "carrier": "membrane",
+    "representations": ["physical_constraint_network", "procedural_mesh"],
+    "operators": ["stretch", "relax"],
+    "temporal_model": "coupled_physical_state",
+    "interaction": "direct_node_manipulation",
+    "constraint": "no_clock_animation",
+    "render_path": "vector_geometry"
+  },
+  "visual_finish": {
+    "composition": "a suspended asymmetric membrane spanning the full field with tension concentrated away from the centre",
+    "material_model": "translucent woven foil with stress-dependent colour, edge light and fine structural threads",
+    "final_render": "antialiased_vector_mesh_with_multiscale_stress_shading",
+    "detail_scales": ["whole membrane silhouette", "cell stress facets", "fine tension threads"],
+    "interaction_stateful": true
+  }
+}
