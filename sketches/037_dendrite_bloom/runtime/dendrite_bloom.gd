@@ -24,7 +24,10 @@ var _accum: float = 0.0
 var _step_index: int = 0
 var _pointer_was_down: bool = false
 var _state_image: Image
-var _state_texture: ImageTexture
+var _state_texture_a: ImageTexture
+var _state_texture_b: ImageTexture
+var _state_front: int = 0
+var _state_dirty: bool = true
 
 @onready var _surface: ColorRect = $ShaderSurface
 
@@ -32,7 +35,7 @@ var _state_texture: ImageTexture
 func _ready() -> void:
     _allocate_state()
     _seed_initial_crystal()
-    _build_texture()
+    _build_textures()
     super._ready()
     _push_shader()
 
@@ -68,10 +71,13 @@ func _stamp_seed(center: Vector2i, radius: int, amount: float) -> void:
                 _nutrient[i] = minf(_nutrient[i], 0.34)
 
 
-func _build_texture() -> void:
+func _build_textures() -> void:
     _state_image = Image.create(GRID_X, GRID_Y, false, Image.FORMAT_RGBA8)
     _write_image()
-    _state_texture = ImageTexture.create_from_image(_state_image)
+    _state_texture_a = ImageTexture.create_from_image(_state_image)
+    _state_texture_b = ImageTexture.create_from_image(_state_image)
+    _state_front = 0
+    _state_dirty = false
 
 
 func get_parameter_schema() -> Array[Dictionary]:
@@ -131,6 +137,7 @@ func _on_pointer_changed() -> void:
                 var falloff := 1.0 - d / (float(radius) + 0.5)
                 _phase[i] = clampf(_phase[i] + falloff * 0.32, 0.0, 1.0)
                 _nutrient[i] = clampf(_nutrient[i] + falloff * 0.18, 0.0, 1.0)
+        _state_dirty = true
     _pointer_was_down = pointer_down
 
 
@@ -142,9 +149,9 @@ func _update_source_simulation(delta: float) -> void:
         _accum -= STEP_SECONDS
         safety += 1
     if safety > 0:
-        _write_image()
-        _state_texture.update(_state_image)
-        _push_shader()
+        _state_dirty = true
+    if _state_dirty:
+        _commit_state_texture()
 
 
 func _simulate_step(dt: float) -> void:
@@ -223,13 +230,29 @@ func _write_image() -> void:
             _state_image.set_pixel(x, y, Color(_phase[i], _nutrient[i], _age[i], 1.0))
 
 
+func _commit_state_texture() -> void:
+    if _state_texture_a == null or _state_texture_b == null:
+        return
+    _write_image()
+    var next_front := 1 - _state_front
+    var target := _state_texture_b if next_front == 1 else _state_texture_a
+    target.update(_state_image)
+    _state_front = next_front
+    _state_dirty = false
+    _push_shader()
+
+
+func _active_state_texture() -> ImageTexture:
+    return _state_texture_b if _state_front == 1 else _state_texture_a
+
+
 func _push_shader() -> void:
-    if not is_instance_valid(_surface) or _state_texture == null:
+    if not is_instance_valid(_surface) or _state_texture_a == null:
         return
     var material := _surface.material as ShaderMaterial
     if material == null:
         return
-    material.set_shader_parameter("u_state", _state_texture)
+    material.set_shader_parameter("u_state", _active_state_texture())
     material.set_shader_parameter("u_texel", Vector2(1.0 / float(GRID_X), 1.0 / float(GRID_Y)))
     material.set_shader_parameter("u_tint", mineral_tint)
     material.set_shader_parameter("u_relief", relief)
@@ -251,15 +274,17 @@ func _get_custom_live_sync_state() -> Dictionary:
 
 func _apply_custom_live_sync_state(state: Dictionary) -> void:
     var v: Variant = state.get("phase", PackedFloat32Array())
-    if v is PackedFloat32Array and (v as PackedFloat32Array).size() == GRID_X * GRID_Y: _phase = (v as PackedFloat32Array).duplicate()
+    if v is PackedFloat32Array and (v as PackedFloat32Array).size() == GRID_X * GRID_Y:
+        _phase = (v as PackedFloat32Array).duplicate()
     v = state.get("nutrient", PackedFloat32Array())
-    if v is PackedFloat32Array and (v as PackedFloat32Array).size() == GRID_X * GRID_Y: _nutrient = (v as PackedFloat32Array).duplicate()
+    if v is PackedFloat32Array and (v as PackedFloat32Array).size() == GRID_X * GRID_Y:
+        _nutrient = (v as PackedFloat32Array).duplicate()
     v = state.get("age", PackedFloat32Array())
-    if v is PackedFloat32Array and (v as PackedFloat32Array).size() == GRID_X * GRID_Y: _age = (v as PackedFloat32Array).duplicate()
+    if v is PackedFloat32Array and (v as PackedFloat32Array).size() == GRID_X * GRID_Y:
+        _age = (v as PackedFloat32Array).duplicate()
     _step_index = int(state.get("step_index", _step_index))
-    _write_image()
-    _state_texture.update(_state_image)
-    _push_shader()
+    _state_dirty = true
+    _commit_state_texture()
 
 
 func _get_custom_live_debug_state() -> Dictionary:
@@ -269,7 +294,8 @@ func _get_custom_live_debug_state() -> Dictionary:
             occupied += 1
     return {
         "occupied_cells": occupied,
-        "render_mode": "phase_field_to_faceted_full_resolution",
+        "render_mode": "phase_field_double_buffered_full_resolution",
+        "state_front": _state_front,
     }
 
 

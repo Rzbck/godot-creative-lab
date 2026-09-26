@@ -5,6 +5,7 @@
 [ext_resource type="Shader" path="res://sketches/027_glass_tide/runtime/glass_tide.gdshader" id="3_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_glass"]
+resource_local_to_scene = true
 shader = ExtResource("3_shader")
 
 [node name="GlassTide" type="Node2D"]

@@ -1,5 +1,7 @@
 extends "res://sketches/_shared/design_sketch_base.gd"
 
+const CHARGE_HIT_RADIUS: float = 42.0
+
 @export_range(36, 120, 1) var line_density: int = 78
 @export_range(0.6, 3.0, 0.01) var field_gain: float = 1.42
 @export_range(2.0, 10.0, 0.1) var integration_step: float = 5.2
@@ -75,26 +77,55 @@ func set_parameter_value(id: String, value: Variant) -> void:
 
 func _on_pointer_changed() -> void:
     var delta_pos := pointer_position - _last_pointer
-    _gesture_velocity = _gesture_velocity.lerp(delta_pos, 0.46)
+    _gesture_velocity = _gesture_velocity.lerp(delta_pos, 0.58)
     _last_pointer = pointer_position
 
     if pointer_down and not _was_down:
-        _active_charge = _nearest_charge(pointer_position / DESIGN_SIZE)
-        _event_counter += 1
-        _charges[_active_charge] = clampf(_charges[_active_charge] * 1.06, -1.35, 1.35)
+        _active_charge = _charge_at_point(pointer_position)
+        if _active_charge >= 0:
+            _event_counter += 1
+            _charges[_active_charge] = clampf(_charges[_active_charge] * 1.035, -1.35, 1.35)
+            _grab_active_charge(pointer_position)
 
     if pointer_down and _active_charge >= 0:
-        var uv := (pointer_position / DESIGN_SIZE).clamp(Vector2(0.06, 0.08), Vector2(0.94, 0.92))
-        _targets[_active_charge] = _targets[_active_charge].lerp(uv, 0.38)
-        _velocities[_active_charge] += _gesture_velocity / DESIGN_SIZE * 0.028
+        _grab_active_charge(pointer_position)
 
-    if not pointer_down:
+    if not pointer_down and _active_charge >= 0:
+        _velocities[_active_charge] = _gesture_velocity / DESIGN_SIZE * 1.9
+        _targets[_active_charge] = _positions[_active_charge]
         _active_charge = -1
+
     _was_down = pointer_down
+    _rebuild_lines()
+    queue_redraw()
+
+
+func _grab_active_charge(design_position: Vector2) -> void:
+    if _active_charge < 0:
+        return
+    var uv := (design_position / DESIGN_SIZE).clamp(Vector2(0.06, 0.08), Vector2(0.94, 0.92))
+    var previous := _positions[_active_charge]
+    _positions[_active_charge] = uv
+    _targets[_active_charge] = uv
+    _velocities[_active_charge] = (uv - previous) * 22.0
+
+
+func _charge_at_point(design_position: Vector2) -> int:
+    var best := -1
+    var best_distance := CHARGE_HIT_RADIUS
+    for i: int in range(5):
+        var d := design_position.distance_to(_positions[i] * DESIGN_SIZE)
+        if d <= best_distance:
+            best_distance = d
+            best = i
+    return best
 
 
 func _update_source_simulation(delta: float) -> void:
     for i: int in range(5):
+        if i == _active_charge and pointer_down:
+            continue
+
         var force := (_targets[i] - _positions[i]) * (0.34 + charge_motion * 0.58)
         for j: int in range(5):
             if i == j:
@@ -107,7 +138,7 @@ func _update_source_simulation(delta: float) -> void:
         _positions[i] += _velocities[i] * delta
         _positions[i] = _positions[i].clamp(Vector2(0.07, 0.09), Vector2(0.93, 0.91))
 
-        if _positions[i].distance_to(_targets[i]) < 0.018 and _velocities[i].length() < 0.012 and i != _active_charge:
+        if _positions[i].distance_to(_targets[i]) < 0.018 and _velocities[i].length() < 0.012:
             _event_counter += 1
             _targets[i] = Vector2(
                 lerpf(0.12, 0.88, _hash01(_event_counter * 47 + i * 13)),
@@ -116,7 +147,7 @@ func _update_source_simulation(delta: float) -> void:
 
     _gesture_velocity *= exp(-delta * 7.5)
     _rebuild_accum += delta
-    if _rebuild_accum >= 1.0 / 18.0:
+    if _rebuild_accum >= 1.0 / 24.0:
         _rebuild_accum = 0.0
         _rebuild_lines()
         queue_redraw()
@@ -179,17 +210,6 @@ func _near_negative_charge(point: Vector2) -> bool:
     return false
 
 
-func _nearest_charge(uv: Vector2) -> int:
-    var best := 0
-    var best_distance := INF
-    for i: int in range(5):
-        var d := uv.distance_squared_to(_positions[i])
-        if d < best_distance:
-            best_distance = d
-            best = i
-    return best
-
-
 func _draw() -> void:
     begin_design_draw(Color(0.006, 0.008, 0.014, 1.0))
 
@@ -207,6 +227,9 @@ func _draw() -> void:
         var positive := _charges[i] > 0.0
         var c := Color(0.36, 0.92, 1.0, 0.92) if positive else Color(1.0, 0.42, 0.72, 0.92)
         draw_circle(p, 18.0 + absf(_charges[i]) * 5.0, Color(c.r, c.g, c.b, 0.035 * halo), true)
+        if i == _active_charge:
+            draw_arc(p, 14.0, 0.0, TAU, 32, Color(c.r, c.g, c.b, 0.88), 1.4, true)
+            draw_arc(p, CHARGE_HIT_RADIUS, 0.0, TAU, 48, Color(c.r, c.g, c.b, 0.14), 1.0, true)
         draw_circle(p, 4.4, Color(c.r, c.g, c.b, 0.94), true)
         draw_circle(p, 1.6, Color(1.0, 1.0, 1.0, 0.96), true)
 
@@ -232,13 +255,17 @@ func _get_custom_live_sync_state() -> Dictionary:
 
 func _apply_custom_live_sync_state(state: Dictionary) -> void:
     var v: Variant = state.get("positions", PackedVector2Array())
-    if v is PackedVector2Array and (v as PackedVector2Array).size() == 5: _positions = (v as PackedVector2Array).duplicate()
+    if v is PackedVector2Array and (v as PackedVector2Array).size() == 5:
+        _positions = (v as PackedVector2Array).duplicate()
     v = state.get("targets", PackedVector2Array())
-    if v is PackedVector2Array and (v as PackedVector2Array).size() == 5: _targets = (v as PackedVector2Array).duplicate()
+    if v is PackedVector2Array and (v as PackedVector2Array).size() == 5:
+        _targets = (v as PackedVector2Array).duplicate()
     v = state.get("velocities", PackedVector2Array())
-    if v is PackedVector2Array and (v as PackedVector2Array).size() == 5: _velocities = (v as PackedVector2Array).duplicate()
+    if v is PackedVector2Array and (v as PackedVector2Array).size() == 5:
+        _velocities = (v as PackedVector2Array).duplicate()
     v = state.get("charges", PackedFloat32Array())
-    if v is PackedFloat32Array and (v as PackedFloat32Array).size() == 5: _charges = (v as PackedFloat32Array).duplicate()
+    if v is PackedFloat32Array and (v as PackedFloat32Array).size() == 5:
+        _charges = (v as PackedFloat32Array).duplicate()
     _event_counter = int(state.get("event_counter", _event_counter))
     _rebuild_lines()
     queue_redraw()
@@ -247,5 +274,6 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
 func _get_custom_live_debug_state() -> Dictionary:
     return {
         "field_line_count": _lines.size(),
-        "render_mode": "antialiased_vector_field",
+        "active_charge": _active_charge,
+        "render_mode": "direct_manipulation_vector_field",
     }

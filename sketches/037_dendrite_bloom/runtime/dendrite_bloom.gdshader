@@ -22,24 +22,39 @@ float crystal_noise(vec2 p) {
     return a * 0.57 + b * 0.29 + c * 0.14;
 }
 
+vec4 smooth_state(vec2 uv) {
+    vec2 o = u_texel * 0.72;
+    vec4 s = texture(u_state, uv) * 4.0;
+    s += texture(u_state, uv + vec2(o.x, 0.0)) * 2.0;
+    s += texture(u_state, uv - vec2(o.x, 0.0)) * 2.0;
+    s += texture(u_state, uv + vec2(0.0, o.y)) * 2.0;
+    s += texture(u_state, uv - vec2(0.0, o.y)) * 2.0;
+    s += texture(u_state, uv + vec2(o.x, o.y));
+    s += texture(u_state, uv + vec2(o.x, -o.y));
+    s += texture(u_state, uv + vec2(-o.x, o.y));
+    s += texture(u_state, uv - o);
+    return s / 16.0;
+}
+
 void fragment() {
-    vec4 state = texture(u_state, UV);
+    vec4 state = smooth_state(UV);
     float phase = state.r;
     float nutrient = state.g;
     float age = state.b;
 
-    float pl = texture(u_state, UV - vec2(u_texel.x, 0.0)).r;
-    float pr = texture(u_state, UV + vec2(u_texel.x, 0.0)).r;
-    float pu = texture(u_state, UV - vec2(0.0, u_texel.y)).r;
-    float pd = texture(u_state, UV + vec2(0.0, u_texel.y)).r;
+    vec2 grad_step = u_texel * 0.82;
+    float pl = smooth_state(UV - vec2(grad_step.x, 0.0)).r;
+    float pr = smooth_state(UV + vec2(grad_step.x, 0.0)).r;
+    float pu = smooth_state(UV - vec2(0.0, grad_step.y)).r;
+    float pd = smooth_state(UV + vec2(0.0, grad_step.y)).r;
     vec2 grad = vec2(pr - pl, pd - pu);
-    float front = clamp(length(grad) * 4.4, 0.0, 1.0);
+    float front = clamp(length(grad) * 3.8, 0.0, 1.0);
 
-    vec3 n = normalize(vec3(-grad.x * u_relief * 7.0, -grad.y * u_relief * 7.0, 0.72));
+    vec3 n = normalize(vec3(-grad.x * u_relief * 6.2, -grad.y * u_relief * 6.2, 0.82));
     vec3 light_a = normalize(vec3(-0.46, -0.31, 0.83));
     vec3 light_b = normalize(vec3(0.68, 0.18, 0.71));
     float lambert = max(0.0, dot(n, light_a));
-    float rim = pow(1.0 - max(0.0, n.z), 2.2);
+    float rim = pow(1.0 - max(0.0, n.z), 2.0);
     float counter = max(0.0, dot(n, light_b));
 
     vec2 pixel = floor(FRAGCOORD.xy);
@@ -52,16 +67,16 @@ void fragment() {
     vec3 hot_edge = mix(vec3(0.82, 1.0, 0.96), vec3(1.0, 0.72, 0.42), u_tint * 0.55);
     vec3 background = vec3(0.008, 0.012, 0.018);
 
-    float body = smoothstep(0.045, 0.88, phase);
+    float body = smoothstep(0.035, 0.74, phase);
     float translucency = clamp((1.0 - age) * 0.45 + nutrient * 0.18, 0.0, 0.6);
     vec3 crystal = cold * (0.20 + 0.72 * lambert);
     crystal += mineral * (0.16 + 0.52 * counter) * (0.45 + facet * 0.55);
     crystal += hot_edge * front * (0.55 + 0.65 * (1.0 - age));
     crystal += mineral * rim * 0.48;
-    crystal += (micro - 0.5) * 0.10 * u_micro;
+    crystal += (micro - 0.5) * 0.075 * u_micro;
     crystal += hot_edge * translucency * 0.22;
 
-    float halo = smoothstep(0.13, 0.0, abs(phase - 0.09)) * (0.16 + nutrient * 0.18);
+    float halo = smoothstep(0.16, 0.018, abs(phase - 0.10)) * (0.12 + nutrient * 0.16);
     vec3 color = mix(background, crystal, body);
     color += hot_edge * halo;
 

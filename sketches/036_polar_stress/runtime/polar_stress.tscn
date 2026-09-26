@@ -5,6 +5,7 @@
 [ext_resource type="Shader" path="res://sketches/036_polar_stress/runtime/polar_stress.gdshader" id="3_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_polar"]
+resource_local_to_scene = true
 shader = ExtResource("3_shader")
 
 [node name="PolarStress" type="Node2D"]

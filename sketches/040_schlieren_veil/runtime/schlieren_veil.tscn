@@ -5,6 +5,7 @@
 [ext_resource type="Shader" path="res://sketches/040_schlieren_veil/runtime/schlieren_veil.gdshader" id="3_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_schlieren"]
+resource_local_to_scene = true
 shader = ExtResource("3_shader")
 
 [node name="SchlierenVeil" type="Node2D"]

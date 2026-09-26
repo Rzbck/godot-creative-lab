@@ -1,12 +1,11 @@
 extends "res://app/main/main_runtime_gallery_compact_review.gd"
 
-# Persist the workstation native window state and apply it as early as Godot
-# allows. Revision 3 deliberately does NOT toggle visibility on the main Window:
-# Godot 4.7.1 rejects changing visibility of the main window. Applying geometry
-# and mode in _enter_tree() is early enough to affect the first rendered scene
-# frame without generating the host error seen on Windows.
+# Persist native workstation state and apply it before the first scene frame.
+# Revision 4 also makes shutdown telemetry atomic: close-event data is flushed
+# and the FileAccess handle is explicitly closed before the sole final publisher
+# is spawned, avoiding the empty-file race observed on the Windows host.
 
-const WINDOW_MEMORY_REVISION: int = 3
+const WINDOW_MEMORY_REVISION: int = 4
 const WINDOW_STATE_PATH: String = "user://creative_lab_window_state.cfg"
 const WINDOW_STATE_SECTION: String = "window"
 const WINDOW_STATE_SETTLE_SECONDS: float = 0.45
@@ -23,7 +22,6 @@ func _enter_tree() -> void:
     if DisplayServer.get_name().to_lower() == "headless":
         _startup_window_restore_active = false
         return
-
     _apply_saved_window_state(_load_saved_window_state())
 
 
@@ -32,8 +30,6 @@ func _ready() -> void:
     call_deferred("_finish_startup_window_restore")
 
 
-# The saved native state is already applied in _enter_tree(). Do not let the
-# legacy startup layer overwrite it with a later fullscreen request.
 func _enter_startup_workstation_fullscreen() -> void:
     pass
 
@@ -111,10 +107,6 @@ func _load_saved_window_state() -> Dictionary:
         return fallback
 
     var state := (state_variant as Dictionary).duplicate(true)
-    # Revision 1 had no dedicated workstation-fullscreen control: its saved
-    # "fullscreen" state came from the custom maximize button. Migrate that
-    # state to the stable borderless expanded window instead of resurrecting the
-    # Windows fullscreen/maximize ambiguity seen in host telemetry.
     if revision < 2 and str(state.get("mode", "")) == "fullscreen":
         state["mode"] = "maximized"
     return state
@@ -157,9 +149,6 @@ func _apply_saved_window_state(state: Dictionary) -> void:
 func _apply_expanded_window_rect(screen: int) -> void:
     var usable := DisplayServer.screen_get_usable_rect(screen)
     var expanded_size := usable.size
-    # On this Windows/Godot setup, an exact monitor-sized borderless client is
-    # reclassified as FULLSCREEN/EXCLUSIVE_FULLSCREEN. Keep a visually invisible
-    # 2 px guard on the bottom edge so the workstation remains genuinely windowed.
     expanded_size.y = maxi(MIN_WINDOW_SIZE.y, expanded_size.y - WINDOW_EXPANDED_GUARD_PX)
 
     DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
@@ -256,16 +245,17 @@ func _array_to_vec2i(value: Variant, fallback: Vector2i) -> Vector2i:
     return fallback
 
 
-# Final close publication must see a closed, immutable JSONL file. Flush the
-# last record, release the FileAccess handle, then spawn the publisher. This
-# avoids the previous race where the close publisher could hash an empty file.
 func _close_window() -> void:
-    _telemetry_event("session_close_request", {
+    # Use a non-autopublished event name here. Base telemetry automatically
+    # publishes session_close_request, which raced the dedicated final publisher.
+    _telemetry_event("session_close_flush", {
         "window_memory_revision": WINDOW_MEMORY_REVISION,
-        "final_publish_spawned_before_quit": true,
+        "final_publish_reason": "session_close_request",
+        "file_closed_before_publish": true,
     })
     if _telemetry_file != null:
         _telemetry_file.flush()
+        _telemetry_file.close()
         _telemetry_file = null
     _spawn_final_telemetry_publisher()
     get_tree().quit()

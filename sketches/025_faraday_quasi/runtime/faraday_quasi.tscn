@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://sketches/_shared/full_canvas_surface.gd" id="3_surface"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_faraday"]
+resource_local_to_scene = true
 shader = ExtResource("2")
 
 [node name="FaradayQuasi" type="Node2D"]

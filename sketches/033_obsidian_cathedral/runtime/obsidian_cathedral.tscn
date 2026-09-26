@@ -5,6 +5,7 @@
 [ext_resource type="Shader" path="res://sketches/033_obsidian_cathedral/runtime/obsidian_cathedral.gdshader" id="3_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_obsidian"]
+resource_local_to_scene = true
 shader = ExtResource("3_shader")
 
 [node name="ObsidianCathedral" type="Node2D"]

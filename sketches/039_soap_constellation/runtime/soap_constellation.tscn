@@ -5,6 +5,7 @@
 [ext_resource type="Shader" path="res://sketches/039_soap_constellation/runtime/soap_constellation.gdshader" id="3_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_soap"]
+resource_local_to_scene = true
 shader = ExtResource("3_shader")
 
 [node name="SoapConstellation" type="Node2D"]

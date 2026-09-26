@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://sketches/_shared/full_canvas_surface.gd" id="3_surface"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rosensweig"]
+resource_local_to_scene = true
 shader = ExtResource("2")
 
 [node name="RosensweigField" type="Node2D"]
