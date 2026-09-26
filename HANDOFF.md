@@ -20,128 +20,112 @@ PROGRAM persists while the workstation navigates Gallery/Settings/other PREVIEW.
 
 Main scene: `res://app/main/main_runtime.tscn`.
 Top runtime: `res://app/main/main_runtime_gallery_host_fixes.gd`.
-Source catalogue: **001–045** before local curation.
+Source catalogue: **001–050** before local curation.
 
-## Latest host feedback — current priority
+## Current user-feedback evidence
 
-Host test on HEAD `a55c65c6...` produced four concrete findings:
+Written RATE transport and startup republish are now verified, not merely expected.
 
-1. **LIST revision 1 was rejected**: 132 px rows with a 260 px image at left were too large. User wants a real compact file-list row, with the live preview used as decorative background over part of the row.
-2. User wants **PREVIOUS / NEXT sketch navigation directly in ProjectView**, avoiding ESC -> Gallery -> click for sequential review.
-3. User entered many **written RATE reviews** and expects future AI sessions to use those automatically for repairs and future creative direction without asking them to repeat comments in chat.
-4. **041 TENSION ORGAN** spammed `Invalid polygon data, triangulation failed` from `_draw()` because deformed four-point membrane cells can become concave/inverted/degenerate.
+Verified telemetry:
+- session: `67a6e7499c4524cf`
+- runtime HEAD: `ceecb6be59a9`
+- written notes are readable at `creative_preference_snapshot.reviews.<sketch>.note`
 
-## Implemented host patch
+Current reviewed-axis averages:
+- visual ~2.06
+- interaction ~1.72
+- originality ~1.92
+- aliveness ~1.64
+- controls ~1.56
+- performance ~2.42
 
-Implementation sequence:
+Main weak axes are therefore **controls, aliveness, interaction**.
 
-- `21d31984...` — Gallery host layer revision 2:
-  - LIST height restored to **68 px**;
-  - real SubViewport preview is a low-alpha backdrop on the right portion of each row;
-  - compact index/title/engine/tags overlay stays readable;
-  - `‹ PREV` / `NEXT ›` buttons are added to ProjectToolbar;
-  - adjacency follows numeric source order of currently browsable/non-trashed sketches;
-  - navigation uses normal `_open_sketch()` path, so PROGRAM persistence is preserved;
-  - startup schedules a review checkpoint so existing local notes can be republished after sanitizer upgrades.
-- `df9710ae...` — 041 rendering safety:
-  - no four-point `draw_colored_polygon()` for deforming cells;
-  - each cell is rendered as two explicit triangles;
-  - shorter diagonal is chosen and near-zero-area triangles are skipped;
-  - physical spring simulation is unchanged.
-- `0c360c35...` — telemetry written-review transport:
-  - diagnostic sanitizer explicitly permits `note` free text only;
-  - max 2000 chars, C0 controls removed;
-  - safe creative identifiers (`sketch_id`, title, tags, creative-signature fields, criteria, reason) are preserved;
-  - publisher refuses a zero-byte sanitized file.
+Bounded positive references:
+- 020 ECHO TISSUE avg ~4.17;
+- 012 CHEMICAL BLOCKS avg ~3.33;
+- 038 ELECTRIC LACE avg ~2.67 with visual 4 / originality 4.
 
-Code HEAD `0c360c35...` passed **CI #312 completely** before documentation: repository policy, temporal audit, adaptive draw self-test, Godot 4.7.1 import, main-scene smoke, tracked cleanliness.
+Do not clone any of them. Preserve only useful qualities such as readable causality, understandable sources, direct state manipulation and clear regime changes.
 
-## Written reviews are first-class evidence
+Latest written feedback that materially shaped the next batch:
+- 041: too basic for the subject, weak felt physics, visual failure when pulled too far;
+- 042: promising but under-interactive; parameters appear ineffective instead of producing genuinely different outcomes;
+- 043: incomprehensible, not felt as real-time interactive, click response weak, visual rejection;
+- 044: too pixelated, no reset, weak parameter effect;
+- 045: strong visual/semantic rejection and lack of comprehensibility.
 
-This is now a durable workflow rule, not a chat convention.
+Durable creative rule: a parameter is useful when it changes **regime, composition, topology, temporal response or material behavior** in a clearly perceivable way. Interaction should be immediate enough to understand and stateful enough to keep mattering after release.
 
-After every meaningful host test, future AI must:
+## Latest batch — 046–050
 
-1. inspect `telemetry/runtime` first;
-2. read the latest `creative_preference_snapshot`;
-3. consume **both numeric axes and written `note` fields** before repairing existing sketches or generating the next batch;
-4. use notes as direct evidence about *why* visual/interaction/aliveness/controls scores are low/high;
-5. update durable project state when a recurring preference, rejection or quality rule is supported by repeated feedback;
-6. never make the user paste the same review into chat when it already exists in telemetry.
+These five sketches were implemented directly from the full feedback corpus, not from a single high-rated reference.
 
-Written reviews guide diagnosis/art direction but are not clone instructions. Numeric/qualitative evidence remains bounded; preserve exploration.
+### 046 INK SHEAR
 
-### Important telemetry history
+Persistent vector ink filaments coupled to user-written eddies. Gesture energy/spin remains in the flow through decaying eddy memory. Controls separate viscosity, vorticity, filament count, pigment split, wet bleed, brush force/radius and memory so they can produce materially different flow/mark regimes.
 
-The current session `5cb124f1822c2ee4` **did publish non-empty checkpoints**. Earlier connector output that looked empty was misleading; raw `latest.jsonl` was ~160 KB.
+### 047 MOIRE APERTURE
 
-Old sanitizer behavior preserved ratings and `note_length`, but stripped the actual `note` string. Therefore the comments entered during that host session are known to exist locally, but their content cannot yet be read remotely from the old publication. Do not invent them.
+Full-resolution analytic moiré/interference field with directly draggable apertures. Density, layer angle, shear, lens power, aperture radius, contrast and registration/chroma variables are intended to change the interference family, not only intensity. No coarse solver texture is exposed.
 
-Because reviews are persisted in `user://creative_lab_reviews.cfg`, host layer revision 2 schedules a startup preference checkpoint. On first launch of the corrected version, the existing notes should be republished through the new sanitizer **without retyping**. Next AI must verify that `creative_preference_snapshot.reviews.<id>.note` is actually present remotely before claiming success.
+### 048 ACTIVE NEMATIC
 
-## Current preference evidence
+Hidden coupled director/flow solver drives a visible MultiMesh of **880 oriented filaments**. Pointer gesture writes orientation/spin into the active matter. Alignment/activity/defect-birth/flow-memory controls target different nematic regimes rather than cosmetic modulation.
 
-Latest remotely visible numeric evidence from the current host session includes:
+### 049 TEMPER SKIN
 
-- 036 POLAR STRESS avg ~1.83
-- 037 DENDRITE BLOOM avg ~2.33
-- 038 ELECTRIC LACE avg ~2.67; visual 4, originality 4 — strongest recent signal, but controls/interaction still weak
-- 039 SOAP CONSTELLATION avg ~2.17
-- 040 SCHLIEREN VEIL avg 2.0
-- 043 SLIT MEMORY avg 1.0
-- 044 EXCITABLE GLASS avg 2.0
-- 045 RIFT VOLUME avg 1.0
+Thermally reactive metal with conduction, cooling and oxide memory. Interaction is state-dependent: cold material heats; already-hot material is quenched/cooled. The visible result depends on thermal history rather than a stateless brush overlay.
 
-Do not infer 041/042 ratings or any missing text note content until telemetry actually contains them.
+### 050 FERRO TRACE
 
-## Gallery browser contract
+Visible MultiMesh field of **1100 iron filings** with 2–4 directly draggable magnetic poles and orientation hysteresis. It preserves the positive source legibility observed in 038 while changing the carrier, dynamics and surface completely.
 
-Tags/search remain semantic metadata. Browsing is file-manager-like:
+Creative collision history in `knowledge/cross-domain/creative_draw_space.json` now includes 046–050.
 
-- default flat INDEX ↑;
-- INDEX ↓, TITLE A–Z, FAMILY;
-- GRID / LIST;
-- GRID size slider;
-- browser state persists in `user://creative_lab_gallery_view.cfg`;
-- sorting/reflow reuses existing cards/SubViewports rather than rebuilding simulations;
-- **LIST must remain dense (~68 px) and visual via background preview, never large horizontal cards**;
-- TRASH is an exclusive browser mode: normal Gallery cards/search/browser controls hide while Trash is open.
+## Validation state
 
-Adaptive quick tags stay bounded; never restore a permanent wall of every tag.
+Implementation HEAD before final documentation:
+`96471494f10c8c292ab8b0c0c04ea6dcf2828034`
 
-## Project navigation contract
+It passed **CI #340** completely:
+- Repository policy — success
+- temporal audit — success
+- adaptive creative draw self-test — success
+- Godot 4.7.1 import — success
+- main-scene smoke — success
+- tracked cleanliness — success
 
-ProjectToolbar now exposes `‹ PREV` and `NEXT ›` for sequential review.
+The validation loop caught and fixed two issues before delivery:
+- 046 GDScript type-inference ambiguity;
+- 047 attempt to redefine shader built-in `PI`.
 
-- order is numeric source index, independent of Gallery sort;
-- locally removed sketches are skipped because `_catalog` is already curated;
-- buttons disable at boundaries, no wrap;
-- switching PREVIEW must never stop or silently replace PROGRAM;
-- TAKE LIVE semantics remain unchanged.
+The batch is therefore **repo/CI validated but NOT host-rated or artistically accepted yet**. Never treat CI green as proof that the sketches are beautiful, comprehensible, fun or good.
 
-## 041 rendering contract
+## Gallery / host contracts still active
 
-Constraint meshes can fold/invert. Do not feed arbitrary deforming quads into polygon triangulation.
+- LIST remains a dense ~68 px row; real preview is a low-alpha background decoration, not a giant left thumbnail.
+- `‹ PREV` / `NEXT ›` browse numeric source order, skip local trash, have no wrap, and use the normal PREVIEW open path.
+- PREV/NEXT/Gallery navigation must never silently replace PROGRAM.
+- adaptive quick tags remain bounded; never restore the permanent tag wall.
+- Gallery supports INDEX ↑/↓, TITLE, FAMILY, GRID/LIST and adjustable GRID size.
+- TRASH is exclusive and local-only.
+- review notes persist in `user://creative_lab_reviews.cfg` and telemetry is first-class evidence.
 
-For 041, and as a pattern for future dynamic meshes:
-
-- tessellate explicitly into triangles;
-- skip degenerate triangles;
-- keep simulation topology separate from render triangulation;
-- renderer errors are product failures even if the artwork still appears on screen.
-
-## Creative-quality contract
+## Rendering / creative-quality contracts
 
 Read:
 - `knowledge/cross-domain/VISUAL_FINISH_GATE.md`
 - `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
+- `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
+- `knowledge/cross-domain/creative_draw_space.json`
 
 Pipeline:
 
-`adaptive draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
+`adaptive draw -> preference evidence -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
 
-Technical diversity is not artistic quality. Frozen frame, material logic, several useful detail scales, stateful interaction and temporal continuity matter. Hidden coarse solvers may drive dynamics; enlarged solver pixels are not finished art. Avoid generic direct-clock wobble, visible phase wrap/reset and shallow pointer overlays.
+Technical diversity is not artistic quality. Hidden coarse solvers are allowed; enlarged solver pixels are not final artwork. Avoid generic direct-clock wobble, visible phase-wrap/reset walls, shallow pointer overlays and parameters that merely change “amount”.
 
 ## Historical non-regressions
 
@@ -155,17 +139,24 @@ Technical diversity is not artistic quality. Frozen frame, material logic, sever
 - RATE remains opaque/centered/in-app.
 - no main-window visibility toggles at startup.
 - no fake Spout/NDI support.
-- do not invent missing reviews or claim text was read when sanitizer removed it.
+- do not invent review evidence.
+- do not infer host FPS from stale telemetry.
 
 ## Required next host validation
 
 1. Sync exact final HEAD and require exact-head CI before launch.
-2. Gallery LIST: rows stay ~68 px; preview decorates background/right side without consuming row height.
-3. Open several sketches and use PREV/NEXT repeatedly; order must be numeric and PROGRAM must remain untouched unless TAKE LIVE is used.
-4. Stress 041 with direct node grabs and extreme parameter changes; terminal must show **zero** triangulation errors.
-5. Do not retype old reviews. Wait for startup review checkpoint, then inspect `telemetry/runtime` and confirm existing written `note` content is present in `creative_preference_snapshot`.
-6. Continue normal RATE notes; confirm new comments appear remotely without chat copy/paste.
-7. Telemetry-first on the next turn before any new creative batch.
+2. Confirm Gallery source count is **50**.
+3. Review 046–050 sequentially with PREV/NEXT while ensuring PROGRAM stays untouched unless TAKE LIVE is pressed.
+4. For each new sketch, watch defaults for ~20–30 s before touching controls; assess autonomous temporal life without generic clock motion.
+5. Interact and release; require immediate readable response plus a persistent/delayed consequence.
+6. Push every parameter through broad ranges; flag any parameter that seems ineffective or only changes intensity.
+7. 046: opposing eddies should visibly steer/shear ink and persist through memory.
+8. 047: aperture dragging plus density/angle/shear/lens extremes should create distinct interference regimes.
+9. 048: visible response must remain filamentary/organic rather than revealing the solver grid; defects/flow/memory should be perceptible.
+10. 049: verify heat vs quench depends on local state, and conduction/cooling/oxide-memory extremes are legible.
+11. 050: drag poles, vary pole count/field parameters, and verify filings reorganize with hysteresis rather than stateless snapping.
+12. Continue RATE numeric + WHY/NOTES normally; user should not repeat those notes in chat.
+13. Close normally and inspect fresh `telemetry/runtime` first on the next turn. Verify session/runtime HEAD before attributing review or performance evidence.
 
 ## Mandatory AI completion protocol
 
