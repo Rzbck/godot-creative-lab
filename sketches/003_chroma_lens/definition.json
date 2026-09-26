@@ -1,0 +1,9 @@
+{
+  "id": "003_chroma_lens",
+  "index": "003",
+  "title": "CHROMA LENS",
+  "scene": "res://sketches/003_chroma_lens/runtime/chroma_lens.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "OPTICAL", "INTERACTIVE"],
+  "description": "A typographic field with an interactive optical region, controlled chromatic displacement and grid-aware hierarchy."
+}

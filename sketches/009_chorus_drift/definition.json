@@ -1,0 +1,9 @@
+{
+  "id": "009_chorus_drift",
+  "index": "009",
+  "title": "CHORUS DRIFT",
+  "scene": "res://sketches/009_chorus_drift/runtime/chorus_drift.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "CHORUS", "INTERACTIVE"],
+  "description": "A field of repeated voices: touch isolates one line from the chorus, holding gives it presence, dragging displaces it, and release lets the crowd absorb it again."
+}

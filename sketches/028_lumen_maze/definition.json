@@ -1,0 +1,19 @@
+{
+  "id": "028_lumen_maze",
+  "index": "028",
+  "title": "LUMEN MAZE",
+  "scene": "res://sketches/028_lumen_maze/runtime/lumen_maze.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["LIGHT", "NETWORK", "INTERACTIVE"],
+  "description": "Light moves through a changing graph of channels. Jams accumulate pressure, releases fire through the network, and touch inserts obstacles that the system routes around and remembers.",
+  "creative_seed": 1522211181,
+  "creative_signature": {
+    "carrier": "light",
+    "representations": ["sdf_field", "graph_topology"],
+    "operators": ["jam_release", "quantize"],
+    "temporal_model": "stochastic_events",
+    "interaction": "place_obstacle",
+    "constraint": "six_column_grid",
+    "render_path": "image_texture_field"
+  }
+}

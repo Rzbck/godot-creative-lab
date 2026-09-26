@@ -1,0 +1,26 @@
+{
+  "id": "043_slit_memory",
+  "index": "043",
+  "title": "SLIT MEMORY",
+  "scene": "res://sketches/043_slit_memory/runtime/slit_memory.tscn",
+  "engine": "GODOT / TEMPORAL SLICING",
+  "tags": ["TEMPORAL", "SLITSCAN", "INTERACTIVE"],
+  "description": "A living temporal textile built from the actual recent history of coupled ribbons. Pressing into the image creates persistent folds in the history lookup, so one gesture can bend, repeat or compress time without stopping the underlying system.",
+  "creative_seed": 43307,
+  "creative_signature": {
+    "carrier": "temporal_ribbon",
+    "representations": ["slitscan", "coupled_oscillators"],
+    "operators": ["time_slice", "fold"],
+    "temporal_model": "persistent_history",
+    "interaction": "fold_memory",
+    "constraint": "no_visual_loop",
+    "render_path": "vector_geometry"
+  },
+  "visual_finish": {
+    "composition": "ten luminous histories cross the frame horizontally with local compressed and repeated temporal knots",
+    "material_model": "fine luminous filaments on deep photographic black with layered persistence bloom",
+    "final_render": "dense_antialiased_temporal_polylines_from_live_history",
+    "detail_scales": ["whole time tapestry", "local history folds", "hairline filament structure"],
+    "interaction_stateful": true
+  }
+}

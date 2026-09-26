@@ -1,0 +1,9 @@
+{
+  "id": "012_chemical_blocks",
+  "index": "012",
+  "title": "CHEMICAL BLOCKS",
+  "scene": "res://sketches/012_chemical_blocks/runtime/chemical_blocks.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["CHEMISTRY", "DIFFUSION", "INTERACTIVE"],
+  "description": "A coarse reaction-diffusion field that breeds, starves and reorganizes itself. Touch seeds reagent and pushes the chemical balance into new regimes."
+}

@@ -1,0 +1,26 @@
+{
+  "id": "048_active_nematic",
+  "index": "048",
+  "title": "ACTIVE NEMATIC",
+  "scene": "res://sketches/048_active_nematic/runtime/active_nematic.tscn",
+  "engine": "GODOT / ACTIVE MATTER",
+  "tags": ["ACTIVE MATTER", "NEMATIC", "INTERACTIVE"],
+  "description": "Hundreds of oriented filaments exchange alignment and angular momentum with their neighbours. Local defects are born asynchronously instead of from a global clock; dragging writes a persistent twist wake into the director field and can reorganize the whole material.",
+  "creative_seed": 2026092605,
+  "creative_signature": {
+    "carrier": "living_tissue",
+    "representations": ["cellular_field", "particle_flow"],
+    "operators": ["couple_neighbours", "phase_switch"],
+    "temporal_model": "fatigue_repair",
+    "interaction": "synchronize_local_phase",
+    "constraint": "limited_density",
+    "render_path": "multimesh"
+  },
+  "visual_finish": {
+    "composition": "an asymmetric director field forms broad aligned rivers punctured by moving topological defect basins",
+    "material_model": "short birefringent biological filaments with order-dependent opacity, warm defect cores and cool aligned domains",
+    "final_render": "multimesh_oriented_filaments_over_coupled_nematic_solver",
+    "detail_scales": ["whole-field flow domains", "defect swirls and shear bands", "individual oriented filaments"],
+    "interaction_stateful": true
+  }
+}

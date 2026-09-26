@@ -1,0 +1,9 @@
+{
+  "id": "004_gommage_type",
+  "index": "004",
+  "title": "GOMMAGE TYPE",
+  "scene": "res://sketches/004_gommage_type/runtime/gommage_type.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "EROSION", "INTERACTIVE"],
+  "description": "Interactive typographic erosion with directional dust, gesture memory and controlled reconstruction."
+}

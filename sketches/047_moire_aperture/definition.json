@@ -1,0 +1,26 @@
+{
+  "id": "047_moire_aperture",
+  "index": "047",
+  "title": "MOIRE APERTURE",
+  "scene": "res://sketches/047_moire_aperture/runtime/moire_aperture.tscn",
+  "engine": "GODOT / ANALYTIC INTERFERENCE",
+  "tags": ["OPTICAL", "GEOMETRY", "INTERACTIVE"],
+  "description": "Three analytic line fields are bent by directly draggable apertures. The anchors have inertia and asynchronous drift, so every intervention reorganizes the interference field instead of adding a cursor effect. Density, angle, shear and lens power produce visibly different optical regimes.",
+  "creative_seed": 2026092602,
+  "creative_signature": {
+    "carrier": "projected_geometry",
+    "representations": ["analytic_shader_field", "modal_field"],
+    "operators": ["displace", "constraint_relax"],
+    "temporal_model": "state_dependent_regime",
+    "interaction": "move_source",
+    "constraint": "no_symmetry",
+    "render_path": "fullscreen_shader"
+  },
+  "visual_finish": {
+    "composition": "three off-centre optical apertures bend a field of fine line lattices into large interference basins and quiet negative-space zones",
+    "material_model": "projected monochrome geometry with ink-black line cores, paper-white field and restrained spectral registration at high interference",
+    "final_render": "full_resolution_analytic_interference_shader",
+    "detail_scales": ["large moire basins", "crossing line lattices", "subpixel registration edges and paper grain"],
+    "interaction_stateful": true
+  }
+}

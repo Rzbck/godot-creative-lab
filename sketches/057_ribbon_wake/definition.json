@@ -1,0 +1,26 @@
+{
+  "id": "057_ribbon_wake",
+  "index": "057",
+  "title": "RIBBON WAKE",
+  "scene": "res://sketches/057_ribbon_wake/runtime/ribbon_wake.tscn",
+  "engine": "GODOT / ELASTIC INK RIBBONS",
+  "tags": ["INK", "ELASTIC", "INTERACTIVE"],
+  "description": "Sixteen broad ink ribbons keep elastic deformation memory instead of breaking into click effects. Drag across the field to comb, fold and shear whole bands; tension, cross-linking, drag, current and memory switch between taut graphic rails, soft coupled cloth-like waves and long-lived flowing folds.",
+  "creative_seed": 2026092657,
+  "creative_signature": {
+    "carrier": "ink",
+    "representations": ["constraint_network", "procedural_mesh"],
+    "operators": ["displace", "feedback"],
+    "temporal_model": "delayed_feedback",
+    "interaction": "write_memory",
+    "constraint": "no_glow",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "sixteen wide continuous bands span the frame and bend into layered wakes instead of exposing solver points",
+    "material_model": "matte near-black ink bands on warm stock with restrained rust strain color and a fine paper-like edge highlight",
+    "final_render": "canvas_broad_elastic_ribbons_with_persistent_drag_written_folds_and_no_click_overlays",
+    "detail_scales": ["whole layered ribbon field", "cross-linked folds and wakes", "individual band edges and strain highlights"],
+    "interaction_stateful": true
+  }
+}

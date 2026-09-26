@@ -1,0 +1,40 @@
+{
+  "id": "055_snap_lattice",
+  "index": "055",
+  "title": "SNAP LATTICE",
+  "scene": "res://sketches/055_snap_lattice/runtime/snap_lattice.tscn",
+  "engine": "GODOT / BISTABLE FACETS",
+  "tags": [
+    "BISTABLE",
+    "FACET",
+    "INTERACTIVE"
+  ],
+  "description": "A field of bistable folded cells snaps between two stable relief states. Pressing one cell injects a local transition that can remain isolated or cascade through neighbours depending on barrier, coupling, bias and damping.",
+  "creative_seed": 2026092655,
+  "creative_signature": {
+    "carrier": "paper",
+    "representations": [
+      "procedural_mesh",
+      "cellular_field"
+    ],
+    "operators": [
+      "phase_switch",
+      "couple_neighbours"
+    ],
+    "temporal_model": "phase_transition",
+    "interaction": "change_material_property",
+    "constraint": "two_scale_hierarchy",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "a dark field of large folded facets forms coherent state domains instead of exposed solver pixels",
+    "material_model": "graphite folded panels with pale relief faces and brief warm snap energy at active ridges",
+    "final_render": "canvas_bistable_facets_with_neighbour_coupled_snap_through_dynamics",
+    "detail_scales": [
+      "global state domains",
+      "facet relief bands",
+      "individual fold ridges and snap markers"
+    ],
+    "interaction_stateful": true
+  }
+}

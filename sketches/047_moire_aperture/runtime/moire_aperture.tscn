@@ -1,0 +1,17 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://sketches/047_moire_aperture/runtime/moire_aperture.gd" id="1_ctrl"]
+[ext_resource type="Script" path="res://sketches/_shared/full_canvas_surface.gd" id="2_surface"]
+[ext_resource type="Shader" path="res://sketches/047_moire_aperture/runtime/moire_aperture.gdshader" id="3_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_moire"]
+resource_local_to_scene = true
+shader = ExtResource("3_shader")
+
+[node name="MoireAperture" type="Node2D"]
+script = ExtResource("1_ctrl")
+
+[node name="ShaderSurface" type="ColorRect" parent="."]
+mouse_filter = 2
+material = SubResource("ShaderMaterial_moire")
+script = ExtResource("2_surface")

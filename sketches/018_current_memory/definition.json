@@ -1,0 +1,9 @@
+{
+  "id": "018_current_memory",
+  "index": "018",
+  "title": "CURRENT MEMORY",
+  "scene": "res://sketches/018_current_memory/runtime/current_memory.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["FLOW", "WAVE", "INTERACTIVE"],
+  "description": "A coupled wave membrane and particle current with delayed field memory. Particles sample the evolving lattice, reconnect in coherent zones and redirect the membrane through motion."
+}

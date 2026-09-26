@@ -1,0 +1,26 @@
+{
+  "id": "056_foam_press",
+  "index": "056",
+  "title": "FOAM PRESS",
+  "scene": "res://sketches/056_foam_press/runtime/foam_press.tscn",
+  "engine": "GODOT / SOFT CONTACT FIELD",
+  "tags": ["FOAM", "PHYSICS", "INTERACTIVE"],
+  "description": "A dense wet-foam field continuously rearranges under contact pressure. Grab and drag cells, stir a neighbourhood, then release into persistent jostling; packing and adhesion move the material from loose mobile bubbles to sticky jammed rafts while pressure, viscosity and breath pulses change the motion regime.",
+  "creative_seed": 2026092656,
+  "creative_signature": {
+    "carrier": "foam",
+    "representations": ["contact_graph", "agent_population"],
+    "operators": ["jam_release", "constraint_relax"],
+    "temporal_model": "state_dependent_regime",
+    "interaction": "pressure_load",
+    "constraint": "no_symmetry",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "seventy deforming polygonal cells form a dense continuous raft whose contact zones reorganize visibly under the hand",
+    "material_model": "dark wet field with translucent teal films, warm compression color and fine bright contact edges",
+    "final_render": "canvas_dense_polygonal_foam_with_soft_contact_dynamics_and_persistent_hand_stirring",
+    "detail_scales": ["whole foam raft", "jamming and adhesion neighborhoods", "individual irregular cell films"],
+    "interaction_stateful": true
+  }
+}

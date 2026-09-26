@@ -1,0 +1,26 @@
+{
+  "id": "045_rift_volume",
+  "index": "045",
+  "title": "RIFT VOLUME",
+  "scene": "res://sketches/045_rift_volume/runtime/rift_volume.tscn",
+  "engine": "GODOT / SDF RAYMARCH",
+  "tags": ["VOLUMETRIC", "SDF", "INTERACTIVE"],
+  "description": "A spatial sculpture built from three drifting SDF masses and a connected folded membrane. Touch deposits a persistent pressure scar into a hidden material field, eroding the raymarched volume and imparting force to nearby masses instead of drawing a cursor effect.",
+  "creative_seed": 45613,
+  "creative_signature": {
+    "carrier": "volumetric_sculpture",
+    "representations": ["raymarch_sdf", "state_texture"],
+    "operators": ["smooth_union", "erode"],
+    "temporal_model": "event_driven_drift",
+    "interaction": "scar_volume",
+    "constraint": "no_shader_time",
+    "render_path": "fullscreen_shader"
+  },
+  "visual_finish": {
+    "composition": "three offset toroidal masses linked by a thin folded membrane with a deep central negative volume",
+    "material_model": "dark mineral ceramic with spectral grazing highlights, carved pressure scars and micro surface relief",
+    "final_render": "full_resolution_sdf_raymarch_with_persistent_scar_field",
+    "detail_scales": ["volumetric silhouette", "folded tunnel topology", "micro mineral and scar relief"],
+    "interaction_stateful": true
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "050_ferro_trace",
+  "index": "050",
+  "title": "FERRO TRACE",
+  "scene": "res://sketches/050_ferro_trace/runtime/ferro_trace.tscn",
+  "engine": "GODOT / MAGNETIC POWDER",
+  "tags": ["MAGNETIC", "PARTICLES", "INTERACTIVE"],
+  "description": "A field of instanced iron filings aligns to two to four directly draggable magnetic poles. Angular inertia and hysteresis keep a memory of previous field topology, so moving one pole leaves the material resolving rather than snapping to a cursor overlay.",
+  "creative_seed": 2026092639,
+  "creative_signature": {
+    "carrier": "magnetic_fluid",
+    "representations": ["point_cloud_3d", "data_structure"],
+    "operators": ["threshold", "accumulate"],
+    "temporal_model": "hysteresis",
+    "interaction": "move_source",
+    "constraint": "hard_safe_margin",
+    "render_path": "multimesh"
+  },
+  "visual_finish": {
+    "composition": "an off-centre constellation of magnetic poles bends a dense powder field into broad topology bands while leaving controlled paper margins",
+    "material_model": "matte iron filings with chain-dependent length, dark metallic cores, soft contact shadows and restrained pole markers",
+    "final_render": "multimesh_iron_filing_field_with_stateful_orientation_hysteresis",
+    "detail_scales": ["global magnetic topology", "chain-density bands", "individual iron filings and contact shadows"],
+    "interaction_stateful": true
+  }
+}

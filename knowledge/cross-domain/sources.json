@@ -1,0 +1,293 @@
+{
+  "schema": 1,
+  "updated": "2026-09-24",
+  "purpose": "Machine-readable index of sources selected for their ability to bridge design, typography, creative coding, shaders, simulation, interaction and realtime systems.",
+  "policy": {
+    "tiers": {
+      "A": "primary, canonical or authoritative technical/design reference",
+      "B": "professional practice, curated specialist resource or focused technical source",
+      "C": "tutorial, community or inspiration source; verify provenance and rights per item"
+    },
+    "reuse_rule": "Catalogue links and our own abstractions. Before copying code, fonts, imagery or assets, verify the exact upstream license and attribution requirements.",
+    "originality_rule": "Extract principles and representation changes from several independent references; do not reproduce one source's surface appearance."
+  },
+  "sources": [
+    {
+      "id": "coding-systems",
+      "name": "Coding Systems",
+      "tier": "B",
+      "url": "https://codingsystems.info/",
+      "kind": "generative-design-practice",
+      "domains": ["graphic-design", "creative-coding", "identity-systems"],
+      "bridges": ["visual-system-to-executable-system", "identity-rules-to-code"],
+      "tags": ["generative-design", "visual-systems", "identity", "tools"],
+      "reuse": "reference"
+    },
+    {
+      "id": "flexible-visual-systems",
+      "name": "Flexible Visual Systems",
+      "tier": "B",
+      "url": "https://flexiblevisualsystems.info/",
+      "kind": "design-research-and-education",
+      "domains": ["graphic-design", "identity-systems", "layout"],
+      "bridges": ["static-identity-to-flexible-system", "design-rules-to-parameter-space"],
+      "tags": ["visual-systems", "grid", "identity", "adaptive-design"],
+      "reuse": "reference"
+    },
+    {
+      "id": "tim-rodenbroeker",
+      "name": "Tim Rodenbröker",
+      "tier": "B",
+      "url": "https://timrodenbroeker.de/",
+      "kind": "creative-coding-practice",
+      "domains": ["communication-design", "creative-coding", "generative-design"],
+      "bridges": ["designer-thinking-to-computation"],
+      "tags": ["creative-coding", "graphic-design", "education"],
+      "reuse": "reference"
+    },
+    {
+      "id": "generative-design-p5",
+      "name": "Generative Design Code Package for p5.js",
+      "tier": "A",
+      "url": "https://github.com/generative-design/Code-Package-p5.js",
+      "site": "https://archive.p5js.org/books/",
+      "kind": "book-code-package",
+      "domains": ["generative-design", "typography", "color", "shape", "interaction"],
+      "bridges": ["visual-design-to-code-controlled-variation"],
+      "tags": ["p5js", "typography", "grids", "patterns", "interaction"],
+      "reuse": "apache-2.0-at-research-time-reverify-exact-files"
+    },
+    {
+      "id": "code-as-creative-medium-exercises",
+      "name": "Code as Creative Medium Exercises",
+      "tier": "A",
+      "url": "https://github.com/golanlevin/exercises",
+      "kind": "educational-exercise-library",
+      "domains": ["typography", "curves", "geometry", "image", "simulation", "sound", "interaction"],
+      "bridges": ["algorithmic-primitive-across-art-domains"],
+      "tags": ["processing", "p5js", "typography", "simulation", "geometry"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "p5-font",
+      "name": "p5.Font textToPoints/textToPaths",
+      "tier": "A",
+      "url": "https://beta.p5js.org/reference/p5/p5.font/",
+      "kind": "official-api-reference",
+      "domains": ["typography", "geometry"],
+      "bridges": ["glyph-to-points", "glyph-to-paths", "type-to-computational-geometry"],
+      "tags": ["glyph-outlines", "points", "paths", "sampling"],
+      "reuse": "reference"
+    },
+    {
+      "id": "creativeapplications-generative-type",
+      "name": "Generative Typography with Processing",
+      "tier": "B",
+      "url": "https://www.creativeapplications.net/tutorial/generative-typography-processing-tutorial/",
+      "kind": "tutorial-and-project-overview",
+      "domains": ["typography", "particles", "flow-fields", "reaction-diffusion", "voronoi", "3d"],
+      "bridges": ["type-to-mask", "type-to-flow-field", "type-to-simulation", "type-to-mesh"],
+      "tags": ["processing", "generative-type", "simulation", "particles"],
+      "reuse": "verify-exact-code-and-dependency-licenses"
+    },
+    {
+      "id": "space-type-generator",
+      "name": "Space Type Generator",
+      "tier": "B",
+      "url": "https://spacetypegenerator.com/",
+      "kind": "interactive-kinetic-type-tool",
+      "domains": ["typography", "motion", "spatial-design"],
+      "bridges": ["type-to-spatial-system", "typesetting-to-topology"],
+      "tags": ["kinetic-type", "spatial-type", "generative-type"],
+      "reuse": "reference"
+    },
+    {
+      "id": "axis-praxis",
+      "name": "Axis-Praxis",
+      "tier": "B",
+      "url": "https://www.axis-praxis.org/",
+      "site": "https://www.axis-praxis.org/playground/",
+      "kind": "variable-font-playground",
+      "domains": ["typography", "interaction", "animation"],
+      "bridges": ["font-axis-to-realtime-parameter", "design-space-to-interaction"],
+      "tags": ["variable-fonts", "axes", "responsive-type", "animation"],
+      "reuse": "reference"
+    },
+    {
+      "id": "drawbot",
+      "name": "DrawBot",
+      "tier": "B",
+      "url": "https://www.drawbot.com/",
+      "kind": "typographic-drawing-programming-environment",
+      "domains": ["typography", "vector-drawing", "animation"],
+      "bridges": ["type-design-to-procedural-graphics", "font-axis-to-animation"],
+      "tags": ["python", "variable-fonts", "drawing", "animation"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "opentype-font-variations",
+      "name": "OpenType Font Variations Overview",
+      "tier": "A",
+      "url": "https://learn.microsoft.com/en-us/typography/opentype/spec/otvaroverview",
+      "kind": "official-specification",
+      "domains": ["font-engineering", "typography"],
+      "bridges": ["font-master-to-continuous-design-space"],
+      "tags": ["variable-fonts", "interpolation", "axes"],
+      "reuse": "reference"
+    },
+    {
+      "id": "msdfgen",
+      "name": "msdfgen",
+      "tier": "B",
+      "url": "https://github.com/Chlumsky/msdfgen",
+      "kind": "distance-field-tool",
+      "domains": ["typography", "gpu-rendering", "geometry"],
+      "bridges": ["font-outline-to-msdf", "geometry-to-shader-distance-field"],
+      "tags": ["msdf", "sdf", "gpu", "glyphs"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "codrops-letters-shaders",
+      "name": "Codrops - Animating Letters with Shaders",
+      "tier": "C",
+      "url": "https://tympanus.net/codrops/2025/03/24/animating-letters-with-shaders-interactive-text-effect-with-three-js-glsl/",
+      "kind": "tutorial",
+      "domains": ["typography", "glsl", "interaction"],
+      "bridges": ["type-surface-to-shader", "raycast-to-deformation"],
+      "tags": ["threejs", "glsl", "displacement", "interactive-type"],
+      "reuse": "reference-reimplement"
+    },
+    {
+      "id": "codrops-kinetic-type-three",
+      "name": "Codrops - Kinetic Typography with Three.js",
+      "tier": "C",
+      "url": "https://tympanus.net/codrops/2020/06/02/kinetic-typography-with-three-js/",
+      "kind": "tutorial",
+      "domains": ["typography", "3d", "glsl"],
+      "bridges": ["type-to-3d-surface", "type-to-shader-material"],
+      "tags": ["kinetic-type", "threejs", "webgl", "mesh"],
+      "reuse": "reference-reimplement"
+    },
+    {
+      "id": "codrops-circular-msdf-type",
+      "name": "Codrops - On-scroll 3D Circular Text",
+      "tier": "C",
+      "url": "https://tympanus.net/codrops/2025/02/03/building-an-on-scroll-3d-circle-text-animation-with-three-js-and-shaders/",
+      "kind": "tutorial",
+      "domains": ["typography", "3d", "msdf", "interaction"],
+      "bridges": ["type-layout-to-spatial-geometry", "input-speed-to-distortion"],
+      "tags": ["msdf", "threejs", "distortion", "scroll"],
+      "reuse": "reference-reimplement"
+    },
+    {
+      "id": "touchdesigner-text-top",
+      "name": "TouchDesigner Text TOP",
+      "tier": "A",
+      "url": "https://docs.derivative.ca/Text_TOP",
+      "kind": "official-docs",
+      "domains": ["typography", "realtime-texture-processing"],
+      "bridges": ["text-to-texture-signal"],
+      "tags": ["touchdesigner", "text", "texture", "realtime"],
+      "reuse": "reference"
+    },
+    {
+      "id": "touchdesigner-glsl-top",
+      "name": "TouchDesigner GLSL TOP",
+      "tier": "A",
+      "url": "https://docs.derivative.ca/Write_a_GLSL_TOP",
+      "kind": "official-docs",
+      "domains": ["glsl", "realtime-node-systems"],
+      "bridges": ["node-graph-to-shader-operator"],
+      "tags": ["touchdesigner", "glsl", "texture-processing"],
+      "reuse": "reference"
+    },
+    {
+      "id": "touchdesigner-feedback-top",
+      "name": "TouchDesigner Feedback TOP",
+      "tier": "A",
+      "url": "https://docs.derivative.ca/Feedback_TOP",
+      "kind": "official-docs",
+      "domains": ["feedback", "realtime-texture-processing"],
+      "bridges": ["image-processing-to-temporal-memory"],
+      "tags": ["touchdesigner", "feedback", "memory", "state"],
+      "reuse": "reference"
+    },
+    {
+      "id": "td-kinetic-type-glsl",
+      "name": "TouchDesigner Kinetic Typography + GLSL tutorial",
+      "tier": "C",
+      "url": "https://www.youtube.com/watch?v=uk-GVKMTk9Y",
+      "kind": "community-tutorial",
+      "domains": ["typography", "glsl", "feedback", "grid", "motion"],
+      "bridges": ["type-to-feedback", "procedural-timing-to-shader-grid"],
+      "tags": ["touchdesigner", "kinetic-type", "feedback", "glsl"],
+      "reuse": "reference"
+    },
+    {
+      "id": "book-of-shaders-cross-domain",
+      "name": "The Book of Shaders",
+      "tier": "A",
+      "url": "https://thebookofshaders.com/",
+      "kind": "book-and-code",
+      "domains": ["shader-math", "color", "patterns", "noise", "simulation"],
+      "bridges": ["mathematical-operator-to-visual-grammar"],
+      "tags": ["glsl", "shaping", "noise", "matrices", "simulation"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "lygia-cross-domain",
+      "name": "LYGIA Shader Library",
+      "tier": "B",
+      "url": "https://github.com/patriciogonzalezvivo/lygia",
+      "kind": "shader-library-taxonomy",
+      "domains": ["shader-math", "sdf", "color", "simulation", "distortion"],
+      "bridges": ["shader-taxonomy-to-cross-domain-operator-vocabulary"],
+      "tags": ["glsl", "wgsl", "sdf", "distort", "simulate"],
+      "reuse": "restricted-license-review-required"
+    },
+    {
+      "id": "nature-of-code-cross-domain",
+      "name": "The Nature of Code",
+      "tier": "A",
+      "url": "https://natureofcode.com/",
+      "kind": "book-and-code",
+      "domains": ["physics", "agents", "particles", "evolution", "creative-coding"],
+      "bridges": ["behavior-model-to-visual-material"],
+      "tags": ["forces", "particles", "agents", "cellular-automata"],
+      "reuse": "verify-upstream"
+    },
+    {
+      "id": "td-reaction-diffusion",
+      "name": "TouchDesigner Reaction-Diffusion Recipe",
+      "tier": "C",
+      "url": "https://yuazi.github.io/touchdesigner/06_recipes_and_projects/y-3/reaction-diffusion",
+      "kind": "technical-recipe",
+      "domains": ["simulation", "glsl", "feedback"],
+      "bridges": ["scientific-simulation-to-realtime-texture"],
+      "tags": ["gray-scott", "reaction-diffusion", "feedback", "texture-state"],
+      "reuse": "reference"
+    },
+    {
+      "id": "advanced-generative-tops",
+      "name": "Advanced Generative Systems in TOPs",
+      "tier": "C",
+      "url": "https://joemighty.github.io/CreativeCoding/touchdesigner/expert/06-generative-systems/",
+      "kind": "technical-tutorial",
+      "domains": ["simulation", "glsl", "feedback", "realtime-node-systems"],
+      "bridges": ["multiple-simulations-to-shared-feedback-architecture"],
+      "tags": ["reaction-diffusion", "cellular-automata", "physarum", "fluids"],
+      "reuse": "reference"
+    },
+    {
+      "id": "mit-tomorrows-typography",
+      "name": "MIT Media Lab - Tomorrow's Typography",
+      "tier": "B",
+      "url": "https://www.media.mit.edu/projects/tomorrow-s-typography/overview/",
+      "kind": "research-project",
+      "domains": ["typography", "interaction", "computational-design", "generative-ai"],
+      "bridges": ["type-design-to-new-interaction-modalities"],
+      "tags": ["computational-typography", "pose", "experimental-type"],
+      "reuse": "reference"
+    }
+  ]
+}

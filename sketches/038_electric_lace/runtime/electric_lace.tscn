@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sketches/038_electric_lace/runtime/electric_lace.gd" id="1_ctrl"]
+
+[node name="ElectricLace" type="Node2D"]
+script = ExtResource("1_ctrl")

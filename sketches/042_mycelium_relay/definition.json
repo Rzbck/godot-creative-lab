@@ -1,0 +1,26 @@
+{
+  "id": "042_mycelium_relay",
+  "index": "042",
+  "title": "MYCELIUM RELAY",
+  "scene": "res://sketches/042_mycelium_relay/runtime/mycelium_relay.tscn",
+  "engine": "GODOT / AGENT ECOLOGY",
+  "tags": ["AGENTS", "GROWTH", "INTERACTIVE"],
+  "description": "A branching population searches a moving nutrient ecology and retains its grown paths. Dragging does not move an object: it plants a persistent nutrient trail that the organism gradually discovers, follows and amplifies.",
+  "creative_seed": 42191,
+  "creative_signature": {
+    "carrier": "mycelium",
+    "representations": ["agents", "graph_network"],
+    "operators": ["branch", "chemotaxis"],
+    "temporal_model": "population_growth",
+    "interaction": "paint_nutrient",
+    "constraint": "persistent_paths",
+    "render_path": "vector_geometry"
+  },
+  "visual_finish": {
+    "composition": "a wide branching organism crossing several off-axis nutrient basins with intentional dark voids",
+    "material_model": "phosphorescent fungal threads with dense cores, soft hyphal bloom and granular growing tips",
+    "final_render": "antialiased_agent_trails_with_persistent_graph_history",
+    "detail_scales": ["global colony silhouette", "branch hierarchy", "fine hyphae and tip spores"],
+    "interaction_stateful": true
+  }
+}

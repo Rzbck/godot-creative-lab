@@ -1,0 +1,19 @@
+{
+  "id": "026_void_tension",
+  "index": "026",
+  "title": "VOID TENSION",
+  "scene": "res://sketches/026_void_tension/runtime/void_tension.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["SYSTEM", "FRACTURE", "INTERACTIVE"],
+  "description": "A stressed network partitions empty space into living territories. Cutting links redistributes force, folds the field and leaves scars that repair over time.",
+  "creative_seed": 630531256,
+  "creative_signature": {
+    "carrier": "void",
+    "representations": ["constraint_network", "voronoi_territory"],
+    "operators": ["fracture", "fold"],
+    "temporal_model": "spring_inertia",
+    "interaction": "cut_links",
+    "constraint": "asymmetric_safe_area",
+    "render_path": "image_texture_field"
+  }
+}

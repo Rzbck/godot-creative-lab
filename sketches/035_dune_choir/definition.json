@@ -1,0 +1,19 @@
+{
+  "id": "035_dune_choir",
+  "index": "035",
+  "title": "DUNE CHOIR",
+  "scene": "res://sketches/035_dune_choir/runtime/dune_choir.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TOPOGRAPHY", "WAVE", "INTERACTIVE"],
+  "description": "A damped two-dimensional wave field rendered as a dense perspective topography of antialiased vector seams, where impacts propagate, interfere and decay before autonomous excitation can return.",
+  "creative_seed": 31035,
+  "creative_signature": {
+    "carrier": "dust",
+    "representations": ["point_cloud_3d", "wave_field"],
+    "operators": ["couple_neighbours", "accumulate"],
+    "temporal_model": "hysteresis",
+    "interaction": "inject_energy",
+    "constraint": "limited_density",
+    "render_path": "canvas_geometry"
+  }
+}

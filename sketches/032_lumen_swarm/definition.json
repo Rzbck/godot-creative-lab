@@ -1,0 +1,19 @@
+{
+  "id": "032_lumen_swarm",
+  "index": "032",
+  "title": "LUMEN SWARM",
+  "scene": "res://sketches/032_lumen_swarm/runtime/lumen_swarm.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["PARTICLES", "LIGHT", "INTERACTIVE"],
+  "description": "Hundreds of instanced luminous streaks advect through a spatial field around an inertial source that touch can redirect without resetting the population.",
+  "creative_seed": 31032,
+  "creative_signature": {
+    "carrier": "light",
+    "representations": ["particle_flow", "data_structure"],
+    "operators": ["advect", "accumulate"],
+    "temporal_model": "autonomous_agents",
+    "interaction": "move_source",
+    "constraint": "limited_density",
+    "render_path": "multimesh"
+  }
+}

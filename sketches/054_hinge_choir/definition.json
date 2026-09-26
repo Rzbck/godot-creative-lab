@@ -1,0 +1,40 @@
+{
+  "id": "054_hinge_choir",
+  "index": "054",
+  "title": "HINGE CHOIR",
+  "scene": "res://sketches/054_hinge_choir/runtime/hinge_choir.tscn",
+  "engine": "GODOT / COLLIDING PENDULA",
+  "tags": [
+    "MECHANICAL",
+    "PHYSICS",
+    "INTERACTIVE"
+  ],
+  "description": "Forty-eight coupled pendular levers behave as a tactile mechanical instrument. Grab any rod continuously, drag through an arc and release with real retained momentum; neighbouring levers exchange torque, weighted bobs collide, and a state-driven escapement can turn decay into sustained collective motion.",
+  "creative_seed": 2026092654,
+  "creative_signature": {
+    "carrier": "metal",
+    "representations": [
+      "constraint_network",
+      "contact_graph"
+    ],
+    "operators": [
+      "couple_neighbours",
+      "jam_release"
+    ],
+    "temporal_model": "spring_inertia",
+    "interaction": "pressure_load",
+    "constraint": "six_column_grid",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "a compact field of long weighted pendula reads as one mechanical instrument, with energy travelling through coupling and literal bob-to-bob impacts",
+    "material_model": "dark steel rods, compact brass weights, restrained orange impact heat and soft mechanical shadows on warm instrument paper",
+    "final_render": "canvas_colliding_pendulum_instrument_with_continuous_grab_release_and_state_driven_escapement",
+    "detail_scales": [
+      "whole coupled instrument",
+      "collision and torque neighborhoods",
+      "individual rods, pivots and weighted bobs"
+    ],
+    "interaction_stateful": true
+  }
+}

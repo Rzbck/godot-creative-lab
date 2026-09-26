@@ -1,0 +1,9 @@
+{
+  "id": "005_pressure_lattice",
+  "index": "005",
+  "title": "REGISTER TYPE",
+  "scene": "res://sketches/005_pressure_lattice/runtime/pressure_lattice.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "PRINT", "INTERACTIVE"],
+  "description": "A typographic print system where touch pressure compresses a chosen line, drag direction creates controlled ink misregistration, and release returns the poster through a damped recovery."
+}

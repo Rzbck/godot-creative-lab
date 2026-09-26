@@ -1,0 +1,9 @@
+{
+  "id": "002_liquid_type",
+  "index": "002",
+  "title": "LIQUID TYPE",
+  "scene": "res://sketches/002_liquid_type/runtime/liquid_type.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "ELASTIC", "INTERACTIVE"],
+  "description": "Elastic generative typography with gesture-driven spacing, chromatic smearing and synchronized live interaction."
+}

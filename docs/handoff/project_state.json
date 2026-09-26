@@ -1,0 +1,190 @@
+{
+  "schema_version": 10,
+  "project": "DC//LAB / Godot Creative Lab",
+  "repository": "Rzbck/godot-creative-lab",
+  "active_branch": "feat/creative-sketches-002-004-20260924",
+  "draft_pr": 7,
+  "pr_base": "feat/gallery-project-workflow-20260923",
+  "engine": {
+    "name": "Godot",
+    "version": "4.7.1.stable.official.a13da4feb",
+    "renderer": "Vulkan / Forward+"
+  },
+  "runtime": {
+    "main_scene": "res://app/main/main_runtime.tscn",
+    "top_runtime_script": "res://app/main/main_runtime_favorites.gd",
+    "top_runtime_parent": "res://app/main/main_runtime_gallery_host_fixes.gd",
+    "expected_gallery_source_count": 60,
+    "program_persists_across_navigation": true,
+    "take_live_supported": true,
+    "touch_program_input": true,
+    "linked_preview_program_state": true,
+    "per_sketch_parameter_persistence": true,
+    "gallery_real_thumbnails": true,
+    "artwork_canvas_excludes_project_metadata": true
+  },
+  "gallery_browser": {
+    "revision": 2,
+    "state_path": "user://creative_lab_gallery_view.cfg",
+    "sort_modes": ["index_asc", "index_desc", "title", "family"],
+    "view_modes": ["grid", "list"],
+    "default_sort": "index_asc",
+    "grid_card_size_adjustable": true,
+    "list_card_height": 68,
+    "list_preview_mode": "low_alpha_background_right_side",
+    "trash_exclusive_mode": true,
+    "adaptive_tag_filters": true
+  },
+  "adjacent_sketch_navigation": {
+    "enabled": true,
+    "controls": ["previous", "next"],
+    "order": "numeric_source_index",
+    "skip_locally_removed": true,
+    "wrap": false,
+    "must_not_replace_program": true
+  },
+  "user_feedback_system": {
+    "reviews_path": "user://creative_lab_reviews.cfg",
+    "review_axes": ["visual", "interaction", "originality", "aliveness", "controls", "performance"],
+    "written_review_enabled": true,
+    "written_review_label": "WHY / NOTES",
+    "written_reviews_are_first_class_evidence": true,
+    "future_ai_must_read_notes_before_repair_or_generation": true,
+    "user_should_not_repeat_existing_remote_review_in_chat": true,
+    "preference_snapshot_event": "creative_preference_snapshot",
+    "ratings_are_bounded_evidence_not_clone_instruction": true,
+    "latest_consumed_review_session": "31a1daf3d902aca6",
+    "latest_consumed_telemetry_head": "c6aeb0ee36704bea5b868f3e2245893977cbf4bf",
+    "recent_reviews": {
+      "050_ferro_trace": {"visual": 3, "interaction": 4, "originality": 3, "aliveness": 2, "controls": 3, "performance": 3, "interpretation": "positive interaction; wants more points/sources and stronger custom visual finish"},
+      "051_capillary_bridge": {"visual": 2, "interaction": 2, "originality": 3, "aliveness": 2, "controls": 1, "performance": 3, "interpretation": "too sparse and limited; weak controls"},
+      "052_fiber_memory": {"visual": 2, "interaction": 1, "originality": 1, "aliveness": 1, "controls": 1, "performance": 1, "interpretation": "too basic; insufficiently granular; insufficient parameters"},
+      "053_avalanche_bed": {"visual": 1, "interaction": 1, "originality": 1, "aliveness": 1, "controls": 1, "performance": 1, "interpretation": "incomprehensible/visually poor; did not read as generative art"},
+      "054_hinge_choir": {"visual": 2, "interaction": 2, "originality": 4, "aliveness": 1, "controls": 2, "performance": 1, "interpretation": "strong idea/potential; needs continuous manipulation, felt pendulum physics, collisions, chain reactions and deeper research"},
+      "055_snap_lattice": {"visual": 2, "interaction": 2, "originality": 3, "aliveness": 2, "controls": 1, "performance": 1, "interpretation": "idea exists but is too passive; needs more mobility/generative life"}
+    },
+    "strong_reference_signals": {
+      "020_echo_tissue": {"average": 4.1666666667, "visual": 4, "interaction": 4, "originality": 4, "aliveness": 4, "controls": 4, "performance": 5},
+      "012_chemical_blocks": {"average": 3.3333333333},
+      "038_electric_lace": {"visual": 4, "originality": 4},
+      "046_ink_shear": {"visual": 4, "originality": 4, "interaction": 2, "performance": 1}
+    }
+  },
+  "favorites": {
+    "enabled": true,
+    "storage": "existing local curation ConfigFile / favorites section",
+    "runtime_layer": "res://app/main/main_runtime_favorites.gd",
+    "toggle_labels": ["☆ ADD FAVORITE / POTENTIAL", "★ FAVORITE / POTENTIAL"],
+    "gallery_badge": "★",
+    "change_event": "sketch_favorite_changed",
+    "snapshot_event": "creative_favorite_snapshot",
+    "snapshot_contains_creative_signature": true,
+    "favorites_are_first_class_preference_evidence": true,
+    "favorites_are_not_clone_instruction": true,
+    "seed_revision": 1,
+    "seeded_favorites": ["054_hinge_choir"],
+    "seed_is_one_time_and_user_can_remove_afterward": true
+  },
+  "telemetry": {
+    "remote_branch": "telemetry/runtime",
+    "latest": "latest.jsonl",
+    "sessions_directory": "sessions/",
+    "telemetry_first_after_host_test": true,
+    "written_note_transport_verified": true,
+    "favorite_transport_enabled": true,
+    "review_checkpoint_enabled": true,
+    "startup_republish_existing_reviews": true
+  },
+  "creative_quality": {
+    "visual_finish_gate": "knowledge/cross-domain/VISUAL_FINISH_GATE.md",
+    "temporal_quality": "knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md",
+    "adaptive_draw": "knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md",
+    "organic_controls": "knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md",
+    "coarse_solver_must_not_be_exposed_as_final_artwork": true,
+    "technical_diversity_is_not_visual_success": true,
+    "generic_clock_wobble_rejected": true,
+    "controls_must_create_visible_regime_changes": true,
+    "interaction_must_be_immediate_and_stateful": true,
+    "continuous_gesture_preferred_over_gratuitous_click_effects": true,
+    "performance_is_a_first_class_acceptance_axis": true,
+    "current_weak_axes": ["aliveness", "controls", "interaction"]
+  },
+  "adaptive_creative_draw": {
+    "space": "knowledge/cross-domain/creative_draw_space.json",
+    "history_through_index": 60,
+    "exploration_probability": 0.24,
+    "ratings_bias_bounded": true,
+    "written_notes_and_favorites_inform_repairs_and_future_draws": true,
+    "latest_implemented_batch": [
+      "056_foam_press",
+      "057_ribbon_wake",
+      "058_vascular_pulse",
+      "059_swarm_lens",
+      "060_crystal_zipper"
+    ],
+    "latest_batch_feedback_targets": [
+      "continuous rather than single-click interaction",
+      "more autonomous life and mobility",
+      "post-release physical or material consequence",
+      "parameters that create visible regime changes",
+      "denser/multi-source composition where useful",
+      "no gratuitous click circles",
+      "bounded runtime cost"
+    ],
+    "latest_batch_host_state": "NOT_YET_HOST_RATED"
+  },
+  "hinge_choir_repair": {
+    "favorite_seeded": true,
+    "oscillators": 48,
+    "continuous_rod_grab_drag_release": true,
+    "retained_angular_momentum": true,
+    "gravity": true,
+    "neighbor_torque_coupling": true,
+    "bob_collisions": true,
+    "collision_rebound_control": true,
+    "state_driven_escapement": true,
+    "direct_clock_wobble": false
+  },
+  "batch_056_060": {
+    "056_foam_press": "70 irregular polygonal foam cells + soft contact/adhesion + continuous stirring + bounded pressure pulses",
+    "057_ribbon_wake": "16 broad elastic ink ribbons + drag-written rest-shape memory + cross-linked persistent folds",
+    "058_vascular_pulse": "84-node elastic pressure network + continuous pumping + propagating pressure + persistent vessel remodeling",
+    "059_swarm_lens": "190 oriented agents + up to six persistent draggable alternating-polarity field sources",
+    "060_crystal_zipper": "18x10 faceted material + directional stress writing + propagation/healing fracture regimes"
+  },
+  "validation": {
+    "workflow": ".github/workflows/ci.yml",
+    "implementation_head_before_docs": "3fd00c7047d6977dfba94cfac894c3b7ccceb4c5",
+    "implementation_ci_run": 354,
+    "implementation_ci_passed": true,
+    "implementation_ci_jobs": {
+      "repository_policy": "success",
+      "temporal_audit": "success",
+      "adaptive_draw_self_test": "success",
+      "godot_4_7_1_import": "success",
+      "main_scene_smoke": "success",
+      "tracked_cleanliness": "success"
+    },
+    "earlier_failed_ci_run": 353,
+    "earlier_failure_reason": "Godot generated app/main/main_runtime_favorites.gd.uid; no parser/runtime smoke failure",
+    "final_exact_head_ci_required_after_docs": true
+  },
+  "constraints": {
+    "merge_main_requires_explicit_user_approval": true,
+    "do_not_fake_spout_ndi": true,
+    "do_not_block_ui_with_telemetry_git_work": true,
+    "do_not_stop_program_on_navigation": true,
+    "do_not_create_independent_linked_output_timeline": true,
+    "do_not_restore_fixed_1280_720_shader_surfaces": true,
+    "do_not_share_mutable_shader_material_between_scene_instances": true,
+    "do_not_restore_native_transparent_review_popup": true,
+    "do_not_toggle_main_window_visibility_on_startup": true,
+    "do_not_use_generic_direct_clock_animation_as_default_aliveness": true,
+    "do_not_invent_review_scores_or_notes": true,
+    "do_not_treat_technical_diversity_as_visual_success": true,
+    "do_not_expose_coarse_solver_as_final_artwork": true,
+    "gallery_list_must_remain_compact": true,
+    "written_reviews_and_favorites_must_be_consumed_automatically": true,
+    "new_batch_is_not_host_accepted_until_user_tests_it": true
+  }
+}

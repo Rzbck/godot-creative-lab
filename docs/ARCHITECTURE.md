@@ -2,202 +2,181 @@
 
 ## Status
 
-Architecture only.
+Godot 4.7.1 creative-coding workstation. Repository state plus matching runtime telemetry are authoritative when they disagree with chat history.
 
-No Godot scene and no creative sketch have been implemented yet.
-
-The user decides the first creative work before any sketch scene is created.
+Source catalogue: **001–045**.
+Entry scene: `res://app/main/main_runtime.tscn`.
+Top runtime: `res://app/main/main_runtime_gallery_host_fixes.gd`.
 
 ## Product model
 
-Creative Lab is composed of two deliberately separate worlds:
+DC//LAB separates:
+1. WORKSTATION / EDITOR — Gallery, Settings, PREVIEW, parameters, review/curation/navigation.
+2. PROGRAM / LIVE OUT — persistent audience-facing output.
+3. SKETCH — isolated state/parameters/interaction runtime.
 
-1. the Creative Lab application;
-2. the creative works hosted by it.
+Navigation is not transport. Gallery browsing, PREV/NEXT and opening another PREVIEW do not stop/replace PROGRAM. `TAKE LIVE` explicitly replaces PROGRAM.
 
-Application:
+## Runtime chain
 
-    app/
+Current upper chain:
 
-Creative works:
+```text
+main_runtime_gallery_host_fixes.gd
+  -> main_runtime_window_memory.gd
+    -> main_runtime_gallery_compact_review.gd
+      -> main_runtime_gallery_feedback_trash.gd
+        -> main_runtime_gallery_adaptive_filters.gd
+          -> main_runtime_gallery_organizer.gd
+            -> main_runtime_program_output.gd
+              -> main_runtime_gallery_persistence.gd
+                -> main_runtime_live_output.gd
+                  -> lower output/window/telemetry layers
+```
 
-    sketches/
+Always inspect actual `extends` relationships before modifying host behavior.
 
-Reusable resources proven to be shared:
+## Gallery host layer revision 2
 
-    shared/
+`main_runtime_gallery_host_fixes.gd` is intentionally a thin final layer for host-proven UX corrections.
 
-Third-party Godot extensions:
+### LIST
 
-    addons/
+LIST is a dense file-browser presentation:
+- row height: ~68 px;
+- no separate large thumbnail;
+- each card reuses its existing real SubViewport texture as a low-alpha decorative backdrop on the right side;
+- compact index/title/engine/tags overlay;
+- ReviewBadge remains above decoration;
+- hover still animates the same underlying preview; idle remains frozen;
+- GRID presentation is unchanged.
 
-## Future application model
+Do not regress LIST into large horizontal cards. The preview decorates the row; it does not determine row height.
 
-    Main
-    |
-    +-- Navigation / Screen Host
-    |
-    +-- Application UI
-    |     |
-    |     +-- Gallery
-    |     +-- Sketch UI
-    |     +-- Settings
-    |     +-- About
-    |
-    +-- Sketch Player
-    |     |
-    |     +-- Active Sketch
-    |     +-- Creative Render Target
-    |
-    +-- Output Hub
-          |
-          +-- Window
-          +-- Spout
-          +-- NDI
-          +-- future outputs
+### TRASH
 
-This is a responsibility model, not an implemented SceneTree.
+TRASH is exclusive:
+- normal Gallery scroll/cards/search/browser controls hide while Trash is open;
+- restore/purge controls remain local curation only;
+- source in Git is never deleted.
 
-## Fundamental rules
+### Adjacent sketch navigation
 
-### Feature-local ownership
+ProjectToolbar contains `‹ PREV` and `NEXT ›`.
+- source order is numeric index, independent of Gallery sort;
+- `_catalog` already excludes locally removed sketches, so they are skipped;
+- no wrap; edge buttons disable;
+- switching calls normal `_open_sketch()` and therefore preserves PROGRAM semantics.
 
-A feature owns its resources.
+## Review / preference feedback
 
-A future creative work keeps its own:
+RATE remains a centered opaque in-app modal with six 1–5 axes plus free text **WHY / NOTES**.
 
-- scripts;
-- scenes;
-- shaders;
-- materials;
-- textures;
-- media;
-- metadata;
-- thumbnail.
+Local persistence:
+`user://creative_lab_reviews.cfg`
 
-Do not create a generic root assets dumping ground.
+The review layer emits `creative_preference_snapshot` and schedules asynchronous `review_checkpoint` publication after rating/note changes. Host layer revision 2 also schedules a startup republish so durable local comments can be transmitted after publisher upgrades without re-entry.
 
-### Sketch isolation
+### Telemetry sanitizer revision — written notes
 
-A sketch must not directly control:
+Historical problem: the diagnostic publisher intentionally removed unapproved strings. Numeric reviews survived, `note_length` survived, but actual `note` text was stripped.
 
-- Gallery;
-- Settings;
-- navigation;
-- Spout lifecycle;
-- NDI lifecycle;
-- another sketch.
+Current `scripts/publish-telemetry-diagnostics.ps1` contract:
+- arbitrary strings still default to rejected;
+- explicitly safe machine-readable identifiers/signature strings are allowed;
+- `note` is the sole bounded free-text field;
+- note max length = 2000 chars;
+- disallowed C0 controls are removed;
+- sanitized output must be non-empty before publication.
 
-The application hosts creative works.
+Written reviews are first-class creative evidence. After host testing, AI must inspect both numeric axes and note strings before repair/new generation. Never ask for chat duplication when telemetry already contains the review.
 
-Creative works do not own the application.
+## Current telemetry evidence
 
-### One creative render boundary
+Session `5cb124f1822c2ee4` proves review checkpoints publish non-empty JSONL. The old sanitizer version contains numeric preference snapshots and `sketch_review_note_changed.note_length`, but not note contents. Existing local comments should be republished by the next startup checkpoint through the new sanitizer; host validation must confirm actual `reviews.<id>.note` strings remotely.
 
-The clean creative image is separate from application UI.
+## Stateful ShaderMaterial isolation
 
-Future model:
+Gallery, PREVIEW and PROGRAM may instantiate the same PackedScene simultaneously. Mutable resources must not leak across instances.
 
-    Active Sketch
-         |
-         v
-    Creative Render
-         |
-         +--> UI preview
-         +--> clean window
-         +--> Spout
-         +--> NDI
-         +--> capture/recording
+Permanent contract:
+- runtime sketch ShaderMaterial subresources use `resource_local_to_scene = true`;
+- CI enforces this;
+- immutable Shader code may be shared, mutable uniforms/textures may not;
+- stateful CPU->GPU texture sketches use atomic/double-buffer patterns when appropriate.
 
-Application chrome must never leak into professional outputs.
+## Dynamic mesh safety — 041
 
-### Optional outputs
+A physical constraint lattice can produce locally concave, inverted or degenerate cells. Renderer polygon triangulation must not be given arbitrary deforming quads.
 
-Spout and NDI are adapters.
+041 now:
+- retains 17×10 spring simulation;
+- picks the shorter diagonal of each cell;
+- draws explicit triangle primitives;
+- skips near-zero-area triangles.
 
-Their absence must not prevent:
+General rule: simulation topology and render tessellation are separate concerns. For dynamic deforming surfaces, provide explicit robust triangles or a mesh pipeline that controls indices.
 
-- opening the project;
-- running Creative Lab;
-- opening a sketch;
-- rendering locally.
+## Gallery persistence / organization
 
-### Minimal global state
+Cards own real sketch instances in SubViewports. Idle thumbnails freeze, hover animates. Persisted parameters can be mirrored into hidden thumbnails, which is why mutable-resource isolation matters.
 
-Normal scene ownership and signals are preferred.
+Browser behavior:
+- INDEX ↑ default;
+- INDEX ↓ / TITLE / FAMILY;
+- GRID / LIST;
+- GRID size adjustable;
+- browser state: `user://creative_lab_gallery_view.cfg`;
+- reflow reparents existing cards/SubViewports rather than recreating simulations;
+- adaptive quick-tag rail stays bounded.
 
-Autoload is used only for genuinely application-global lifetime services.
+## Window / output
 
-Persistent settings are a possible future candidate.
+Saved workstation window state remains separate from F11 artwork presentation. Never toggle main `Window.visible` during startup. PROGRAM output remains persistent and interactive on the physical output surface.
 
-No Autoload is implemented yet.
+## Full-canvas render contract
 
-## Responsibilities
+Logical design coordinates are usually 1280×720; actual PREVIEW/PROGRAM surfaces adapt to viewport size.
 
-### app/main
+Nodes named `ShaderSurface` use shared `res://sketches/_shared/full_canvas_surface.gd`. CI rejects fixed 1280×720 ShaderSurface offsets.
 
-Future composition root.
+Hidden low-resolution state is allowed. Final visible output must reconstruct suitable high-resolution form/material/detail; coarse solver pixels are not finished art.
 
-Connects high-level systems.
+## Creative / temporal contracts
 
-Must remain small.
+Read:
+- `knowledge/cross-domain/VISUAL_FINISH_GATE.md`
+- `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
+- `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 
-### app/core
+Pipeline:
+`adaptive draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
 
-Non-visual application contracts and models.
+Preferred temporal chain:
+`time -> force/state/memory/event -> coupled system -> render`
 
-Possible future concepts:
+Reject generic direct clock wobble, visible phase wraps/global resets/respawn walls and superficial pointer effects. Physical periodic forcing is allowed only when the visible representation remains continuous.
 
-- SketchDefinition;
-- sketch catalog;
-- capability definitions;
-- application constants.
+## Preference evidence
 
-### app/runtime
+Current recent remote ratings include:
+- 036 ~1.83
+- 037 ~2.33
+- 038 ~2.67 (visual/originality 4; best recent signal but weak controls/interaction)
+- 039 ~2.17
+- 040 2.0
+- 043 1.0
+- 044 2.0
+- 045 1.0
 
-Execution systems:
+Written comments from the old sanitizer publication must not be invented. Once republished, those notes should directly inform repairs and bounded creative biases.
 
-- sketch hosting;
-- render hosting;
-- application inputs;
-- outputs.
+## Historical non-regressions
 
-### app/settings
-
-Persistent user preferences and versioned defaults.
-
-### app/ui
-
-Application UI only.
-
-Contains:
-
-- screens;
-- components;
-- Theme;
-- application-owned icons/fonts/assets.
-
-### sketches
-
-Independent creative projects.
-
-### shared
-
-Resources that have demonstrated reuse.
-
-Do not promote something into shared pre-emptively.
-
-### addons
-
-Third-party Godot plugins/extensions.
-
-Each dependency must have documented source, version and license.
-
-## Validation vocabulary
-
-Keep distinct:
-
-- architecture decided;
-- implemented;
-- runtime validated;
-- user visually validated.
+- 005 source path stays `005_pressure_lattice`, visible artwork remains **REGISTER TYPE**.
+- generalized glyph-contour treatment is not a house style.
+- no permanent full tag wall.
+- mutable ShaderMaterial state stays local per scene.
+- RATE stays opaque/centered/in-app.
+- no main-window visibility toggles at startup.
+- Spout/NDI are future adapters; never represent them as installed/working when they are not.

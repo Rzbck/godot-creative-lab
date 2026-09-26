@@ -1,0 +1,26 @@
+{
+  "id": "039_soap_constellation",
+  "index": "039",
+  "title": "SOAP CONSTELLATION",
+  "scene": "res://sketches/039_soap_constellation/runtime/soap_constellation.tscn",
+  "engine": "GODOT / FOAM OPTICS",
+  "tags": ["FOAM", "OPTICS", "INTERACTIVE"],
+  "description": "A pressure-coupled constellation of soap cells. Bubble geometry relaxes under surface tension while the final full-resolution material resolves Plateau-like seams, thin-film interference and microscopic pearlescent grain.",
+  "creative_seed": 39311,
+  "creative_signature": {
+    "carrier": "foam",
+    "representations": ["sdf_field", "data_structure"],
+    "operators": ["constraint_relax", "couple_neighbours"],
+    "temporal_model": "state_dependent_regime",
+    "interaction": "pressure_load",
+    "constraint": "large_negative_space",
+    "render_path": "fullscreen_shader"
+  },
+  "visual_finish": {
+    "composition": "eight unequal cells clustered off-centre with a dark breathable perimeter",
+    "material_model": "transparent soap film with interference colour and pressure-dependent seams",
+    "final_render": "full_resolution_sdf_thin_film_material",
+    "detail_scales": ["bubble constellation", "film junction network", "micro pearlescent grain"],
+    "interaction_stateful": true
+  }
+}

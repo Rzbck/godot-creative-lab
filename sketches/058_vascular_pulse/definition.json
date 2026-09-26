@@ -1,0 +1,26 @@
+{
+  "id": "058_vascular_pulse",
+  "index": "058",
+  "title": "VASCULAR PULSE",
+  "scene": "res://sketches/058_vascular_pulse/runtime/vascular_pulse.tscn",
+  "engine": "GODOT / REMODELING FLOW NETWORK",
+  "tags": ["NETWORK", "FLOW", "STATEFUL"],
+  "description": "An elastic vessel bed carries pressure rather than decorative branches. Drag through it to pump several neighbouring vessels continuously; pulses propagate, recoil moves junctions and repeated flow permanently remodels conductance thickness. Conduction, leak, pump, recoil and remodeling produce visibly different fast, damped, hypertrophic or self-pulsing regimes.",
+  "creative_seed": 2026092658,
+  "creative_signature": {
+    "carrier": "living_tissue",
+    "representations": ["graph_topology", "wave_field"],
+    "operators": ["accumulate", "couple_neighbours"],
+    "temporal_model": "accumulation_decay",
+    "interaction": "write_memory",
+    "constraint": "asymmetric_safe_area",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "a branching full-frame vessel bed carries bright pressure fronts through a persistent dark-red network with locally remodeled thickness",
+    "material_model": "deep tissue ground, dark vessels, hot orange arterial flow and small faceted junctions instead of generic point sprites",
+    "final_render": "canvas_elastic_vascular_network_with_propagating_pressure_and_persistent_flow_remodeling",
+    "detail_scales": ["whole transport bed", "pressure and remodeling routes", "individual vessel segments and faceted junctions"],
+    "interaction_stateful": true
+  }
+}

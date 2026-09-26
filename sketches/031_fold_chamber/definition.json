@@ -1,0 +1,19 @@
+{
+  "id": "031_fold_chamber",
+  "index": "031",
+  "title": "FOLD CHAMBER",
+  "scene": "res://sketches/031_fold_chamber/runtime/fold_chamber.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["GEOMETRY", "RELIEF", "INTERACTIVE"],
+  "description": "A high-resolution triangulated relief whose pressure, neighbouring constraints and autonomous loads continuously refold a metallic paper-like surface.",
+  "creative_seed": 31031,
+  "creative_signature": {
+    "carrier": "paper",
+    "representations": ["procedural_mesh", "modal_field"],
+    "operators": ["constraint_relax", "fold"],
+    "temporal_model": "spring_inertia",
+    "interaction": "pressure_load",
+    "constraint": "hard_safe_margin",
+    "render_path": "canvas_geometry"
+  }
+}

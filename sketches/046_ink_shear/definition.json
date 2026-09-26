@@ -1,0 +1,26 @@
+{
+  "id": "046_ink_shear",
+  "index": "046",
+  "title": "INK SHEAR",
+  "scene": "res://sketches/046_ink_shear/runtime/ink_shear.tscn",
+  "engine": "GODOT / ADVECTIVE INK",
+  "tags": ["INK", "FLOW", "INTERACTIVE"],
+  "description": "Stateful pigment filaments negotiate a persistent vortex field instead of following a clock. Dragging writes momentum and eddies into the liquid; viscosity, curl, bleed and memory move the work between laminar marbling, torn ribbons and dense turbulent knots.",
+  "creative_seed": 2026092604,
+  "creative_signature": {
+    "carrier": "ink",
+    "representations": ["particle_flow", "fluid_grid"],
+    "operators": ["advect", "accumulate"],
+    "temporal_model": "accumulation_decay",
+    "interaction": "inject_energy",
+    "constraint": "no_symmetry",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "three offset pigment currents cross a dark paper field, leaving broad negative space and an asymmetrical central shear zone",
+    "material_model": "wet translucent ink with saturated cores, diluted feathering and pooled overlap density",
+    "final_render": "antialiased_vector_filaments_with_stateful_eddy_advection",
+    "detail_scales": ["whole-current silhouette", "individual pigment ribbons", "fine wet-edge strands and droplets"],
+    "interaction_stateful": true
+  }
+}

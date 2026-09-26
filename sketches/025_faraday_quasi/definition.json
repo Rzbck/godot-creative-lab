@@ -1,0 +1,9 @@
+{
+  "id": "025_faraday_quasi",
+  "index": "025",
+  "title": "FARADAY QUASI",
+  "scene": "res://sketches/025_faraday_quasi/runtime/faraday_quasi.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["RESONANCE", "FLUID", "INTERACTIVE"],
+  "description": "Parametric forcing excites competing standing-wave modes. Frequency, damping and mode coupling select stripes, squares and quasi-pattern states."
+}

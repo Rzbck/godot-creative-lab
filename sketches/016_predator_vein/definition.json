@@ -1,0 +1,9 @@
+{
+  "id": "016_predator_vein",
+  "index": "016",
+  "title": "PREDATOR VEIN",
+  "scene": "res://sketches/016_predator_vein/runtime/predator_vein.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["ECOSYSTEM", "NETWORK", "INTERACTIVE"],
+  "description": "A nutrient network whose nodes regrow, diffuse energy and reconnect while persistent predators consume local resources, scar the field and reorganize the graph."
+}

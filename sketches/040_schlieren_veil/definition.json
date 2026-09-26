@@ -1,0 +1,26 @@
+{
+  "id": "040_schlieren_veil",
+  "index": "040",
+  "title": "SCHLIEREN VEIL",
+  "scene": "res://sketches/040_schlieren_veil/runtime/schlieren_veil.tscn",
+  "engine": "GODOT / ADVECTED FLUID",
+  "tags": ["FLUID", "OPTICS", "INTERACTIVE"],
+  "description": "A coupled density/heat/velocity field rendered like high-speed schlieren photography. Buoyant plumes advect and curl through each other while touch injects persistent heat and vorticity into the flow.",
+  "creative_seed": 40421,
+  "creative_signature": {
+    "carrier": "smoke",
+    "representations": ["fluid_grid", "analytic_shader_field"],
+    "operators": ["advect", "diffuse"],
+    "temporal_model": "state_dependent_regime",
+    "interaction": "inject_energy",
+    "constraint": "no_glow",
+    "render_path": "fullscreen_shader"
+  },
+  "visual_finish": {
+    "composition": "three asymmetric buoyant plumes rising through a wide dark optical chamber",
+    "material_model": "schlieren density-gradient imaging with heat-dependent refractive colour",
+    "final_render": "hidden_fluid_solver_to_full_resolution_gradient_optics",
+    "detail_scales": ["plume silhouette", "vorticity folds", "micro refractive grain"],
+    "interaction_stateful": true
+  }
+}

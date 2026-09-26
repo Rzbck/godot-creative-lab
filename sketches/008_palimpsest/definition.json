@@ -1,0 +1,9 @@
+{
+  "id": "008_palimpsest",
+  "index": "008",
+  "title": "PALIMPSEST",
+  "scene": "res://sketches/008_palimpsest/runtime/palimpsest.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "MEMORY", "INTERACTIVE"],
+  "description": "A layered typographic archive: slow scratching reveals older language, fast gestures tear into deeper strata, holding preserves a trace, and time gradually writes the present back over it."
+}

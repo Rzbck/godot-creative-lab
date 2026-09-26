@@ -1,0 +1,9 @@
+{
+  "id": "020_echo_tissue",
+  "index": "020",
+  "title": "ECHO TISSUE",
+  "scene": "res://sketches/020_echo_tissue/runtime/echo_tissue.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TISSUE", "MEMORY", "INTERACTIVE"],
+  "description": "An excitable cellular tissue with delayed feedback, refractory memory and neighbourhood morphology. Touch seeds activity that merges, consumes itself and returns through delayed echoes."
+}

@@ -1,179 +1,179 @@
 # AGENTS.md — DataC0re Creative Lab
 
-This repository is a Godot-based creative-coding laboratory.
+This repository is a Godot 4.7.1 creative-coding workstation developed through human + AI sessions.
 
-Its goals are:
-- learn Godot progressively through real creative-coding experiments;
-- keep every experiment accessible from a central gallery;
-- isolate sketches so experiments cannot silently break each other;
-- provide reusable real-time outputs such as Window, Spout and NDI;
-- remain understandable and maintainable across human and AI sessions.
-
-This file contains permanent working rules.
-Current operational state belongs in HANDOFF.md.
+The repository itself is the continuity system. Do not reconstruct the project only from chat memory.
 
 ## Bootstrap for every substantial session
 
-Before modifying the project:
+Before modifying anything:
 
-1. Verify the real repository path.
-2. Verify active branch, HEAD and CLEAN/DIRTY state.
-3. Read AGENTS.md.
-4. Read HANDOFF.md.
-5. Read only the architecture, decision or active exec-plan documents relevant to the task.
-6. Inspect the actual scene/script/shader involved before proposing changes.
+1. Resolve the real remote branch HEAD and CI state from GitHub.
+2. Read this file.
+3. Read `HANDOFF.md`.
+4. Read `docs/handoff/CURRENT_WORK.md` and `docs/handoff/OPERATIONS.md`.
+5. Read `docs/handoff/project_state.json`.
+6. Read `docs/ARCHITECTURE.md` and `docs/SKETCH_CONTRACT.md` for the implemented runtime/sketch model.
+7. Inspect the exact scene/script/shader involved before proposing changes.
+8. For creative/design work, consult relevant `knowledge/` material before inventing from model memory alone.
 
-Never reconstruct current project state only from an old chat.
+If documentation disagrees with current code or telemetry, investigate. Git HEAD + runtime evidence win.
 
 ## Evidence vocabulary
 
-Keep these states distinct:
-
-- HOST_VALIDATED: observed on the user's real machine/runtime.
-- REPO_VALIDATED: durable repository state verified in Git.
-- IMPLEMENTED_NOT_VALIDATED: implemented but not yet validated as required.
-- EXPERIMENTAL: prototype or hypothesis.
-- BLOCKER: prevents the next safe step.
-- NEXT: agreed next operation.
+- **HOST_VALIDATED** — observed on user's real Windows/Godot runtime.
+- **REPO_VALIDATED** — committed state validated by CI/repository checks.
+- **IMPLEMENTED_NOT_VALIDATED** — code exists but required validation missing.
+- **EXPERIMENTAL** — prototype/hypothesis.
+- **BLOCKER** — prevents next safe step.
+- **NEXT** — agreed next operation.
 
 Existing code is not automatically validated behavior.
 
 ## Git discipline
 
-main is the published baseline.
+- Repository: `Rzbck/godot-creative-lab`.
+- Never merge/change `main` without explicit user approval.
+- Feature-branch commits/pushes through GitHub are expected.
+- Keep current stacked branch/PR structure unless concrete reason to change.
+- Never force-push routinely or destructive reset/clean casually.
+- Never overwrite unrelated concurrent work.
+- Never instruct user to use blind `git add -A`.
+- Human validation decides promotion/merge.
 
-For non-trivial work:
-- use a dedicated branch;
-- if several tasks run concurrently: one task = one branch = one worktree;
-- verify path, branch, HEAD and status before writing;
-- never force-push as routine recovery;
-- never use destructive reset/clean without explicit need;
-- never overwrite unrelated concurrent work;
-- do not use blind git add -A;
-- do not push or merge without explicit user approval.
+## User workflow
 
-Human validation decides promotion to main.
+The user does not want to write code manually.
 
-## PowerShell
+Preferred loop:
 
-The user pastes commands directly into PowerShell 7.
+1. AI inspects GitHub/telemetry.
+2. AI edits feature branch directly.
+3. AI updates durable handoff/state in same work session.
+4. AI resolves exact final remote HEAD.
+5. AI waits for CI on that exact HEAD and verifies all required jobs.
+6. If host validation useful, AI automatically supplies canonical PowerShell `sync + exact-head CI wait + launch` from `docs/handoff/OPERATIONS.md`.
+7. User tests.
+8. AI reads online telemetry before asking for copied logs/screenshots.
 
-Interactive command blocks must therefore be complete copy/paste blocks wrapped as:
+PowerShell must be a complete copy/paste `& { ... }` block.
 
-    & {
-        ...
-    }
+## Mandatory AI completion protocol
 
-Avoid constructs split across separate pastes that can leave PowerShell at the >> continuation prompt.
+After any material repository change (runtime, sketch, architecture, creative direction, validation, knowledge rules, branch/PR state, or NEXT), before final response:
 
-For substantial reusable automation, create a versioned .ps1 under scripts/ instead.
+1. Commit/push intended work to active feature branch.
+2. Update `docs/handoff/CURRENT_WORK.md` when durable state/rejection/validation/NEXT changed.
+3. Update `HANDOFF.md` when future session would reconstruct wrong state.
+4. Update `docs/handoff/project_state.json` when machine-readable state/constraints changed.
+5. Update `docs/handoff/NEXT_AI_PROMPT.md` when startup rules/method/NEXT changed.
+6. Update `docs/handoff/OPERATIONS.md` when canonical test/sync/launch or regression workflow changed.
+7. Resolve final remote branch HEAD **after all documentation commits**.
+8. Wait for and inspect CI for that exact SHA. Never use an older green run for a newer HEAD.
+9. Report exact short HEAD + CI.
+10. If host validation benefits the work, include canonical PowerShell automatically.
+11. After host test, inspect `telemetry/runtime` first.
 
-## Godot architecture
-
-Each creative sketch must remain isolated.
-
-Target flow:
-
-Gallery
-  -> selected Sketch
-  -> central render target / SubViewport
-  -> Window
-  -> optional Spout
-  -> optional NDI
-
-Sketches must not directly depend on Spout or NDI.
-
-Outputs are adapters around the central render path.
-
-If an optional output extension is missing, the gallery and sketches must still work.
-
-Shared systems belong under shared/.
-Sketch-specific code and assets belong inside that sketch whenever practical.
-
-## Creative coding principles
-
-Prefer small experiments that teach one concept clearly.
-
-Do not hide Godot fundamentals behind excessive framework code.
-
-When introducing a Godot concept, explain:
-- what the node/resource/script is;
-- why it exists;
-- how data flows through it;
-- what is Godot-specific versus general creative-coding logic.
-
-## Output dependencies
-
-Spout and NDI are optional integrations.
-
-Before adding a native extension:
-- verify supported Godot version;
-- verify supported renderer/platform;
-- document upstream source and license;
-- pin the version used;
-- confirm a clean fallback when unavailable.
-
-Do not commit arbitrary downloaded binaries without documenting their origin and licensing.
-
-## Sources of truth
-
-- Git HEAD + active files = what exists.
-- Runtime result = what actually ran.
-- HANDOFF.md = compact current state.
-- docs/ARCHITECTURE.md = durable architecture.
-- docs/decisions/ = durable decisions.
-- docs/exec-plans/active/ = bounded ongoing work.
-- docs/SESSION_LOG.md = compact material session history.
-
-If these disagree, investigate instead of silently reconciling them.
-
-## Handoff maintenance
-
-Update HANDOFF.md after material changes:
-- meaningful validation;
-- rejection of an approach;
-- architectural decision;
-- new blocker;
-- release/promotion;
-- genuine change of NEXT.
-
-Do not store conversation transcripts.
-
-Keep durable decisions, evidence, commit references and next actions.
-
-## Godot project configuration
-
-`project.godot` is tracked and important, but the Godot editor may legitimately rewrite it.
-
-Before treating a dirty worktree as a blocker:
-
-1. run `scripts/preflight.ps1`;
-2. if only `project.godot` changed, inspect its exact diff;
-3. distinguish editor normalization from intentional Project Settings changes;
-4. never automatically restore, stage, or accept arbitrary `project.godot` changes.
-
-Prefer the Godot editor / Project Settings UI for ordinary engine configuration.
-
-Use `.gitattributes` as the repository source of truth for line-ending policy.
+Continuity is part of task completion, not optional cleanup.
 
 ## Automated validation
 
-Prefer repeatable repository scripts and CI over repeatedly asking the user to perform equivalent manual checks.
+Local standard check: `scripts/check.ps1`
 
-Local standard check:
+GitHub CI: `.github/workflows/ci.yml`
 
-    scripts/check.ps1
+Expected gates:
 
-GitHub CI:
+- repository policy;
+- Godot 4.7.1 headless import;
+- main-scene smoke test;
+- no tracked-file modification caused by import.
 
-    .github/workflows/ci.yml
+Runtime/code work is not finished until relevant CI is green.
 
-For PowerShell 7 automation that invokes native commands such as Git or Godot, enable:
+### Full-canvas render gate
 
-    $PSNativeCommandUseErrorActionPreference = $true
+A node named `ShaderSurface` is a full artwork surface.
 
-A failing native process must not be silently treated as success.
+It must use:
 
-Godot CI must remain pinned to the validated project engine version until an explicit engine upgrade is validated.
+`res://sketches/_shared/full_canvas_surface.gd`
 
-Do not add expensive build/export matrices before the project actually needs them.
+Never use a fixed physical 1280×720 `ShaderSurface`; logical design coordinates may remain 1280×720 while the actual render surface follows the real SubViewport.
+
+Repository policy fails if a runtime scene contains `ShaderSurface` without the shared component or restores fixed 1280/720 offsets. The host also emits `sketch_surface_contract` telemetry. Do not weaken this guard to get a sketch through CI; fix the sketch representation.
+
+## Telemetry-first debugging
+
+Before asking the user for logs, inspect sanitized public telemetry:
+
+- branch `telemetry/runtime`
+- `latest.jsonl`
+- `sessions/`
+
+Telemetry covers window/layout/render/PROGRAM/input/resize plus Gallery curation and render-surface coverage. Publication is async; a publisher PID is not proof upload succeeded. Verify remote branch and matching tested HEAD/session.
+
+## Explicit user review data
+
+Each sketch can be rated 1–5 on:
+
+- visual;
+- interaction;
+- originality;
+- aliveness;
+- controls;
+- performance.
+
+Ratings persist locally and `sketch_review_changed` telemetry exposes sanitized numeric scores.
+
+When structured review data exists, treat it as **first-class creative evidence**. Use it to decide which mechanisms/aesthetics/interactions to repeat, mutate, refine or avoid. Do not override explicit scores with speculative taste inference.
+
+## User curation / Trash
+
+The workstation supports reversible local Trash and delayed local retirement.
+
+- do not delete `res://sketches/...` source files from the runtime;
+- `PURGE` in the app means remove permanently from this workstation Gallery, not Git deletion;
+- actual source deletion is a separate explicit repo action;
+- do not casually resurrect locally retired work in normal Gallery loading.
+
+## Product behavior that must not regress
+
+- Workstation usable while PROGRAM/LIVE OUT runs on selected display.
+- Gallery/Settings/project navigation does not stop PROGRAM.
+- Another PREVIEW can replace PROGRAM via TAKE LIVE.
+- Touch/mouse on physical output controls PROGRAM sketch.
+- Linked PREVIEW/PROGRAM represent same generative state.
+- Per-sketch parameters persist.
+- Gallery cards show real thumbnails; only hovered preview animates.
+- Gallery discovery/search/filtering generated from metadata.
+- Permanent tag UI remains bounded: generated quick rail + collapsed MORE, search indexes all tags.
+- Full-canvas artwork surfaces cover actual PREVIEW/PROGRAM viewport; no accidental gray due to fixed sketch surface.
+- PROGRAM contains no debug/title chrome unless intentionally artwork.
+- Selecting fullscreen display does not move/destroy workstation UI.
+
+## Sketch contract
+
+Creative works live under `sketches/<id>/`, discovered from `definition.json`.
+
+Host owns Gallery/navigation/PROGRAM transport/reviews/curation. Sketches own creative rendering, parameters and generative state.
+
+For synchronized live rendering, use existing live-sync contract rather than unrelated second simulation.
+
+Read `docs/SKETCH_CONTRACT.md` before adding a new rendering pattern.
+
+Do not fake Spout/NDI; they remain future adapters.
+
+## Knowledge library
+
+- `knowledge/creative-coding/` — shaders, simulations, feedback, particles, fields, geometry/GPU.
+- `knowledge/design/` — typography, layout, hierarchy, color, realtime design translation.
+- `knowledge/cross-domain/` — technique palette, collision-first exploration, physics/chemistry, coupling, performance and idea mutation.
+
+For substantial exploration prioritize current pointers in `CURRENT_WORK.md` / `HANDOFF.md`.
+
+Use sources as research starting points. Do not vendor/copy third-party code/assets blindly; check license/provenance.
+
+## Handoff maintenance
+
+Store concise state, evidence, decisions, branch/PR references, failures, validation and next actions. Do not store chat transcripts.

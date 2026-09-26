@@ -1,0 +1,26 @@
+{
+  "id": "037_dendrite_bloom",
+  "index": "037",
+  "title": "DENDRITE BLOOM",
+  "scene": "res://sketches/037_dendrite_bloom/runtime/dendrite_bloom.tscn",
+  "engine": "GODOT / PHASE GROWTH",
+  "tags": ["CRYSTAL", "CHEMISTRY", "INTERACTIVE"],
+  "description": "An anisotropic crystal-growth field with nutrient depletion and remelting. A hidden coupled lattice drives a full-resolution mineral surface with faceted branches, luminous growth fronts and microscopic grain.",
+  "creative_seed": 37147,
+  "creative_signature": {
+    "carrier": "crystal",
+    "representations": ["phase_field_texture", "analytic_shader_field"],
+    "operators": ["precipitate", "consume_regrow"],
+    "temporal_model": "irreversible_mutation",
+    "interaction": "thermal_quench",
+    "constraint": "asymmetric_safe_area",
+    "render_path": "fullscreen_shader"
+  },
+  "visual_finish": {
+    "composition": "off-centre mineral bloom growing into a dark negative field",
+    "material_model": "translucent crystalline relief with mineral edge emission",
+    "final_render": "hidden_phase_solver_to_full_resolution_faceted_material",
+    "detail_scales": ["branch silhouette", "growth-front facets", "micro mineral grain"],
+    "interaction_stateful": true
+  }
+}

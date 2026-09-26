@@ -1,0 +1,40 @@
+{
+  "id": "053_avalanche_bed",
+  "index": "053",
+  "title": "AVALANCHE BED",
+  "scene": "res://sketches/053_avalanche_bed/runtime/avalanche_bed.tscn",
+  "engine": "GODOT / GRANULAR SLOPE",
+  "tags": [
+    "GRANULAR",
+    "PHYSICS",
+    "INTERACTIVE"
+  ],
+  "description": "A continuous granular ridge receives autonomous feed and relaxes by a controllable angle of repose. Drag above the surface pours material; drag into the bed excavates it. Cohesion and compaction change whether the landscape flows, clumps or holds steep cuts.",
+  "creative_seed": 2026092653,
+  "creative_signature": {
+    "carrier": "granular_matter",
+    "representations": [
+      "data_structure",
+      "procedural_mesh"
+    ],
+    "operators": [
+      "jam_release",
+      "erode"
+    ],
+    "temporal_model": "state_dependent_regime",
+    "interaction": "remove_mass",
+    "constraint": "single_material",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "a broad earthen ridge spans the frame with a clear evolving silhouette and restrained stratification marks",
+    "material_model": "dry-to-compacted ochre granular bed with a bright crest and dark compressed strata",
+    "final_render": "continuous_canvas_granular_profile_with_avalanche_relaxation_and_stateful_compaction",
+    "detail_scales": [
+      "landscape silhouette",
+      "avalanche shoulders and cuts",
+      "fine compacted strata"
+    ],
+    "interaction_stateful": true
+  }
+}

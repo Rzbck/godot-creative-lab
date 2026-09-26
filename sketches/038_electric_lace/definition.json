@@ -1,0 +1,26 @@
+{
+  "id": "038_electric_lace",
+  "index": "038",
+  "title": "ELECTRIC LACE",
+  "scene": "res://sketches/038_electric_lace/runtime/electric_lace.tscn",
+  "engine": "GODOT / VECTOR FIELD",
+  "tags": ["FIELD", "VECTOR", "INTERACTIVE"],
+  "description": "A high-resolution electrostatic engraving. Moving charges reshape dozens of integrated field lines; touch physically relocates a charge and the entire lace recomputes around the new topology.",
+  "creative_seed": 38203,
+  "creative_signature": {
+    "carrier": "signal",
+    "representations": ["data_structure", "particle_flow"],
+    "operators": ["advect", "couple_neighbours"],
+    "temporal_model": "spring_inertia",
+    "interaction": "move_source",
+    "constraint": "limited_density",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "asymmetric five-charge constellation with quiet margins and woven trajectories",
+    "material_model": "luminous engraved field lines on deep optical black",
+    "final_render": "antialiased_vector_resolution_fieldline_geometry",
+    "detail_scales": ["constellation", "field-line weave", "hairline cores and charge halos"],
+    "interaction_stateful": true
+  }
+}

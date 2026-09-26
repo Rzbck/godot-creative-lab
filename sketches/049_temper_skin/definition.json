@@ -1,0 +1,26 @@
+{
+  "id": "049_temper_skin",
+  "index": "049",
+  "title": "TEMPER SKIN",
+  "scene": "res://sketches/049_temper_skin/runtime/temper_skin.tscn",
+  "engine": "GODOT / THERMAL METAL",
+  "tags": ["METAL", "THERMAL", "INTERACTIVE"],
+  "description": "A brushed steel skin carries moving heat reservoirs, conduction and persistent oxide temper. Touching cold metal heats it; touching a sufficiently hot zone quenches it. The same gesture therefore has opposite consequences depending on material state.",
+  "creative_seed": 2026092629,
+  "creative_signature": {
+    "carrier": "metal",
+    "representations": ["analytic_shader_field", "data_structure"],
+    "operators": ["diffuse", "phase_switch"],
+    "temporal_model": "hysteresis",
+    "interaction": "thermal_quench",
+    "constraint": "no_glow",
+    "render_path": "fullscreen_shader"
+  },
+  "visual_finish": {
+    "composition": "overlapping thermal basins form an asymmetric diagonal across a dark steel plate, with cooler negative space preserved around the perimeter",
+    "material_model": "brushed steel with physically motivated heat temper colours, oxide memory, gradient-derived buckling and directional grain",
+    "final_render": "full_resolution_analytic_thermal_metal_shader",
+    "detail_scales": ["large thermal basins", "temper rings and buckled highlights", "fine brushed-metal grain"],
+    "interaction_stateful": true
+  }
+}

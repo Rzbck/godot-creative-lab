@@ -1,0 +1,17 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://sketches/034_phosphor_sand/runtime/phosphor_sand.gd" id="1_ctrl"]
+[ext_resource type="Script" path="res://sketches/_shared/full_canvas_surface.gd" id="2_surface"]
+[ext_resource type="Shader" path="res://sketches/034_phosphor_sand/runtime/phosphor_sand.gdshader" id="3_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_phosphor"]
+resource_local_to_scene = true
+shader = ExtResource("3_shader")
+
+[node name="PhosphorSand" type="Node2D"]
+script = ExtResource("1_ctrl")
+
+[node name="ShaderSurface" type="ColorRect" parent="."]
+mouse_filter = 2
+material = SubResource("ShaderMaterial_phosphor")
+script = ExtResource("2_surface")

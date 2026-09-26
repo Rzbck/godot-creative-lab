@@ -1,159 +1,163 @@
 # HANDOFF — DataC0re Creative Lab
 
-Canonical restart point for a new human or AI session.
+Canonical restart point. Resolve the real remote branch HEAD and the CI for that exact SHA before trusting any recorded commit. Repository state plus matching host telemetry are authoritative when chat history disagrees.
 
-Always re-check Git branch, HEAD and status before trusting this snapshot.
-
-## Product
-
-Godot creative-coding laboratory built around a gallery of independent real-time sketches.
-
-Target capabilities include:
-- 2D / 3D generative visuals;
-- shaders;
-- particles;
-- feedback;
-- audio reactivity;
-- MIDI / OSC;
-- cameras / video;
-- procedural systems;
-- Spout output;
-- NDI output.
+Last material refresh: 2026-09-26.
 
 ## Repository
 
-GitHub:
-Rzbck/godot-creative-lab
+- GitHub: `Rzbck/godot-creative-lab`
+- branch: `feat/creative-sketches-002-004-20260924`
+- draft PR: #7, base `feat/gallery-project-workflow-20260923`
+- Godot: 4.7.1 stable
+- workstation root: `E:\_Project\GodotCreativeLab`
+- GUI: `C:\Godot\Godot_v4.7.1-stable_win64.exe`
+- never merge/change `main` without explicit user approval
 
-Local target:
-E:\_Project\GodotCreativeLab
+## Stable product contract
 
-Default published branch:
-main
+PROGRAM persists while the workstation navigates Gallery/Settings/other PREVIEW. `TAKE LIVE` explicitly replaces PROGRAM. Physical PROGRAM touch/mouse is supported. Linked PREVIEW/PROGRAM share one state/timeline. Per-sketch parameters persist. Gallery uses real sketch thumbnails and only hovered previews animate. PROGRAM is artwork-only. Telemetry/network work stays asynchronous. Local Trash never deletes Git source.
 
-Active architecture branch:
-`chore/architecture-foundation-20260923`
+Main scene: `res://app/main/main_runtime.tscn`.
+Top runtime: `res://app/main/main_runtime_gallery_host_fixes.gd`.
+Source catalogue: **001–050** before local curation.
 
-## HOST_VALIDATED
+## Current user-feedback evidence
 
-- Godot `4.7.1.stable.official.a13da4feb`.
-- Godot command available through the user PATH.
-- Vulkan / Forward+ launches successfully on NVIDIA GeForce RTX 5080.
-- Local repository policy validation passes.
-- Local Godot headless import passes.
+Written RATE transport and startup republish are now verified, not merely expected.
 
-## Architecture direction
+Verified telemetry:
+- session: `67a6e7499c4524cf`
+- runtime HEAD: `ceecb6be59a9`
+- written notes are readable at `creative_preference_snapshot.reviews.<sketch>.note`
 
-    Gallery
-      -> Sketch Player
-      -> central creative render boundary
-      -> local preview/window
-      -> optional Spout adapter
-      -> optional NDI adapter
+Current reviewed-axis averages:
+- visual ~2.06
+- interaction ~1.72
+- originality ~1.92
+- aliveness ~1.64
+- controls ~1.56
+- performance ~2.42
 
-Sketches must remain usable without NDI or Spout installed.
+Main weak axes are therefore **controls, aliveness, interaction**.
 
-## Accepted architecture decisions
+Bounded positive references:
+- 020 ECHO TISSUE avg ~4.17;
+- 012 CHEMICAL BLOCKS avg ~3.33;
+- 038 ELECTRIC LACE avg ~2.67 with visual 4 / originality 4.
 
-- application code under `app/`;
-- creative works under `sketches/`;
-- feature-local resource ownership;
-- genuinely reusable resources only under `shared/`;
-- central clean creative render boundary;
-- Window / Spout / NDI treated as output adapters;
-- minimal Autoload/global state policy;
-- future persistent settings stored under `user://`;
-- central application UI design system;
-- project-wide Godot Theme as the visual delivery layer;
-- semantic tokens, Theme Type Variations and centralized icons/fonts.
+Do not clone any of them. Preserve only useful qualities such as readable causality, understandable sources, direct state manipulation and clear regime changes.
 
-Architecture references:
+Latest written feedback that materially shaped the next batch:
+- 041: too basic for the subject, weak felt physics, visual failure when pulled too far;
+- 042: promising but under-interactive; parameters appear ineffective instead of producing genuinely different outcomes;
+- 043: incomprehensible, not felt as real-time interactive, click response weak, visual rejection;
+- 044: too pixelated, no reset, weak parameter effect;
+- 045: strong visual/semantic rejection and lack of comprehensibility.
 
-- `docs/ARCHITECTURE.md`
-- `docs/PROJECT_STRUCTURE.md`
-- `docs/UI_ARCHITECTURE.md`
-- `docs/DESIGN_SYSTEM.md`
-- `docs/SKETCH_CONTRACT.md`
-- `docs/OUTPUT_ARCHITECTURE.md`
-- `docs/SETTINGS_ARCHITECTURE.md`
-- `docs/decisions/`
+Durable creative rule: a parameter is useful when it changes **regime, composition, topology, temporal response or material behavior** in a clearly perceivable way. Interaction should be immediate enough to understand and stateful enough to keep mattering after release.
 
-## UI design-system state
+## Latest batch — 046–050
 
-Architecture only.
+These five sketches were implemented directly from the full feedback corpus, not from a single high-rated reference.
 
-No palette, font family, icon family, component scene or skin is selected yet.
+### 046 INK SHEAR
 
-ThemeGen `v1.4.0` has been researched as an MIT-licensed Godot 4.x programmatic theme-authoring candidate. It is not installed or adopted until a Godot 4.7.1 + CI compatibility spike passes.
+Persistent vector ink filaments coupled to user-written eddies. Gesture energy/spin remains in the flow through decaying eddy memory. Controls separate viscosity, vorticity, filament count, pigment split, wet bleed, brush force/radius and memory so they can produce materially different flow/mark regimes.
 
-The connected Supericons tool is available for coherent icon selection when UI visual implementation begins.
+### 047 MOIRE APERTURE
 
-## project.godot editor policy
+Full-resolution analytic moiré/interference field with directly draggable apertures. Density, layer angle, shear, lens power, aperture radius, contrast and registration/chroma variables are intended to change the interference family, not only intensity. No coarse solver texture is exposed.
 
-Godot 4.7.1 normalized `project.godot` on first editor launch.
+### 048 ACTIVE NEMATIC
 
-Validated normalization:
-- standard Godot configuration-file header;
-- `config/features=PackedStringArray("4.7")`;
-- existing display settings preserved.
+Hidden coupled director/flow solver drives a visible MultiMesh of **880 oriented filaments**. Pointer gesture writes orientation/spin into the active matter. Alignment/activity/defect-birth/flow-memory controls target different nematic regimes rather than cosmetic modulation.
 
-Future sessions must use `scripts/preflight.ps1`.
+### 049 TEMPER SKIN
 
-A `project.godot`-only dirty state is `REVIEW_REQUIRED`, not an automatic blocker.
+Thermally reactive metal with conduction, cooling and oxide memory. Interaction is state-dependent: cold material heats; already-hot material is quenched/cooled. The visible result depends on thermal history rather than a stateless brush overlay.
 
-## Automation foundation
+### 050 FERRO TRACE
 
-Local validation entry point:
+Visible MultiMesh field of **1100 iron filings** with 2–4 directly draggable magnetic poles and orientation hysteresis. It preserves the positive source legibility observed in 038 while changing the carrier, dynamics and surface completely.
 
-`scripts/check.ps1`
+Creative collision history in `knowledge/cross-domain/creative_draw_space.json` now includes 046–050.
 
-GitHub workflow:
+## Validation state
 
-`.github/workflows/ci.yml`
+Implementation HEAD before final documentation:
+`96471494f10c8c292ab8b0c0c04ea6dcf2828034`
 
-Current CI targets:
+It passed **CI #340** completely:
+- Repository policy — success
+- temporal audit — success
+- adaptive creative draw self-test — success
+- Godot 4.7.1 import — success
+- main-scene smoke — success
+- tracked cleanliness — success
 
-- repository policy;
-- Godot 4.7.1 headless import;
-- tracked-file cleanliness after Godot import.
+The validation loop caught and fixed two issues before delivery:
+- 046 GDScript type-inference ambiguity;
+- 047 attempt to redefine shader built-in `PI`.
 
-Dependabot is configured for GitHub Actions updates.
+The batch is therefore **repo/CI validated but NOT host-rated or artistically accepted yet**. Never treat CI green as proof that the sketches are beautiful, comprehensible, fun or good.
 
-No export/build/release pipeline exists yet.
+## Gallery / host contracts still active
 
-## Current intentional state
+- LIST remains a dense ~68 px row; real preview is a low-alpha background decoration, not a giant left thumbnail.
+- `‹ PREV` / `NEXT ›` browse numeric source order, skip local trash, have no wrap, and use the normal PREVIEW open path.
+- PREV/NEXT/Gallery navigation must never silently replace PROGRAM.
+- adaptive quick tags remain bounded; never restore the permanent tag wall.
+- Gallery supports INDEX ↑/↓, TITLE, FAMILY, GRID/LIST and adjustable GRID size.
+- TRASH is exclusive and local-only.
+- review notes persist in `user://creative_lab_reviews.cfg` and telemetry is first-class evidence.
 
-- no `.tscn`;
-- no Gallery implementation;
-- no Settings implementation;
-- no sketch implementation;
-- no Spout;
-- no NDI;
-- no Autoload;
-- no icon assets;
-- no font assets;
-- no Theme resource yet.
+## Rendering / creative-quality contracts
 
-## Validation vocabulary
+Read:
+- `knowledge/cross-domain/VISUAL_FINISH_GATE.md`
+- `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
+- `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
+- `knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md`
+- `knowledge/cross-domain/creative_draw_space.json`
 
-HOST_VALIDATED:
-- Godot 4.7.1 runtime/editor and local headless import.
+Pipeline:
 
-REPO_VALIDATED:
-- repository architecture and local CI policy.
+`adaptive draw -> preference evidence -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
 
-IMPLEMENTED_NOT_VALIDATED:
-- GitHub Actions remote CI until first PR run completes.
+Technical diversity is not artistic quality. Hidden coarse solvers are allowed; enlarged solver pixels are not final artwork. Avoid generic direct-clock wobble, visible phase-wrap/reset walls, shallow pointer overlays and parameters that merely change “amount”.
 
-EXPERIMENTAL:
-- ThemeGen candidate until compatibility spike.
+## Historical non-regressions
 
-BLOCKER:
-- none for architecture work.
+- 001 stays technical foundation/reference.
+- 005 source path remains `005_pressure_lattice`, visible artwork **REGISTER TYPE**; never restore Pressure Lattice visual concept.
+- generalized glyph-contour treatment across 006–010 was rejected; contours are optional infrastructure, not house style.
+- do not stop PROGRAM on navigation.
+- do not create independent linked timelines.
+- `ShaderSurface` must stay full-canvas via shared sizing component.
+- every mutable sketch `ShaderMaterial` remains `resource_local_to_scene = true`.
+- RATE remains opaque/centered/in-app.
+- no main-window visibility toggles at startup.
+- no fake Spout/NDI support.
+- do not invent review evidence.
+- do not infer host FPS from stale telemetry.
 
-## NEXT
+## Required next host validation
 
-1. Open/refresh the architecture PR and let GitHub Actions validate the remote branch.
-2. Keep architecture scene-free.
-3. Decide the first implementation target before creating any `.tscn`.
-4. Before UI implementation, validate the design-system authoring path (native Godot Theme vs ThemeGen-assisted).
+1. Sync exact final HEAD and require exact-head CI before launch.
+2. Confirm Gallery source count is **50**.
+3. Review 046–050 sequentially with PREV/NEXT while ensuring PROGRAM stays untouched unless TAKE LIVE is pressed.
+4. For each new sketch, watch defaults for ~20–30 s before touching controls; assess autonomous temporal life without generic clock motion.
+5. Interact and release; require immediate readable response plus a persistent/delayed consequence.
+6. Push every parameter through broad ranges; flag any parameter that seems ineffective or only changes intensity.
+7. 046: opposing eddies should visibly steer/shear ink and persist through memory.
+8. 047: aperture dragging plus density/angle/shear/lens extremes should create distinct interference regimes.
+9. 048: visible response must remain filamentary/organic rather than revealing the solver grid; defects/flow/memory should be perceptible.
+10. 049: verify heat vs quench depends on local state, and conduction/cooling/oxide-memory extremes are legible.
+11. 050: drag poles, vary pole count/field parameters, and verify filings reorganize with hysteresis rather than stateless snapping.
+12. Continue RATE numeric + WHY/NOTES normally; user should not repeat those notes in chat.
+13. Close normally and inspect fresh `telemetry/runtime` first on the next turn. Verify session/runtime HEAD before attributing review or performance evidence.
+
+## Mandatory AI completion protocol
+
+After every material repository change: finish code -> push -> update durable docs/state -> resolve final remote HEAD **after all docs** -> wait/inspect CI for that exact SHA -> report exact short HEAD + exact CI -> automatically provide canonical PowerShell when host validation is useful -> after host test inspect telemetry first.

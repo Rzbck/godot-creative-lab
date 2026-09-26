@@ -1,0 +1,9 @@
+{
+  "id": "010_fault_register",
+  "index": "010",
+  "title": "FAULT REGISTER",
+  "scene": "res://sketches/010_fault_register/runtime/fault_register.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["TYPOGRAPHY", "FRACTURE", "INTERACTIVE"],
+  "description": "A strict editorial system under stress: press anchors a fault, drag shears the grid and type, holding deepens the break, and release leaves a persistent registration scar."
+}

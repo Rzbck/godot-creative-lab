@@ -1,0 +1,9 @@
+{
+  "id": "023_spinodal_marangoni",
+  "index": "023",
+  "title": "SPINODAL MARANGONI",
+  "scene": "res://sketches/023_spinodal_marangoni/runtime/spinodal_marangoni.tscn",
+  "engine": "GODOT / GENERATIVE",
+  "tags": ["PHASE", "MARANGONI", "INTERACTIVE"],
+  "description": "A conserved binary material phase-separates, coarsens and is advected by surface-tension gradients. Touch becomes a thermal quench, not a paintbrush."
+}
