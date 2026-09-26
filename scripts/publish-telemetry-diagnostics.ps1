@@ -43,6 +43,9 @@ $SafeWindowKeys = @(
     "borderless", "resize_disabled", "always_on_top", "unresizable", "content_scale_factor"
 )
 
+# These strings are machine-readable product/creative identifiers, not arbitrary
+# runtime text. Keeping them makes preference snapshots useful without exposing
+# unrelated labels or file-system data.
 $SafeStringKeys = @{
     previous_mode = $true
     restore_mode = $true
@@ -51,7 +54,31 @@ $SafeStringKeys = @{
     godot = $true
     os = $true
     git_head = $true
+    reason = $true
+    sketch_id = $true
+    criterion = $true
+    title = $true
+    engine = $true
+    id = $true
+    carrier = $true
+    interaction = $true
+    constraint = $true
+    render_path = $true
+    temporal_model = $true
+    tags = $true
+    representations = $true
+    operators = $true
+    criteria = $true
+    final_render = $true
 }
+
+# Written REVIEW content is explicitly user-authored feedback intended for the
+# remote creative feedback loop. It is the only free-text payload allowed by
+# the sanitizer and is bounded to the same limit as the in-app editor.
+$SafeFreeTextKeys = @{
+    note = $true
+}
+$MaxReviewNoteChars = 2000
 
 function Write-Status {
     param(
@@ -87,6 +114,19 @@ function Get-PublicSessionId {
     }
 }
 
+function Convert-ToSafeReviewText {
+    param([string]$Value)
+
+    # Keep line breaks/tabs because short structured feedback is useful, but
+    # remove all other C0 control characters before serializing to JSON.
+    $Text = [regex]::Replace($Value, '[\x00-\x08\x0B\x0C\x0E-\x1F]', ' ')
+    $Text = $Text.Trim()
+    if ($Text.Length -gt $MaxReviewNoteChars) {
+        $Text = $Text.Substring(0, $MaxReviewNoteChars)
+    }
+    return $Text
+}
+
 function Convert-ToDiagnosticValue {
     param(
         $Value,
@@ -108,6 +148,10 @@ function Convert-ToDiagnosticValue {
     }
 
     if ($Value -is [string]) {
+        if ($SafeFreeTextKeys.ContainsKey($Key)) {
+            return Convert-ToSafeReviewText -Value ([string]$Value)
+        }
+
         if (-not $SafeStringKeys.ContainsKey($Key)) {
             return $null
         }
@@ -121,7 +165,7 @@ function Convert-ToDiagnosticValue {
             return $null
         }
 
-        if ($Key -ne "git_head" -and $Text -notmatch '^[A-Za-z0-9 ._()\-]{0,128}$') {
+        if ($Key -ne "git_head" -and $Text -notmatch '^[A-Za-z0-9 ._()/+\-]{0,128}$') {
             return $null
         }
 
@@ -255,6 +299,11 @@ try {
     $SanitizedContent = Convert-ToSanitizedTelemetry -SourcePath $TelemetryFile -PublicSession $PublicSession
     $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($SanitizedFile, $SanitizedContent, $Utf8NoBom)
+
+    $SanitizedLength = (Get-Item -LiteralPath $SanitizedFile).Length
+    if ($SanitizedLength -le 0) {
+        throw "Sanitized telemetry file is empty; refusing remote publication."
+    }
 
     $null = git rev-parse --is-inside-work-tree
     if ($LASTEXITCODE -ne 0) {
