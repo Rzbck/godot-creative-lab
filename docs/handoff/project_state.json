@@ -1,5 +1,5 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "project": "DC//LAB / Godot Creative Lab",
   "repository": "Rzbck/godot-creative-lab",
   "active_branch": "feat/creative-sketches-002-004-20260924",
@@ -14,7 +14,7 @@
     "main_scene": "res://app/main/main_runtime.tscn",
     "top_runtime_script": "res://app/main/main_runtime_gallery_host_fixes.gd",
     "top_runtime_parent": "res://app/main/main_runtime_window_memory.gd",
-    "expected_gallery_source_count": 45,
+    "expected_gallery_source_count": 50,
     "program_persists_across_navigation": true,
     "take_live_supported": true,
     "touch_program_input": true,
@@ -45,8 +45,7 @@
     "skip_locally_removed": true,
     "wrap": false,
     "uses_normal_open_sketch_path": true,
-    "must_not_replace_program": true,
-    "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
+    "must_not_replace_program": true
   },
   "user_feedback_system": {
     "reviews_path": "user://creative_lab_reviews.cfg",
@@ -61,44 +60,42 @@
     "preference_snapshot_event": "creative_preference_snapshot",
     "startup_republish_existing_reviews": true,
     "ratings_are_bounded_evidence_not_clone_instruction": true,
-    "latest_visible_numeric_evidence": {
-      "036_polar_stress": {"average": 1.83},
-      "037_dendrite_bloom": {"average": 2.33},
-      "038_electric_lace": {"average": 2.67, "visual": 4, "originality": 4},
-      "039_soap_constellation": {"average": 2.17},
-      "040_schlieren_veil": {"average": 2.0},
-      "043_slit_memory": {"average": 1.0},
-      "044_excitable_glass": {"average": 2.0},
-      "045_rift_volume": {"average": 1.0}
+    "latest_axis_averages": {
+      "visual": 2.0555555556,
+      "interaction": 1.7222222222,
+      "originality": 1.9166666667,
+      "aliveness": 1.6388888889,
+      "controls": 1.5555555556,
+      "performance": 2.4166666667
     },
-    "do_not_invent_missing_041_042_or_note_content": true
+    "strong_reference_signals": {
+      "020_echo_tissue": {"average": 4.1666666667, "visual": 4, "interaction": 4, "originality": 4, "aliveness": 4, "controls": 4, "performance": 5},
+      "012_chemical_blocks": {"average": 3.3333333333},
+      "038_electric_lace": {"average": 2.6666666667, "visual": 4, "originality": 4}
+    },
+    "latest_written_reviews": {
+      "041_tension_organ": "oui plutot basic pour ce genre de chos eon ressent ma la physique et en plsu si on tire trop ca cree des bug visuel mal gere",
+      "042_mycelium_relay": "opk cest pas mal mais c amanque dinteractione tpareil les parametre on comprend pas on a limpresion que ca fait rien , en gros les parametre cest bine aussi quand onncre eune rell different en faite",
+      "043_slit_memory": "on comrpend rien ce nest pa sinteractif temps reel on ressent rine quon on clique et ces tmoche",
+      "044_excitable_glass": "torep pixeliser pas de reset posible et les parametre ne font pas rgand chose",
+      "045_rift_volume": "ca resmeble a irne du tout ces tmoche c ane vaut rien du tout on comrpend pas cest naze"
+    }
   },
   "telemetry": {
     "remote_branch": "telemetry/runtime",
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "telemetry_first_after_host_test": true,
-    "current_observed_public_session": "5cb124f1822c2ee4",
-    "current_session_non_empty": true,
-    "old_sanitizer_preserved_numeric_ratings": true,
-    "old_sanitizer_preserved_note_length_only": true,
-    "old_sanitizer_stripped_note_content": true,
-    "written_note_transport_fix_commit": "0c360c358e4b08fc456ba158fd35d6f62e18a253",
+    "current_verified_session": "67a6e7499c4524cf",
+    "current_verified_runtime_head": "ceecb6be59a9",
+    "written_note_transport_verified": true,
+    "verified_note_location": "creative_preference_snapshot.reviews.<sketch>.note",
     "safe_free_text_fields": ["note"],
     "safe_note_max_chars": 2000,
     "sanitized_zero_byte_publish_rejected": true,
     "review_checkpoint_enabled": true,
     "review_checkpoint_delay_seconds": 0.8,
-    "existing_local_notes_expected_to_republish_at_startup": true,
-    "note_transport_host_validation_required": true
-  },
-  "tension_organ_041": {
-    "previous_error": "Invalid polygon data, triangulation failed",
-    "cause": "deforming_quad_can_be_concave_inverted_or_degenerate",
-    "fix_commit": "df9710aec3351f07b2f3403d05f8977bb635575e",
-    "render_strategy": "explicit_two_triangle_tessellation_shorter_diagonal_skip_degenerate",
-    "physics_changed": false,
-    "state": "REPO_VALIDATED_HOST_STRESS_REQUIRED"
+    "startup_republish_verified": true
   },
   "shader_state_contract": {
     "mutable_shader_material_local_to_scene": true,
@@ -117,13 +114,17 @@
     "visual_finish_gate": "knowledge/cross-domain/VISUAL_FINISH_GATE.md",
     "temporal_quality": "knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md",
     "adaptive_draw": "knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md",
-    "pipeline": "adaptive_draw -> prototype -> observe -> mutate -> art_direct -> visual_finish_gate -> keep_or_reject",
+    "organic_controls": "knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md",
+    "pipeline": "adaptive_draw -> preference_evidence -> prototype -> observe -> mutate -> art_direct -> visual_finish_gate -> keep_or_reject",
     "ci_visual_finish_required_since_index": 36,
     "minimum_detail_scales": 3,
     "coarse_solver_must_not_be_exposed_as_final_artwork": true,
     "technical_diversity_is_not_visual_success": true,
     "generic_clock_wobble_rejected": true,
-    "visible_phase_wrap_reset_respawn_wall_rejected": true
+    "visible_phase_wrap_reset_respawn_wall_rejected": true,
+    "controls_must_create_visible_regime_changes": true,
+    "interaction_must_be_immediate_and_stateful": true,
+    "weakest_axes_current": ["controls", "aliveness", "interaction"]
   },
   "adaptive_creative_draw": {
     "space": "knowledge/cross-domain/creative_draw_space.json",
@@ -133,17 +134,32 @@
     "written_notes_inform_repairs_and_durable_rules": true,
     "draw_is_collision_generator_not_quality_gate": true,
     "latest_implemented_batch": [
-      "041_tension_organ",
-      "042_mycelium_relay",
-      "043_slit_memory",
-      "044_excitable_glass",
-      "045_rift_volume"
-    ]
+      "046_ink_shear",
+      "047_moire_aperture",
+      "048_active_nematic",
+      "049_temper_skin",
+      "050_ferro_trace"
+    ],
+    "latest_batch_feedback_targets": [
+      "stronger_parameter_regime_changes",
+      "higher_aliveness_without_clock_wobble",
+      "direct_stateful_interaction",
+      "no_visible_coarse_pixels",
+      "comprehensible_sources_and_material_causality"
+    ],
+    "latest_batch_host_state": "NOT_YET_HOST_RATED"
+  },
+  "batch_046_050": {
+    "046_ink_shear": "persistent vector ink filaments + user-written eddies",
+    "047_moire_aperture": "full-resolution analytic interference + directly draggable apertures",
+    "048_active_nematic": "hidden coupled director solver + 880 visible MultiMesh filaments",
+    "049_temper_skin": "state-dependent heat/quench metal + conduction + oxide memory",
+    "050_ferro_trace": "1100 MultiMesh iron filings + directly draggable magnetic poles + hysteresis"
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
-    "implementation_head_before_docs": "0c360c358e4b08fc456ba158fd35d6f62e18a253",
-    "implementation_ci_run": 312,
+    "implementation_head_before_docs": "96471494f10c8c292ab8b0c0c04ea6dcf2828034",
+    "implementation_ci_run": 340,
     "implementation_ci_passed": true,
     "implementation_ci_jobs": {
       "repository_policy": "success",
@@ -153,7 +169,6 @@
       "main_scene_smoke": "success",
       "tracked_cleanliness": "success"
     },
-    "docs_bundle_commit_before_final_ci": "1243a199743d7438a0443faf516484c17d3cde5a",
     "final_exact_head_ci_required_after_docs": true
   },
   "constraints": {
@@ -167,11 +182,12 @@
     "do_not_restore_native_transparent_review_popup": true,
     "do_not_toggle_main_window_visibility_on_startup": true,
     "do_not_use_generic_direct_clock_animation_as_default_aliveness": true,
-    "do_not_invent_missing_review_scores_or_notes": true,
+    "do_not_invent_review_scores_or_notes": true,
     "do_not_treat_technical_diversity_as_visual_success": true,
     "do_not_expose_coarse_solver_as_final_artwork": true,
-    "preserve_038_positive_concept_signal": true,
+    "preserve_038_positive_concept_signal_without_cloning_it": true,
     "gallery_list_must_remain_compact": true,
-    "written_reviews_must_be_consumed_automatically": true
+    "written_reviews_must_be_consumed_automatically": true,
+    "new_batch_is_not_host_accepted_until_user_tests_it": true
   }
 }
