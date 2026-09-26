@@ -9,44 +9,83 @@ Resume from the repository, not from assumptions.
 - draft PR: #7
 - base: `feat/gallery-project-workflow-20260923`
 - never merge/change `main` without explicit user approval
-- expected source catalogue: **001–055**
+- expected source catalogue: **001–060**
+- top runtime: `res://app/main/main_runtime_favorites.gd`
 
 Read `docs/handoff/CURRENT_WORK.md` and `docs/handoff/project_state.json` first.
 
 ## Mandatory first action after the user's host test
 
-Inspect fresh `telemetry/runtime` before repairing or generating anything. Written RATE comments are first-class evidence and the user should not have to repeat them in chat.
+Inspect fresh `telemetry/runtime` before repairing or generating anything. Consume all three preference channels automatically:
 
-The latest observed checkpoint before 051–055 was built was on telemetry HEAD `c8681daea3d1566c95b522658ad348a8d07415b4`, session `6b82f797db3cfd8d`. The session blob was too large for the connector to reconstruct every 047–050 review during the generation pass. Do not invent missing ratings or notes.
+1. numeric RATE axes;
+2. written WHY / NOTES;
+3. ★ FAVORITE / POTENTIAL state.
 
-Confirmed evidence at that boundary:
-- user said 046–050 were already better and asked to advance to the next series;
-- 046 INK SHEAR = visual 4 / interaction 2 / originality 4 / aliveness 2 / controls 2 / performance 1;
-- earlier durable failures: weak physical feel, unreadable interaction, controls that appear ineffective, visible coarse pixels, missing reset, incomprehensible/weak visual concepts.
+The user should not have to repeat any existing review or favorite in chat.
+
+The review session consumed to create this pass was `31a1daf3d902aca6`, telemetry HEAD `c6aeb0ee36704bea5b868f3e2245893977cbf4bf`.
+
+## Preference signal that drove this pass
+
+- 050 FERRO TRACE: interaction was a positive signal; user wanted more points/sources and stronger visual customisation.
+- 051 CAPILLARY BRIDGE: too sparse, visually weak, limited interaction and controls.
+- 052 FIBER MEMORY: too basic, insufficiently granular, weak interaction/parameters.
+- 053 AVALANCHE BED: rejected as incomprehensible/visually poor and not reading as generative art.
+- 054 HINGE CHOIR: originality 4 and explicitly considered to have potential, but interaction was too click-like; user wanted felt pendulum physics, collisions, chain reactions, more depth and better performance.
+- 055 SNAP LATTICE: idea exists but too passive; user wants more mobile/generative/alive systems.
+- 046 INK SHEAR remains useful as a visual/originality signal, but its interaction/performance were weak and the user specifically disliked circles appearing on click.
+
+Durable rule: reuse qualities, not surfaces. A favorite is evidence of interest/potential, not a clone instruction.
+
+## Favorites feature
+
+`app/main/main_runtime_favorites.gd` layers on top of the validated host chain.
+
+- local favorite state persists in the curation config;
+- Project inspector has `☆ ADD FAVORITE / POTENTIAL` / `★ FAVORITE / POTENTIAL`;
+- Gallery badge shows `★` for favorites;
+- `sketch_favorite_changed` publishes individual changes;
+- `creative_favorite_snapshot` publishes the complete favorite set plus title/tags/creative signature;
+- preference checkpoints also emit favorite snapshots;
+- **054 HINGE CHOIR is seeded favorite once** per explicit user request. The user can remove it afterward.
+
+## 054 HINGE CHOIR repaired
+
+The old click-impulse array was replaced by a denser tactile pendular system:
+
+- 48 weighted pendula;
+- continuous grab near a rod, drag through an arc, release with retained momentum;
+- gravity and neighbour torque coupling;
+- actual weighted-bob collisions + adjustable rebound;
+- state-driven center-crossing escapement for sustained collective motion without direct clock wobble;
+- controls: coupling, bearing drag, escapement drive, gravity, lever length, collision rebound;
+- polygonal weighted bobs rather than transient click circles;
+- lower oscillator count than the prior version to target the previous performance=1 review.
 
 ## Current new batch awaiting host rating
 
-### 051 CAPILLARY BRIDGE
-84 droplets, persistent pointer-written wet zones, bounded capillary attraction. Test isolated beads vs bridges/clusters with surface tension, wetting, evaporation, reach, feed and inertia.
+### 056 FOAM PRESS
+70 irregular polygonal foam cells. Continuous grab/stir interaction, contact pressure, adhesion and jamming; bounded pressure pulses. Packing/adhesion/viscosity/pressure/pulse/hand response should visibly separate loose mobile foam from sticky jammed rafts.
 
-### 052 FIBER MEMORY
-42 x 13 fiber field. Pointer combs directly and writes persistent directional memory; twist couples neighboring strands. Clock terms are only low-amplitude autonomous-current modulation, documented with `TEMPORAL_INTENT`.
+### 057 RIBBON WAKE
+16 broad elastic ink ribbons with persistent drag-written rest-shape memory. Tension/drag/spatial current/cross-link/width/memory should separate taut graphic rails, soft coupled wakes and long-lived folds. No click-circle overlay.
 
-### 053 AVALANCHE BED
-Continuous 96-column granular ridge. Pointer above surface adds mass; pointer in/below surface excavates. Repose, cohesion and compaction should visibly change flow vs stable steep cuts.
+### 058 VASCULAR PULSE
+84-node elastic vessel graph carrying pressure. Continuous drag pumps a neighbourhood; pressure propagates/leaks, junctions recoil, repeated flow persistently remodels vessel thickness. Conduction/leak/remodel/pump/recoil/contrast should expose different transport regimes.
 
-### 054 HINGE CHOIR
-8 x 8 coupled mechanical levers. Direct manipulation stores angular energy and propagates through neighbors. Clock phase only shapes decaying stored impulse ringing and is documented with `TEMPORAL_INTENT`.
+### 059 SWARM LENS
+190 oriented shard agents with up to six persistent draggable alternating-polarity diamond sources. Press empty space to add a source or drag an existing one. Field strength/orbit-radial balance/reach/drag/coherence/wander should create capture, orbit, repulsion and streaming regimes.
 
-### 055 SNAP LATTICE
-16 x 9 large bistable folded facets. Pointer injects local snap-through; barrier/coupling/bias/damping should move behavior from isolated snaps to cascades and persistent domains.
+### 060 CRYSTAL ZIPPER
+18 x 10 continuous triangular faceted material. Drag writes directional stress; cracks propagate after release and heal later. Toughness/propagation/healing/diffusion/shear/relief should separate ductile strain from brittle zipper cascades. No decorative square background.
 
-All five use `canvas_geometry`; there are zero new fullscreen shaders in 051–055. This is deliberate to prioritize tangible causality and runtime cost after 046's performance score of 1.
+All 056–060 use `canvas_geometry`. `knowledge/cross-domain/creative_draw_space.json` includes history through 060 and the new 054 contact/collision signature.
 
 ## Validation state
 
-Implementation/fix HEAD before durable docs: `25cb01539d0b4b767140dab79ee9215e739d1a44`.
-CI #348 passed completely on that exact implementation HEAD:
+Implementation/fix HEAD before durable docs: `3fd00c7047d6977dfba94cfac894c3b7ccceb4c5`.
+CI #354 passed completely on that exact implementation HEAD:
 - repository policy;
 - temporal audit;
 - adaptive creative draw self-test;
@@ -54,22 +93,23 @@ CI #348 passed completely on that exact implementation HEAD:
 - main-scene smoke;
 - tracked cleanliness.
 
-An earlier run #346 failed only because 052/054 direct clock trigonometry lacked explicit `TEMPORAL_INTENT`; that was fixed before #348.
+CI #353 failed only because the new runtime script's generated `.gd.uid` was initially untracked; no parser/runtime smoke step failed. The UID was committed before #354.
 
-The final documentation HEAD is newer than the implementation HEAD and must also have exact-head CI green before handoff is considered complete.
+The final durable-doc HEAD is newer than the implementation HEAD and must also have exact-head CI green before handoff is complete.
 
 ## What to judge in the next host session
 
-1. Gallery source count must be 55.
-2. Watch each 051–055 for ~20–30 seconds at defaults.
-3. Interaction must be immediately understandable.
-4. Release must leave meaningful material/system state where intended.
-5. Move every parameter through a large range. If it appears to do nothing, treat it as a failure.
-6. Compare materially different regimes rather than cosmetic intensity.
-7. Pay close attention to runtime/performance.
-8. Reset must return to a usable state.
-9. Keep PREVIEW/PROGRAM persistence and all existing Gallery contracts intact.
-10. Let the user RATE + write WHY/NOTES normally; consume telemetry automatically afterward.
+1. Gallery count must be 60.
+2. 054 must show ★ initially.
+3. Toggle favorite on another sketch and verify persistence.
+4. Re-test 054 for continuous grab/release, pendulum inertia, collisions, chain reactions, regime changes and performance.
+5. Watch 056–060 at defaults for ~20–30 seconds.
+6. Sweep every parameter through a large range; if a control appears to do nothing, fail it.
+7. Interaction must be immediately readable and leave meaningful state/delayed consequence where intended.
+8. Judge whether autonomous motion feels alive without generic clock wobble.
+9. Pay close attention to performance.
+10. RATE + WHY/NOTES + ★ normally. Close normally so telemetry publishes.
+11. Next AI must read fresh telemetry before any next repair/generation pass.
 
 ## Product contracts that must not regress
 
@@ -83,15 +123,14 @@ The final documentation HEAD is newer than the implementation HEAD and must also
 - GRID/LIST, sorting, grid size and compact ~68 px LIST remain.
 - PREV/NEXT changes PREVIEW only and must not silently replace PROGRAM.
 - mutable ShaderMaterial state stays local per scene instance.
-- RATE is opaque/centered/in-app and written notes are first-class evidence.
+- RATE remains opaque/centered/in-app.
 - no fake Spout/NDI.
+- no main-window visibility toggle at startup.
 
 ## Creative rules
 
-Do not clone a high-scoring sketch. Reuse qualities, not surfaces. Controls must create visible regime/composition changes. Interaction must be immediate and stateful. Hidden coarse simulation is acceptable; visible solver pixels are not finished artwork. Technical diversity is not proof of visual quality. Generic direct-clock wobble is rejected as default aliveness.
-
-`knowledge/cross-domain/creative_draw_space.json` includes history through 055; use it to avoid accidental collisions.
+Controls must create visible regime/composition changes. Interaction should be continuous where that improves agency, immediate and stateful. Avoid gratuitous click markers. Hidden coarse simulation is acceptable; visible solver pixels are not finished artwork. Technical diversity is not proof of visual quality. Generic direct-clock wobble is rejected as default aliveness. Performance remains a first-class acceptance axis.
 
 ## Completion contract
 
-Any material change must follow: code/push -> durable docs/state -> exact remote HEAD -> exact-head CI -> report SHA/result. Keep PR #7 draft unless the user explicitly asks otherwise. Never merge/change `main` without explicit approval.
+Any material change must follow: code/push -> durable docs/state -> exact remote HEAD -> exact-head CI -> report SHA/result. For host validation, automatically provide the canonical PowerShell from `docs/handoff/OPERATIONS.md` that syncs the branch, waits for CI on the exact SHA and only then launches Godot. Keep PR #7 draft unless the user explicitly asks otherwise. Never merge/change `main` without explicit approval.
