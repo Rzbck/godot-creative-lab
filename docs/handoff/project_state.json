@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "project": "DC//LAB / Godot Creative Lab",
   "repository": "Rzbck/godot-creative-lab",
   "active_branch": "feat/creative-sketches-002-004-20260924",
@@ -21,10 +21,22 @@
     "per_sketch_parameter_persistence": true,
     "gallery_real_thumbnails": true,
     "gallery_adaptive_tag_filters": true,
+    "gallery_browser_revision": 2,
+    "gallery_browser_state_path": "user://creative_lab_gallery_view.cfg",
+    "gallery_sort_modes": ["index_asc", "index_desc", "title", "family"],
+    "gallery_view_modes": ["grid", "list"],
+    "gallery_grid_card_size_adjustable": true,
+    "gallery_default_sort": "index_asc",
     "artwork_canvas_excludes_project_metadata": true
   },
+  "shader_state_contract": {
+    "mutable_shader_material_local_to_scene": true,
+    "ci_enforces_shader_material_locality": true,
+    "reason": "gallery_thumbnail_preview_program_must_not_share_mutable_uniform_or_texture_state",
+    "stateful_texture_double_buffered_sketches": ["037_dendrite_bloom", "040_schlieren_veil"]
+  },
   "workstation_window": {
-    "revision": 3,
+    "revision": 4,
     "state_path": "user://creative_lab_window_state.cfg",
     "main_window_visibility_toggle_rejected": true,
     "restore_strategy": "apply_screen_mode_geometry_in_enter_tree_without_visibility_toggle",
@@ -37,50 +49,64 @@
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "telemetry_first_after_host_test": true,
-    "recovered_intermediate_session": "003706451ab202f2",
-    "close_fix": "flush_release_file_then_spawn_hidden_publisher",
-    "close_fix_host_validation_required": true
+    "latest_final_close_was_empty": true,
+    "review_checkpoint_enabled": true,
+    "review_checkpoint_delay_seconds": 0.8,
+    "close_strategy": "session_close_flush_then_flush_close_release_then_single_hidden_final_publisher",
+    "close_fix_host_validation_required": true,
+    "new_036_040_remote_scores_available": false
   },
   "user_feedback_system": {
     "reviews_path": "user://creative_lab_reviews.cfg",
+    "review_ui_revision": 4,
     "review_axes": ["visual", "interaction", "originality", "aliveness", "controls", "performance"],
     "review_ui": "compact_row_plus_centered_opaque_in_app_modal",
+    "written_review_enabled": true,
+    "written_review_label": "WHY / NOTES",
+    "written_review_max_chars": 2000,
+    "written_review_in_preference_snapshot": true,
+    "save_review_button": true,
     "preference_snapshot_event": "creative_preference_snapshot",
-    "recovered_reviewed_count": 21,
-    "axis_averages": {
-      "visual": 2.0,
-      "interaction": 1.8571,
-      "originality": 1.8571,
-      "aliveness": 1.6190,
-      "controls": 1.7619,
-      "performance": 2.5714
-    },
-    "latest_recovered_ratings": {
-      "026_void_tension": {"visual":1,"interaction":1,"originality":1,"aliveness":1,"controls":1,"performance":1,"average":1.0},
-      "027_glass_tide": {"visual":2,"interaction":1,"originality":1,"aliveness":1,"controls":1,"performance":1,"average":1.1667},
-      "028_lumen_maze": {"visual":1,"interaction":1,"originality":1,"aliveness":1,"controls":1,"performance":1,"average":1.0},
-      "029_fiber_felt": {"visual":1,"interaction":1,"originality":1,"aliveness":1,"controls":1,"performance":1,"average":1.0},
-      "030_reactor_skin": {"visual":1,"interaction":1,"originality":1,"aliveness":1,"controls":1,"performance":1,"average":1.0}
-    },
-    "batch_031_035_numeric_scores_available": false,
-    "batch_031_035_direct_feedback": "pas fameux",
     "ratings_are_bounded_evidence_not_clone_instruction": true,
+    "latest_recovered_numeric_batch": {
+      "031_fold_chamber": {"average": 2.0},
+      "032_lumen_swarm": {"average": 1.5},
+      "033_obsidian_cathedral": {"average": 1.0},
+      "034_phosphor_sand": {"average": 2.1667},
+      "035_dune_choir": {"average": 1.0}
+    },
+    "new_036_040_scores_remote": null,
     "curation_path": "user://creative_lab_curation.cfg",
     "trash_never_deletes_git_source": true
+  },
+  "latest_host_feedback": {
+    "037_dendrite_bloom": {
+      "pixel_stair_step_visible": true,
+      "stale_or_black_frame_on_interaction_or_parameter_scrub": true,
+      "fix": "local_shader_material_plus_double_buffered_state_texture_plus_multitap_reconstruction"
+    },
+    "038_electric_lace": {
+      "qualitative": "vraiment sympa",
+      "interaction_previous_too_light": true,
+      "fix": "direct_visible_charge_hit_test_drag_and_release_inertia"
+    },
+    "040_schlieren_veil": {
+      "stale_or_old_frame_on_interaction_or_parameter_scrub": true,
+      "fix": "local_shader_material_plus_double_buffered_state_texture_plus_multitap_reconstruction"
+    }
   },
   "creative_quality": {
     "visual_finish_gate": "knowledge/cross-domain/VISUAL_FINISH_GATE.md",
     "pipeline": "adaptive_draw -> prototype -> observe -> mutate -> art_direct -> visual_finish_gate -> keep_or_reject",
     "ci_visual_finish_required_since_index": 36,
-    "ci_required_visual_finish_fields": ["composition", "material_model", "final_render", "detail_scales", "interaction_stateful"],
     "minimum_detail_scales": 3,
-    "coarse_solver_must_not_be_exposed_as_final_artwork": true
+    "coarse_solver_must_not_be_exposed_as_final_artwork": true,
+    "technical_diversity_is_not_visual_success": true
   },
   "temporal_quality": {
     "knowledge": "knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md",
     "audit_script": "scripts/ci/audit_temporal_motion.py",
     "direct_clock_trig_requires_intent_since_index": 26,
-    "intent_marker": "TEMPORAL_INTENT:",
     "generic_clock_wobble_rejected": true,
     "visible_phase_wrap_reset_respawn_wall_rejected": true
   },
@@ -90,8 +116,6 @@
     "script": "scripts/creative/draw_recipe.py",
     "exploration_probability": 0.24,
     "ratings_bias_bounded": true,
-    "creative_signature_required_since_index": 26,
-    "visual_finish_required_since_index": 36,
     "draw_is_collision_generator_not_quality_gate": true,
     "latest_implemented_batch": [
       "036_polar_stress",
@@ -101,42 +125,20 @@
       "040_schlieren_veil"
     ],
     "batches_026_030_numerically_rejected": true,
-    "batch_031_035_qualitatively_weak": true
-  },
-  "latest_batch": {
-    "036_polar_stress": {"render":"full_resolution_photoelastic_shader","state":"REPO_VALIDATED_HOST_VALIDATION_REQUIRED"},
-    "037_dendrite_bloom": {"render":"hidden_phase_solver_to_full_resolution_crystal_material","state":"REPO_VALIDATED_HOST_VALIDATION_REQUIRED"},
-    "038_electric_lace": {"render":"antialiased_vector_field_lines","state":"REPO_VALIDATED_HOST_VALIDATION_REQUIRED"},
-    "039_soap_constellation": {"render":"full_resolution_thin_film_sdf_material","state":"REPO_VALIDATED_HOST_VALIDATION_REQUIRED"},
-    "040_schlieren_veil": {"render":"hidden_fluid_solver_to_full_resolution_schlieren_material","state":"REPO_VALIDATED_HOST_VALIDATION_REQUIRED"}
-  },
-  "faraday_quasi": {
-    "id": "025_faraday_quasi",
-    "old_visible_cut_root_cause": "wrapped forcing phase transformed by fractional shader coefficients plus direct click-local height patch",
-    "wrapped_forcing_removed_from_visible_shader": true,
-    "touch_modifies_modal_state": true,
-    "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
+    "batch_031_035_weak_by_numeric_and_direct_feedback": true
   },
   "render_contract": {
     "shader_surface_component": "sketches/_shared/full_canvas_surface.gd",
     "ci_rejects_fixed_1280_720_shader_surface": true,
+    "ci_rejects_non_local_shader_material": true,
     "hidden_low_res_state_allowed": true,
     "final_visible_representation_must_be_high_resolution": true
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
-    "required": [
-      "repository_policy",
-      "visual_finish_contract",
-      "temporal_motion_audit",
-      "adaptive_creative_draw_self_test",
-      "godot_4_7_1_headless_import",
-      "main_scene_smoke_test",
-      "tracked_file_cleanliness"
-    ],
-    "runtime_batch_commit_before_final_docs": "bebe9fe88423f82790ae3899d2131d4312797301",
-    "runtime_batch_ci_run": 297,
-    "runtime_batch_ci_passed": true,
+    "implementation_commit_before_docs": "e20e1751ed2dae70899f56fcf5217b3d84e75910",
+    "implementation_ci_run": 299,
+    "implementation_ci_passed": true,
     "final_exact_head_ci_required_after_docs": true
   },
   "constraints": {
@@ -146,11 +148,13 @@
     "do_not_stop_program_on_navigation": true,
     "do_not_create_independent_linked_output_timeline": true,
     "do_not_restore_fixed_1280_720_shader_surfaces": true,
+    "do_not_share_mutable_shader_material_between_scene_instances": true,
     "do_not_restore_native_transparent_review_popup": true,
     "do_not_toggle_main_window_visibility_on_startup": true,
     "do_not_use_generic_direct_clock_animation_as_default_aliveness": true,
     "do_not_invent_missing_review_scores": true,
     "do_not_treat_technical_diversity_as_visual_success": true,
-    "do_not_expose_coarse_solver_as_final_artwork": true
+    "do_not_expose_coarse_solver_as_final_artwork": true,
+    "preserve_038_positive_concept_signal": true
   }
 }
