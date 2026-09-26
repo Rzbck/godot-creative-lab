@@ -1,5 +1,5 @@
 {
-  "schema_version": 9,
+  "schema_version": 10,
   "project": "DC//LAB / Godot Creative Lab",
   "repository": "Rzbck/godot-creative-lab",
   "active_branch": "feat/creative-sketches-002-004-20260924",
@@ -12,9 +12,9 @@
   },
   "runtime": {
     "main_scene": "res://app/main/main_runtime.tscn",
-    "top_runtime_script": "res://app/main/main_runtime_gallery_host_fixes.gd",
-    "top_runtime_parent": "res://app/main/main_runtime_window_memory.gd",
-    "expected_gallery_source_count": 55,
+    "top_runtime_script": "res://app/main/main_runtime_favorites.gd",
+    "top_runtime_parent": "res://app/main/main_runtime_gallery_host_fixes.gd",
+    "expected_gallery_source_count": 60,
     "program_persists_across_navigation": true,
     "take_live_supported": true,
     "touch_program_input": true,
@@ -32,143 +32,130 @@
     "grid_card_size_adjustable": true,
     "list_card_height": 68,
     "list_preview_mode": "low_alpha_background_right_side",
-    "list_large_horizontal_cards_rejected": true,
     "trash_exclusive_mode": true,
-    "adaptive_tag_filters": true,
-    "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
+    "adaptive_tag_filters": true
   },
   "adjacent_sketch_navigation": {
     "enabled": true,
     "controls": ["previous", "next"],
-    "location": "ProjectToolbar",
     "order": "numeric_source_index",
     "skip_locally_removed": true,
     "wrap": false,
-    "uses_normal_open_sketch_path": true,
     "must_not_replace_program": true
   },
   "user_feedback_system": {
     "reviews_path": "user://creative_lab_reviews.cfg",
-    "review_ui_revision": 4,
     "review_axes": ["visual", "interaction", "originality", "aliveness", "controls", "performance"],
     "written_review_enabled": true,
     "written_review_label": "WHY / NOTES",
-    "written_review_max_chars": 2000,
     "written_reviews_are_first_class_evidence": true,
     "future_ai_must_read_notes_before_repair_or_generation": true,
     "user_should_not_repeat_existing_remote_review_in_chat": true,
     "preference_snapshot_event": "creative_preference_snapshot",
-    "startup_republish_existing_reviews": true,
     "ratings_are_bounded_evidence_not_clone_instruction": true,
-    "historical_axis_averages_before_046_050": {
-      "visual": 2.0555555556,
-      "interaction": 1.7222222222,
-      "originality": 1.9166666667,
-      "aliveness": 1.6388888889,
-      "controls": 1.5555555556,
-      "performance": 2.4166666667
+    "latest_consumed_review_session": "31a1daf3d902aca6",
+    "latest_consumed_telemetry_head": "c6aeb0ee36704bea5b868f3e2245893977cbf4bf",
+    "recent_reviews": {
+      "050_ferro_trace": {"visual": 3, "interaction": 4, "originality": 3, "aliveness": 2, "controls": 3, "performance": 3, "interpretation": "positive interaction; wants more points/sources and stronger custom visual finish"},
+      "051_capillary_bridge": {"visual": 2, "interaction": 2, "originality": 3, "aliveness": 2, "controls": 1, "performance": 3, "interpretation": "too sparse and limited; weak controls"},
+      "052_fiber_memory": {"visual": 2, "interaction": 1, "originality": 1, "aliveness": 1, "controls": 1, "performance": 1, "interpretation": "too basic; insufficiently granular; insufficient parameters"},
+      "053_avalanche_bed": {"visual": 1, "interaction": 1, "originality": 1, "aliveness": 1, "controls": 1, "performance": 1, "interpretation": "incomprehensible/visually poor; did not read as generative art"},
+      "054_hinge_choir": {"visual": 2, "interaction": 2, "originality": 4, "aliveness": 1, "controls": 2, "performance": 1, "interpretation": "strong idea/potential; needs continuous manipulation, felt pendulum physics, collisions, chain reactions and deeper research"},
+      "055_snap_lattice": {"visual": 2, "interaction": 2, "originality": 3, "aliveness": 2, "controls": 1, "performance": 1, "interpretation": "idea exists but is too passive; needs more mobility/generative life"}
     },
     "strong_reference_signals": {
       "020_echo_tissue": {"average": 4.1666666667, "visual": 4, "interaction": 4, "originality": 4, "aliveness": 4, "controls": 4, "performance": 5},
       "012_chemical_blocks": {"average": 3.3333333333},
-      "038_electric_lace": {"average": 2.6666666667, "visual": 4, "originality": 4}
-    },
-    "confirmed_feedback_at_051_generation_boundary": {
-      "046_ink_shear": {"visual": 4, "interaction": 2, "originality": 4, "aliveness": 2, "controls": 2, "performance": 1},
-      "user_summary": "046-050 are already better; consume the notes and advance to the next series",
-      "missing_exact_047_050_values_must_not_be_invented": true
-    },
-    "durable_written_reviews": {
-      "041_tension_organ": "oui plutot basic pour ce genre de chos eon ressent ma la physique et en plsu si on tire trop ca cree des bug visuel mal gere",
-      "042_mycelium_relay": "opk cest pas mal mais c amanque dinteractione tpareil les parametre on comprend pas on a limpresion que ca fait rien , en gros les parametre cest bine aussi quand onncre eune rell different en faite",
-      "043_slit_memory": "on comrpend rien ce nest pa sinteractif temps reel on ressent rine quon on clique et ces tmoche",
-      "044_excitable_glass": "torep pixeliser pas de reset posible et les parametre ne font pas rgand chose",
-      "045_rift_volume": "ca resmeble a irne du tout ces tmoche c ane vaut rien du tout on comrpend pas cest naze"
+      "038_electric_lace": {"visual": 4, "originality": 4},
+      "046_ink_shear": {"visual": 4, "originality": 4, "interaction": 2, "performance": 1}
     }
+  },
+  "favorites": {
+    "enabled": true,
+    "storage": "existing local curation ConfigFile / favorites section",
+    "runtime_layer": "res://app/main/main_runtime_favorites.gd",
+    "toggle_labels": ["☆ ADD FAVORITE / POTENTIAL", "★ FAVORITE / POTENTIAL"],
+    "gallery_badge": "★",
+    "change_event": "sketch_favorite_changed",
+    "snapshot_event": "creative_favorite_snapshot",
+    "snapshot_contains_creative_signature": true,
+    "favorites_are_first_class_preference_evidence": true,
+    "favorites_are_not_clone_instruction": true,
+    "seed_revision": 1,
+    "seeded_favorites": ["054_hinge_choir"],
+    "seed_is_one_time_and_user_can_remove_afterward": true
   },
   "telemetry": {
     "remote_branch": "telemetry/runtime",
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "telemetry_first_after_host_test": true,
-    "latest_observed_review_checkpoint_head": "c8681daea3d1566c95b522658ad348a8d07415b4",
-    "latest_observed_session": "6b82f797db3cfd8d",
-    "session_blob_was_too_large_for_complete_connector_reconstruction": true,
-    "do_not_invent_unread_values": true,
     "written_note_transport_verified": true,
-    "verified_note_location": "creative_preference_snapshot.reviews.<sketch>.note",
-    "safe_free_text_fields": ["note"],
-    "safe_note_max_chars": 2000,
+    "favorite_transport_enabled": true,
     "review_checkpoint_enabled": true,
-    "review_checkpoint_delay_seconds": 0.8,
-    "startup_republish_verified": true
-  },
-  "shader_state_contract": {
-    "mutable_shader_material_local_to_scene": true,
-    "ci_enforces_shader_material_locality": true,
-    "stateful_texture_double_buffered_sketches": ["037_dendrite_bloom", "040_schlieren_veil", "044_excitable_glass", "045_rift_volume"]
-  },
-  "workstation_window": {
-    "revision": 4,
-    "state_path": "user://creative_lab_window_state.cfg",
-    "main_window_visibility_toggle_rejected": true,
-    "restore_strategy": "apply_screen_mode_geometry_in_enter_tree_without_visibility_toggle",
-    "logical_maximized_strategy": "borderless_windowed_usable_rect_minus_2px_bottom_guard",
-    "f11_is_separate_artwork_presentation": true
+    "startup_republish_existing_reviews": true
   },
   "creative_quality": {
     "visual_finish_gate": "knowledge/cross-domain/VISUAL_FINISH_GATE.md",
     "temporal_quality": "knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md",
     "adaptive_draw": "knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md",
     "organic_controls": "knowledge/cross-domain/ORGANIC_COUPLING_AND_CONTROLS.md",
-    "pipeline": "adaptive_draw -> preference_evidence -> prototype -> observe -> mutate -> art_direct -> visual_finish_gate -> keep_or_reject",
-    "ci_visual_finish_required_since_index": 36,
-    "minimum_detail_scales": 3,
     "coarse_solver_must_not_be_exposed_as_final_artwork": true,
     "technical_diversity_is_not_visual_success": true,
     "generic_clock_wobble_rejected": true,
-    "visible_phase_wrap_reset_respawn_wall_rejected": true,
     "controls_must_create_visible_regime_changes": true,
     "interaction_must_be_immediate_and_stateful": true,
+    "continuous_gesture_preferred_over_gratuitous_click_effects": true,
     "performance_is_a_first_class_acceptance_axis": true,
-    "weakest_axes_prior_to_046_050": ["controls", "aliveness", "interaction"]
+    "current_weak_axes": ["aliveness", "controls", "interaction"]
   },
   "adaptive_creative_draw": {
     "space": "knowledge/cross-domain/creative_draw_space.json",
-    "script": "scripts/creative/draw_recipe.py",
+    "history_through_index": 60,
     "exploration_probability": 0.24,
     "ratings_bias_bounded": true,
-    "written_notes_inform_repairs_and_durable_rules": true,
-    "draw_is_collision_generator_not_quality_gate": true,
+    "written_notes_and_favorites_inform_repairs_and_future_draws": true,
     "latest_implemented_batch": [
-      "051_capillary_bridge",
-      "052_fiber_memory",
-      "053_avalanche_bed",
-      "054_hinge_choir",
-      "055_snap_lattice"
+      "056_foam_press",
+      "057_ribbon_wake",
+      "058_vascular_pulse",
+      "059_swarm_lens",
+      "060_crystal_zipper"
     ],
     "latest_batch_feedback_targets": [
-      "lower runtime cost than 046",
-      "stronger physical material causality",
-      "direct stateful interaction",
+      "continuous rather than single-click interaction",
+      "more autonomous life and mobility",
+      "post-release physical or material consequence",
       "parameters that create visible regime changes",
-      "no visible coarse pixels",
-      "working reset",
-      "autonomous life without generic clock wobble"
+      "denser/multi-source composition where useful",
+      "no gratuitous click circles",
+      "bounded runtime cost"
     ],
     "latest_batch_host_state": "NOT_YET_HOST_RATED"
   },
-  "batch_051_055": {
-    "051_capillary_bridge": "84 droplets + persistent pointer-written wet zones + capillary clustering",
-    "052_fiber_memory": "42x13 woven fiber field + direct combing + persistent directional memory + neighbor twist",
-    "053_avalanche_bed": "96-column continuous granular ridge + pour/excavate interaction + repose/cohesion/compaction regimes",
-    "054_hinge_choir": "8x8 coupled mechanical levers + direct manipulation + propagating stored angular energy",
-    "055_snap_lattice": "16x9 large bistable folded facets + isolated-to-cascade snap-through dynamics"
+  "hinge_choir_repair": {
+    "favorite_seeded": true,
+    "oscillators": 48,
+    "continuous_rod_grab_drag_release": true,
+    "retained_angular_momentum": true,
+    "gravity": true,
+    "neighbor_torque_coupling": true,
+    "bob_collisions": true,
+    "collision_rebound_control": true,
+    "state_driven_escapement": true,
+    "direct_clock_wobble": false
+  },
+  "batch_056_060": {
+    "056_foam_press": "70 irregular polygonal foam cells + soft contact/adhesion + continuous stirring + bounded pressure pulses",
+    "057_ribbon_wake": "16 broad elastic ink ribbons + drag-written rest-shape memory + cross-linked persistent folds",
+    "058_vascular_pulse": "84-node elastic pressure network + continuous pumping + propagating pressure + persistent vessel remodeling",
+    "059_swarm_lens": "190 oriented agents + up to six persistent draggable alternating-polarity field sources",
+    "060_crystal_zipper": "18x10 faceted material + directional stress writing + propagation/healing fracture regimes"
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
-    "implementation_head_before_docs": "25cb01539d0b4b767140dab79ee9215e739d1a44",
-    "implementation_ci_run": 348,
+    "implementation_head_before_docs": "3fd00c7047d6977dfba94cfac894c3b7ccceb4c5",
+    "implementation_ci_run": 354,
     "implementation_ci_passed": true,
     "implementation_ci_jobs": {
       "repository_policy": "success",
@@ -178,8 +165,8 @@
       "main_scene_smoke": "success",
       "tracked_cleanliness": "success"
     },
-    "earlier_failed_ci_run": 346,
-    "earlier_failure_reason": "052 and 054 required TEMPORAL_INTENT documentation for secondary direct-clock modulation",
+    "earlier_failed_ci_run": 353,
+    "earlier_failure_reason": "Godot generated app/main/main_runtime_favorites.gd.uid; no parser/runtime smoke failure",
     "final_exact_head_ci_required_after_docs": true
   },
   "constraints": {
@@ -196,9 +183,8 @@
     "do_not_invent_review_scores_or_notes": true,
     "do_not_treat_technical_diversity_as_visual_success": true,
     "do_not_expose_coarse_solver_as_final_artwork": true,
-    "preserve_038_positive_concept_signal_without_cloning_it": true,
     "gallery_list_must_remain_compact": true,
-    "written_reviews_must_be_consumed_automatically": true,
+    "written_reviews_and_favorites_must_be_consumed_automatically": true,
     "new_batch_is_not_host_accepted_until_user_tests_it": true
   }
 }
