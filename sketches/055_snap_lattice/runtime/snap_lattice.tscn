@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sketches/055_snap_lattice/runtime/snap_lattice.gd" id="1"]
+
+[node name="SnapLattice" type="Node2D"]
+script = ExtResource("1")

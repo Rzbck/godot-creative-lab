@@ -1,0 +1,40 @@
+{
+  "id": "054_hinge_choir",
+  "index": "054",
+  "title": "HINGE CHOIR",
+  "scene": "res://sketches/054_hinge_choir/runtime/hinge_choir.tscn",
+  "engine": "GODOT / COUPLED LINKAGES",
+  "tags": [
+    "MECHANICAL",
+    "COUPLED",
+    "INTERACTIVE"
+  ],
+  "description": "Sixty-four hinged levers form a coupled mechanical instrument. Pulling one hinge stores angular energy that propagates through neighbours; damping, coupling and phase bias move the system between isolated knocks, travelling responses and collective motion.",
+  "creative_seed": 2026092654,
+  "creative_signature": {
+    "carrier": "metal",
+    "representations": [
+      "constraint_network",
+      "modal_field"
+    ],
+    "operators": [
+      "couple_neighbours",
+      "feedback"
+    ],
+    "temporal_model": "spring_inertia",
+    "interaction": "inject_energy",
+    "constraint": "six_column_grid",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "an eight-by-eight field of mechanical levers reads as one instrument while local impulses produce travelling energy bands",
+    "material_model": "brushed dark linkages with brass pivots, restrained orange stress accents and soft mechanical shadows",
+    "final_render": "canvas_coupled_hinge_array_with_direct_manipulation_and_propagating_angular_energy",
+    "detail_scales": [
+      "whole coupled instrument",
+      "travelling energy neighborhoods",
+      "individual hinges, rods and tips"
+    ],
+    "interaction_stateful": true
+  }
+}

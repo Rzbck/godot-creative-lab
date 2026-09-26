@@ -1,0 +1,40 @@
+{
+  "id": "051_capillary_bridge",
+  "index": "051",
+  "title": "CAPILLARY BRIDGE",
+  "scene": "res://sketches/051_capillary_bridge/runtime/capillary_bridge.tscn",
+  "engine": "GODOT / CAPILLARY DROPLETS",
+  "tags": [
+    "LIQUID",
+    "PHYSICS",
+    "INTERACTIVE"
+  ],
+  "description": "Discrete droplets fall, attract and bridge around persistent wet spots written by the pointer. Surface tension, wetting, evaporation and feed rate move the piece between isolated beads, transient chains and broad capillary clustering.",
+  "creative_seed": 2026092651,
+  "creative_signature": {
+    "carrier": "liquid",
+    "representations": [
+      "agent_population",
+      "contact_graph"
+    ],
+    "operators": [
+      "couple_neighbours",
+      "accumulate"
+    ],
+    "temporal_model": "accumulation_decay",
+    "interaction": "write_memory",
+    "constraint": "hard_safe_margin",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "falling bead clusters form off-centre capillary chains around user-written wet zones with generous warm negative space",
+    "material_model": "translucent green-black liquid beads with restrained highlights, contact shadows and thin capillary bridges",
+    "final_render": "canvas_droplets_with_stateful_wetting_and_capillary_bridge_network",
+    "detail_scales": [
+      "global droplet flow",
+      "capillary bridge clusters",
+      "individual beads, highlights and wet halos"
+    ],
+    "interaction_stateful": true
+  }
+}

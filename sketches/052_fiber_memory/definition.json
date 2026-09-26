@@ -1,0 +1,40 @@
+{
+  "id": "052_fiber_memory",
+  "index": "052",
+  "title": "FIBER MEMORY",
+  "scene": "res://sketches/052_fiber_memory/runtime/fiber_memory.tscn",
+  "engine": "GODOT / COMBED FIBER FIELD",
+  "tags": [
+    "FIBER",
+    "MATERIAL",
+    "INTERACTIVE"
+  ],
+  "description": "A woven field can be combed directly with the pointer. Fibers retain the gesture, relax according to memory, and transmit twist across neighbouring strands so a stroke becomes a persistent material reorientation rather than a cursor effect.",
+  "creative_seed": 2026092652,
+  "creative_signature": {
+    "carrier": "fiber",
+    "representations": [
+      "constraint_network",
+      "procedural_mesh"
+    ],
+    "operators": [
+      "constraint_relax",
+      "accumulate"
+    ],
+    "temporal_model": "fatigue_repair",
+    "interaction": "change_material_property",
+    "constraint": "no_glow",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "forty-two horizontal fibers occupy a dark textile field, with sparse transverse stitches making local combing legible at room scale",
+    "material_model": "matte woven fiber with warm warp accents, dark interstices and persistent directional memory",
+    "final_render": "canvas_polyline_fiber_weave_with_combing_memory_and_twist_coupling",
+    "detail_scales": [
+      "whole-cloth flow",
+      "strand bundles and cross-stitches",
+      "individual fiber deflection"
+    ],
+    "interaction_stateful": true
+  }
+}
