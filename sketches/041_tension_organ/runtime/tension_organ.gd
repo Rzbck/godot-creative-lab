@@ -3,6 +3,7 @@ extends "res://sketches/_shared/design_sketch_base.gd"
 const COLS: int = 17
 const ROWS: int = 10
 const STEP_SECONDS: float = 1.0 / 60.0
+const RENDER_TRIANGLE_AREA_EPSILON: float = 0.75
 
 @export_range(0.2, 2.4, 0.01) var tension: float = 1.05
 @export_range(0.2, 2.6, 0.01) var elasticity: float = 1.18
@@ -206,6 +207,30 @@ func _cell_stress(col: int, row: int) -> float:
     return clampf(absf(current - base) / maxf(1.0, base) * 4.0, 0.0, 1.0)
 
 
+func _draw_safe_triangle(a: Vector2, b: Vector2, c: Vector2, color: Color) -> void:
+    var area2 := absf((b - a).cross(c - a))
+    if area2 < RENDER_TRIANGLE_AREA_EPSILON:
+        return
+    draw_primitive(
+        PackedVector2Array([a, b, c]),
+        PackedColorArray([color, color, color]),
+        PackedVector2Array()
+    )
+
+
+func _draw_safe_cell(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, color: Color) -> void:
+    # A deformed spring cell can become concave or even locally inverted. A
+    # four-point polygon asks RenderingServer to triangulate that unstable shape
+    # and can spam `Invalid polygon data`. Draw explicit triangles instead. Use
+    # the shorter diagonal to reduce visual flips as the membrane folds.
+    if p0.distance_squared_to(p2) <= p1.distance_squared_to(p3):
+        _draw_safe_triangle(p0, p1, p2, color)
+        _draw_safe_triangle(p0, p2, p3, color)
+    else:
+        _draw_safe_triangle(p0, p1, p3, color)
+        _draw_safe_triangle(p1, p2, p3, color)
+
+
 func _draw() -> void:
     begin_design_draw(Color(0.009, 0.010, 0.015, 1.0))
 
@@ -224,7 +249,13 @@ func _draw() -> void:
             var base_color := cold.lerp(mid, shade)
             var color := base_color.lerp(hot, stress * sheen * 0.78)
             color.a = 0.88
-            draw_colored_polygon(PackedVector2Array([_positions[i0], _positions[i1], _positions[i2], _positions[i3]]), color)
+            _draw_safe_cell(
+                _positions[i0],
+                _positions[i1],
+                _positions[i2],
+                _positions[i3],
+                color
+            )
 
     for row: int in range(ROWS):
         var line := PackedVector2Array()
@@ -276,11 +307,14 @@ func _apply_custom_live_sync_state(state: Dictionary) -> void:
     if v is PackedVector2Array and (v as PackedVector2Array).size() == COLS * ROWS:
         _velocities = (v as PackedVector2Array).duplicate()
     v = state.get("drive_position", _drive_position)
-    if v is Vector2: _drive_position = v as Vector2
+    if v is Vector2:
+        _drive_position = v as Vector2
     v = state.get("drive_velocity", _drive_velocity)
-    if v is Vector2: _drive_velocity = v as Vector2
+    if v is Vector2:
+        _drive_velocity = v as Vector2
     v = state.get("drive_target", _drive_target)
-    if v is Vector2: _drive_target = v as Vector2
+    if v is Vector2:
+        _drive_target = v as Vector2
     _drive_timer = float(state.get("drive_timer", _drive_timer))
     _event_counter = int(state.get("event_counter", _event_counter))
 
@@ -289,5 +323,5 @@ func _get_custom_live_debug_state() -> Dictionary:
     return {
         "mesh_nodes": _positions.size(),
         "grabbed_node": _grabbed,
-        "render_mode": "stateful_constraint_mesh",
+        "render_mode": "stateful_constraint_mesh_safe_triangles",
     }
