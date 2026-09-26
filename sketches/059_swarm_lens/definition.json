@@ -1,0 +1,26 @@
+{
+  "id": "059_swarm_lens",
+  "index": "059",
+  "title": "SWARM LENS",
+  "scene": "res://sketches/059_swarm_lens/runtime/swarm_lens.tscn",
+  "engine": "GODOT / MULTI-SOURCE SWARM",
+  "tags": ["SWARM", "MULTI-SOURCE", "INTERACTIVE"],
+  "description": "A field of oriented shards is controlled by persistent draggable lenses. Drag an existing diamond source or press elsewhere to add another, up to six; the sources remain after release and continuously reorganize the swarm. Field strength, orbit/radial balance, reach, coherence, drag and wander create capture, orbit, repulsion and streaming regimes.",
+  "creative_seed": 2026092659,
+  "creative_signature": {
+    "carrier": "data_swarm",
+    "representations": ["agent_population", "data_structure"],
+    "operators": ["advect", "phase_switch"],
+    "temporal_model": "autonomous_agents",
+    "interaction": "move_source",
+    "constraint": "limited_density",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "one hundred ninety tapered moving shards flow around up to six persistent diamond lenses, creating multiple simultaneous centres of action",
+    "material_model": "deep blue-black field, cool glassy shards, warm/cyan source polarity diamonds and no transient click circles",
+    "final_render": "canvas_multi_source_orbital_swarm_with_persistent_dragged_lenses_and_oriented_shard_agents",
+    "detail_scales": ["whole multi-centre swarm", "capture and orbit streams", "individual tapered agents and diamond sources"],
+    "interaction_stateful": true
+  }
+}

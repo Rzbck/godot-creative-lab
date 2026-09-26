@@ -1,0 +1,26 @@
+{
+  "id": "060_crystal_zipper",
+  "index": "060",
+  "title": "CRYSTAL ZIPPER",
+  "scene": "res://sketches/060_crystal_zipper/runtime/crystal_zipper.tscn",
+  "engine": "GODOT / STRESS FRACTURE MESH",
+  "tags": ["CRYSTAL", "FRACTURE", "STATEFUL"],
+  "description": "A continuous faceted material stores the direction and strength of your drag as stress. Cracks keep propagating after release, redistribute stress and later heal; toughness, propagation, diffusion, shear and healing move the same gesture from ductile glowing strain to brittle zipper-like cascades.",
+  "creative_seed": 2026092660,
+  "creative_signature": {
+    "carrier": "crystal",
+    "representations": ["procedural_mesh", "data_structure"],
+    "operators": ["fracture", "diffuse"],
+    "temporal_model": "fatigue_repair",
+    "interaction": "change_material_property",
+    "constraint": "no_symmetry",
+    "render_path": "canvas_geometry"
+  },
+  "visual_finish": {
+    "composition": "an edge-to-edge field of offset triangular facets reads as one material while drag-written stress produces branching warm fracture zippers",
+    "material_model": "smoky dark crystal facets with restrained bronze stress and narrow hot fracture seams, without a decorative square background",
+    "final_render": "canvas_continuous_triangular_stress_material_with_directional_drag_fracture_and_stateful_healing",
+    "detail_scales": ["whole faceted slab", "propagating fracture fronts", "individual relief facets and narrow crack seams"],
+    "interaction_stateful": true
+  }
+}

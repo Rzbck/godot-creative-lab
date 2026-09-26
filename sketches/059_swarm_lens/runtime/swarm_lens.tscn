@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sketches/059_swarm_lens/runtime/swarm_lens.gd" id="1"]
+
+[node name="SwarmLens" type="Node2D"]
+script = ExtResource("1")
