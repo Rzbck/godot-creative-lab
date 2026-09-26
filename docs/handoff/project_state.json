@@ -1,5 +1,5 @@
 {
-  "schema_version": 7,
+  "schema_version": 8,
   "project": "DC//LAB / Godot Creative Lab",
   "repository": "Rzbck/godot-creative-lab",
   "active_branch": "feat/creative-sketches-002-004-20260924",
@@ -21,44 +21,32 @@
     "linked_preview_program_state": true,
     "per_sketch_parameter_persistence": true,
     "gallery_real_thumbnails": true,
-    "gallery_adaptive_tag_filters": true,
-    "gallery_browser_revision": 2,
-    "gallery_browser_state_path": "user://creative_lab_gallery_view.cfg",
-    "gallery_sort_modes": ["index_asc", "index_desc", "title", "family"],
-    "gallery_view_modes": ["grid", "list"],
-    "gallery_grid_card_size_adjustable": true,
-    "gallery_default_sort": "index_asc",
-    "gallery_list_visual_preview": true,
-    "gallery_list_preview_side": "left",
-    "gallery_trash_exclusive_mode": true,
     "artwork_canvas_excludes_project_metadata": true
   },
-  "shader_state_contract": {
-    "mutable_shader_material_local_to_scene": true,
-    "ci_enforces_shader_material_locality": true,
-    "reason": "gallery_thumbnail_preview_program_must_not_share_mutable_uniform_or_texture_state",
-    "stateful_texture_double_buffered_sketches": ["037_dendrite_bloom", "040_schlieren_veil", "044_excitable_glass", "045_rift_volume"]
-  },
-  "workstation_window": {
-    "revision": 4,
-    "state_path": "user://creative_lab_window_state.cfg",
-    "main_window_visibility_toggle_rejected": true,
-    "restore_strategy": "apply_screen_mode_geometry_in_enter_tree_without_visibility_toggle",
-    "logical_maximized_strategy": "borderless_windowed_usable_rect_minus_2px_bottom_guard",
-    "f11_is_separate_artwork_presentation": true,
+  "gallery_browser": {
+    "revision": 2,
+    "state_path": "user://creative_lab_gallery_view.cfg",
+    "sort_modes": ["index_asc", "index_desc", "title", "family"],
+    "view_modes": ["grid", "list"],
+    "default_sort": "index_asc",
+    "grid_card_size_adjustable": true,
+    "list_card_height": 68,
+    "list_preview_mode": "low_alpha_background_right_side",
+    "list_large_horizontal_cards_rejected": true,
+    "trash_exclusive_mode": true,
+    "adaptive_tag_filters": true,
     "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
   },
-  "telemetry": {
-    "remote_branch": "telemetry/runtime",
-    "latest": "latest.jsonl",
-    "sessions_directory": "sessions/",
-    "telemetry_first_after_host_test": true,
-    "latest_final_close_was_empty_before_current_batch": true,
-    "review_checkpoint_enabled": true,
-    "review_checkpoint_delay_seconds": 0.8,
-    "close_strategy": "session_close_flush_then_flush_close_release_then_single_hidden_final_publisher",
-    "close_fix_host_validation_required": true,
-    "new_036_045_remote_scores_available": false
+  "adjacent_sketch_navigation": {
+    "enabled": true,
+    "controls": ["previous", "next"],
+    "location": "ProjectToolbar",
+    "order": "numeric_source_index",
+    "skip_locally_removed": true,
+    "wrap": false,
+    "uses_normal_open_sketch_path": true,
+    "must_not_replace_program": true,
+    "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
   },
   "user_feedback_system": {
     "reviews_path": "user://creative_lab_reviews.cfg",
@@ -67,61 +55,82 @@
     "written_review_enabled": true,
     "written_review_label": "WHY / NOTES",
     "written_review_max_chars": 2000,
-    "written_review_in_preference_snapshot": true,
-    "save_review_button": true,
+    "written_reviews_are_first_class_evidence": true,
+    "future_ai_must_read_notes_before_repair_or_generation": true,
+    "user_should_not_repeat_existing_remote_review_in_chat": true,
     "preference_snapshot_event": "creative_preference_snapshot",
+    "startup_republish_existing_reviews": true,
     "ratings_are_bounded_evidence_not_clone_instruction": true,
-    "latest_recovered_numeric_batch": {
-      "031_fold_chamber": {"average": 2.0},
-      "032_lumen_swarm": {"average": 1.5},
-      "033_obsidian_cathedral": {"average": 1.0},
-      "034_phosphor_sand": {"average": 2.1667},
-      "035_dune_choir": {"average": 1.0}
+    "latest_visible_numeric_evidence": {
+      "036_polar_stress": {"average": 1.83},
+      "037_dendrite_bloom": {"average": 2.33},
+      "038_electric_lace": {"average": 2.67, "visual": 4, "originality": 4},
+      "039_soap_constellation": {"average": 2.17},
+      "040_schlieren_veil": {"average": 2.0},
+      "043_slit_memory": {"average": 1.0},
+      "044_excitable_glass": {"average": 2.0},
+      "045_rift_volume": {"average": 1.0}
     },
-    "new_036_045_scores_remote": null,
-    "curation_path": "user://creative_lab_curation.cfg",
-    "trash_never_deletes_git_source": true
+    "do_not_invent_missing_041_042_or_note_content": true
   },
-  "latest_host_feedback": {
-    "host_retest_after_latest_patch_completed": false,
-    "037_dendrite_bloom": {
-      "previous_pixel_stair_step_visible": true,
-      "previous_stale_or_black_frame_on_interaction_or_parameter_scrub": true,
-      "latest_fix": "local_shader_material_plus_double_buffered_state_texture_plus_multitap_reconstruction",
-      "latest_fix_host_validated": false
-    },
-    "038_electric_lace": {
-      "qualitative": "vraiment sympa",
-      "previous_interaction_too_light": true,
-      "latest_fix": "direct_visible_charge_hit_test_drag_and_release_inertia",
-      "latest_fix_host_validated": false
-    },
-    "040_schlieren_veil": {
-      "previous_stale_or_old_frame_on_interaction_or_parameter_scrub": true,
-      "latest_fix": "local_shader_material_plus_double_buffered_state_texture_plus_multitap_reconstruction",
-      "latest_fix_host_validated": false
-    },
-    "gallery": {
-      "trash_previous_showed_normal_gallery": true,
-      "list_previous_hid_preview": true,
-      "trash_exclusive_fix_host_validated": false,
-      "list_visual_preview_fix_host_validated": false
-    }
+  "telemetry": {
+    "remote_branch": "telemetry/runtime",
+    "latest": "latest.jsonl",
+    "sessions_directory": "sessions/",
+    "telemetry_first_after_host_test": true,
+    "current_observed_public_session": "5cb124f1822c2ee4",
+    "current_session_non_empty": true,
+    "old_sanitizer_preserved_numeric_ratings": true,
+    "old_sanitizer_preserved_note_length_only": true,
+    "old_sanitizer_stripped_note_content": true,
+    "written_note_transport_fix_commit": "0c360c358e4b08fc456ba158fd35d6f62e18a253",
+    "safe_free_text_fields": ["note"],
+    "safe_note_max_chars": 2000,
+    "sanitized_zero_byte_publish_rejected": true,
+    "review_checkpoint_enabled": true,
+    "review_checkpoint_delay_seconds": 0.8,
+    "existing_local_notes_expected_to_republish_at_startup": true,
+    "note_transport_host_validation_required": true
+  },
+  "tension_organ_041": {
+    "previous_error": "Invalid polygon data, triangulation failed",
+    "cause": "deforming_quad_can_be_concave_inverted_or_degenerate",
+    "fix_commit": "df9710aec3351f07b2f3403d05f8977bb635575e",
+    "render_strategy": "explicit_two_triangle_tessellation_shorter_diagonal_skip_degenerate",
+    "physics_changed": false,
+    "state": "REPO_VALIDATED_HOST_STRESS_REQUIRED"
+  },
+  "shader_state_contract": {
+    "mutable_shader_material_local_to_scene": true,
+    "ci_enforces_shader_material_locality": true,
+    "stateful_texture_double_buffered_sketches": ["037_dendrite_bloom", "040_schlieren_veil", "044_excitable_glass", "045_rift_volume"]
+  },
+  "workstation_window": {
+    "revision": 4,
+    "state_path": "user://creative_lab_window_state.cfg",
+    "main_window_visibility_toggle_rejected": true,
+    "restore_strategy": "apply_screen_mode_geometry_in_enter_tree_without_visibility_toggle",
+    "logical_maximized_strategy": "borderless_windowed_usable_rect_minus_2px_bottom_guard",
+    "f11_is_separate_artwork_presentation": true
   },
   "creative_quality": {
     "visual_finish_gate": "knowledge/cross-domain/VISUAL_FINISH_GATE.md",
+    "temporal_quality": "knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md",
+    "adaptive_draw": "knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md",
     "pipeline": "adaptive_draw -> prototype -> observe -> mutate -> art_direct -> visual_finish_gate -> keep_or_reject",
     "ci_visual_finish_required_since_index": 36,
     "minimum_detail_scales": 3,
     "coarse_solver_must_not_be_exposed_as_final_artwork": true,
-    "technical_diversity_is_not_visual_success": true
+    "technical_diversity_is_not_visual_success": true,
+    "generic_clock_wobble_rejected": true,
+    "visible_phase_wrap_reset_respawn_wall_rejected": true
   },
   "adaptive_creative_draw": {
-    "documentation": "knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md",
     "space": "knowledge/cross-domain/creative_draw_space.json",
     "script": "scripts/creative/draw_recipe.py",
     "exploration_probability": 0.24,
     "ratings_bias_bounded": true,
+    "written_notes_inform_repairs_and_durable_rules": true,
     "draw_is_collision_generator_not_quality_gate": true,
     "latest_implemented_batch": [
       "041_tension_organ",
@@ -131,59 +140,19 @@
       "045_rift_volume"
     ]
   },
-  "latest_batch": {
-    "041_tension_organ": {
-      "representation": "constraint_network_plus_vector_mesh",
-      "interaction": "direct_node_manipulation",
-      "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
-    },
-    "042_mycelium_relay": {
-      "representation": "branching_agent_ecology_plus_persistent_graph_trails",
-      "interaction": "paint_persistent_nutrients",
-      "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
-    },
-    "043_slit_memory": {
-      "representation": "real_history_temporal_slicing_plus_coupled_channels",
-      "interaction": "write_persistent_time_folds",
-      "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
-    },
-    "044_excitable_glass": {
-      "representation": "hidden_excitable_grid_to_full_resolution_glass",
-      "interaction": "state_dependent_seed_or_quench",
-      "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
-    },
-    "045_rift_volume": {
-      "representation": "full_resolution_sdf_raymarch_plus_persistent_scar_field",
-      "interaction": "scar_volume_and_kick_masses",
-      "state": "REPO_VALIDATED_HOST_VALIDATION_REQUIRED"
-    }
-  },
-  "render_contract": {
-    "shader_surface_component": "sketches/_shared/full_canvas_surface.gd",
-    "ci_rejects_fixed_1280_720_shader_surface": true,
-    "ci_rejects_non_local_shader_material": true,
-    "hidden_low_res_state_allowed": true,
-    "final_visible_representation_must_be_high_resolution": true
-  },
-  "temporal_quality": {
-    "knowledge": "knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md",
-    "audit_script": "scripts/ci/audit_temporal_motion.py",
-    "direct_clock_trig_requires_intent_since_index": 26,
-    "generic_clock_wobble_rejected": true,
-    "visible_phase_wrap_reset_respawn_wall_rejected": true
-  },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
-    "implementation_commit_before_final_docs": "c43be4300105e8677db22dd7c291a59d80fbc9f5",
-    "implementation_ci_run": 307,
+    "implementation_head_before_docs": "0c360c358e4b08fc456ba158fd35d6f62e18a253",
+    "implementation_ci_run": 312,
     "implementation_ci_passed": true,
     "implementation_ci_jobs": {
       "repository_policy": "success",
-      "godot_4_7_1_headless": "success",
+      "temporal_audit": "success",
+      "adaptive_draw_self_test": "success",
+      "godot_4_7_1_import": "success",
       "main_scene_smoke": "success",
       "tracked_cleanliness": "success"
     },
-    "docs_bundle_commit_before_final_ci": "04672299404ecb56a51941afea7154c8655e0ed1",
     "final_exact_head_ci_required_after_docs": true
   },
   "constraints": {
@@ -197,9 +166,11 @@
     "do_not_restore_native_transparent_review_popup": true,
     "do_not_toggle_main_window_visibility_on_startup": true,
     "do_not_use_generic_direct_clock_animation_as_default_aliveness": true,
-    "do_not_invent_missing_review_scores": true,
+    "do_not_invent_missing_review_scores_or_notes": true,
     "do_not_treat_technical_diversity_as_visual_success": true,
     "do_not_expose_coarse_solver_as_final_artwork": true,
-    "preserve_038_positive_concept_signal": true
+    "preserve_038_positive_concept_signal": true,
+    "gallery_list_must_remain_compact": true,
+    "written_reviews_must_be_consumed_automatically": true
   }
 }

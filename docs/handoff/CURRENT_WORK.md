@@ -8,127 +8,127 @@ Last refreshed: 2026-09-26.
 - draft PR: #7
 - base: `feat/gallery-project-workflow-20260923`
 - never merge/change `main` without explicit user approval
-- resolve final remote HEAD after all docs, then require CI on that exact SHA
+- source catalogue: **001–045**
+- top runtime: `app/main/main_runtime_gallery_host_fixes.gd`
 
-## Current runtime / catalogue
+## Latest host test
 
-Main scene: `res://app/main/main_runtime.tscn`.
-Top runtime: `res://app/main/main_runtime_gallery_host_fixes.gd` -> `main_runtime_window_memory.gd` -> existing validated chain.
-Source catalogue: **001–045** before local curation.
+The user tested HEAD `a55c65c6...` and reported:
 
-Preserve real Gallery thumbnails/hover animation, parameter persistence, PREVIEW/PROGRAM separation, persistent PROGRAM across navigation, TAKE LIVE, physical output input, linked state sync, artwork-only PROGRAM output and async telemetry.
+- LIST revision 1 is too large; rows must stay compact and use preview imagery as background decoration rather than a large left thumbnail.
+- ProjectView needs direct previous/next sketch browsing.
+- written RATE feedback has been entered extensively and must become automatic evidence for future repairs/creative generation.
+- 041 TENSION ORGAN repeatedly emitted `Invalid polygon data, triangulation failed` from `_draw()`.
 
-## Host status
+Terminal also showed successful asynchronous `review_checkpoint` publisher processes.
 
-The user has **not yet performed a new host test** after the latest 037/038/040 fixes or after 041–045 were added. Treat current work as repo/CI validated only.
+## Telemetry-first findings
 
-Prior direct feedback driving this pass:
+Raw GitHub telemetry proves the current session is non-empty. Session: `5cb124f1822c2ee4`.
 
-- 037: coarse cells + stale/black-frame flashes during interaction/parameter scrub.
-- 038: concept liked, but charges needed direct manipulation.
-- 040: same stale-frame glitch.
-- RATE needed free-text explanations.
-- Gallery needed file-browser sort/view/size, visual LIST rows and a real Trash view.
+The old sanitizer preserved:
+- numeric `sketch_review_changed` events;
+- `creative_preference_snapshot` ratings;
+- `sketch_review_note_changed.note_length`.
 
-## Gallery host fixes
+But it **removed the actual written `note` string**. Therefore the user did not need to paste the notes because the app stored them locally, but the current remote copy cannot yet reveal their contents. Never claim otherwise.
 
-A thin top layer `main_runtime_gallery_host_fixes.gd` isolates the new UX fixes from the lower runtime.
+Latest visible numeric evidence includes:
+- 036 ~1.83
+- 037 ~2.33
+- 038 ~2.67 (visual 4 / originality 4; strongest recent signal)
+- 039 ~2.17
+- 040 2.0
+- 043 1.0
+- 044 2.0
+- 045 1.0
 
-### LIST
+Do not invent missing 041/042 values or text comments.
 
-The previous revision explicitly hid the card TextureRect. Current LIST builds a second card presentation that reuses the same SubViewport texture:
+## Implementation completed before docs
 
-- preview left (~260 px wide);
-- index/title/engine/tags/description right;
-- row height ~132 px;
-- GRID/LIST toggling does not recreate sketches.
+### Gallery host layer revision 2 — `21d31984...`
 
-### TRASH
+- LIST row height = **68 px**.
+- real SubViewport preview is reused as a low-alpha right-side background layer.
+- compact index/title/engine/tags remain overlaid.
+- existing ReviewBadge remains above the decoration.
+- PREV/NEXT buttons are inserted after `< GALLERY` in ProjectToolbar.
+- adjacency uses numeric source order, skips locally removed sketches, disables at edges, no wrap.
+- `_open_sketch()` remains the switching path, preserving PROGRAM semantics.
+- startup schedules `review_checkpoint_startup_republish` so saved user notes can be republished automatically.
 
-The previous Trash button only opened a drawer while normal Gallery cards remained visible behind it. Current Trash is exclusive:
+### 041 safe tessellation — `df9710ae...`
 
-- normal `gallery_scroll`, search row and browser controls hide while Trash is open;
-- only local Trash rows remain visible;
-- normal tags/MORE exit Trash mode;
-- restore/purge still never mutate Git source.
+The failure was not random: deforming spring cells can become concave, inverted or near-degenerate, while `draw_colored_polygon([p0,p1,p2,p3])` asks the renderer to triangulate them.
 
-## Stateful shader fixes retained
+Fix:
+- remove dynamic quad polygon triangulation;
+- choose the shorter diagonal per cell;
+- draw two explicit triangle primitives;
+- skip triangles below a small area threshold;
+- leave physical spring simulation unchanged.
 
-Shared mutable ShaderMaterial was the architectural stale-frame root cause. Permanent contract:
+### Written-review telemetry — `0c360c35...`
 
-- `resource_local_to_scene = true` on sketch ShaderMaterials;
-- CI enforces it;
-- PREVIEW/PROGRAM/thumbnail may share immutable Shader resources, never mutable uniform/texture state;
-- 037/040 use double-buffer state textures and weighted state reconstruction;
-- 044/045 were built with local materials and double-buffered state textures from the start.
+`publish-telemetry-diagnostics.ps1` now:
+- allows only one bounded free-text field: `note`;
+- caps it at 2000 chars;
+- strips disallowed control characters;
+- preserves safe creative identifiers/tags/signature strings;
+- rejects zero-byte sanitized output.
 
-038 keeps its positive concept but now uses direct visible-charge hit test/drag and release inertia; empty-space click grabs nothing.
+Because notes are persisted in `user://creative_lab_reviews.cfg`, the next startup checkpoint should republish existing comments without retyping them.
 
-## New 041–045 batch
+## Validation
 
-### 041 TENSION ORGAN
+Implementation HEAD `0c360c358e4b08fc456ba158fd35d6f62e18a253` passed **CI #312** completely before documentation:
+- Repository policy — success
+- temporal audit — success
+- adaptive creative draw self-test — success
+- Godot 4.7.1 import — success
+- main scene smoke — success
+- tracked cleanliness — success
 
-Physical soft-body membrane: 17×10 constraint mesh, structural/diagonal springs, stochastic autonomous forcing through the material, direct node grab, residual release energy, stress-dependent facet material.
+Host validation is still required for dynamic 041 stress, compact list appearance, PREV/NEXT UX and actual remote note contents.
 
-### 042 MYCELIUM RELAY
+## Durable feedback rule
 
-Branching agent ecology: chemotaxis, energy, moving nutrients and persistent trails. Dragging paints a nutrient path into the world; agents discover it later instead of following a cursor immediately.
+Written RATE comments are first-class creative evidence. After every host test, before generating or repairing sketches, future AI must inspect the latest remote preference snapshot and read **numeric ratings plus text notes**. The user should not need to repeat an existing RATE comment in chat.
 
-### 043 SLIT MEMORY
+Use the comments for:
+- direct bug/interaction repairs;
+- understanding why a score is low/high;
+- extracting recurring visual/interaction preferences;
+- bounded bias in future creative recipes;
+- updating durable creative rules when feedback repeats.
 
-Real temporal slicing: ten coupled channels and a 180-frame live history. User interaction writes persistent time folds into the history lookup, bending/compressing/repeating time while the source dynamics continue.
+Do not turn one positive review into a cloning rule; keep exploration active.
 
-### 044 EXCITABLE GLASS
+## Existing contracts to preserve
 
-Hidden 96×54 excitable/refractory medium. Autonomous pacemakers drive waves. Quiet touch seeds excitation; active touch quenches it. Full-res multi-tap glass shader reconstructs relief/caustics/micro detail.
-
-### 045 RIFT VOLUME
-
-Full-res SDF raymarch with three toroidal masses and a folded membrane. Damped CPU anchors move without shader TIME. Touch writes a persistent scar field that erodes geometry and kicks nearby masses. AO/normals/mineral lighting finish the surface.
-
-All five include live-sync state, `creative_signature` and `visual_finish` metadata.
-
-## Code validation before docs
-
-Code/UID HEAD: `c43be4300105e8677db22dd7c291a59d80fbc9f5`.
-CI #307 fully green:
-
-- Repository policy: success
-- temporal audit: success
-- adaptive draw self-test: success
-- Godot 4.7.1 import: success
-- main-scene smoke: success
-- tracked cleanliness: success
-
-First CI #305 had only one failure: Godot generated `.uid` files for the new scripts/shaders. Those UIDs were then versioned; no runtime/script/shader error was reported.
-
-## REVIEW / telemetry
-
-RATE revision 4 includes six numeric axes + `WHY / NOTES`, persisted locally and included in `creative_preference_snapshot`. Rating/note changes schedule a remote checkpoint ~0.8 s later.
-
-Last useful remote ratings remain 031–035: 2.0, 1.5, 1.0, ~2.17, 1.0. The latest final close before this batch was empty. There is no trustworthy new numeric verdict for 036–045 yet.
-
-## Creative rules
-
-`VISUAL_FINISH_GATE.md` and `TEMPORAL_MOTION_QUALITY.md` remain mandatory.
-
-- technical distance alone is not quality;
-- frozen frame must work;
-- interaction should alter state/topology/material/history;
-- several useful detail scales;
-- no coarse solver exposed as final artwork;
-- no generic clock wobble, visible phase wrap, global reset or respawn wall.
+- PROGRAM persists across navigation; TAKE LIVE explicitly replaces it.
+- physical PROGRAM touch/mouse works.
+- linked PREVIEW/PROGRAM share one timeline/state.
+- per-sketch params persist.
+- real Gallery thumbnails; idle frozen, hover live.
+- TRASH is exclusive and local only; never delete Git source.
+- Gallery supports INDEX ↑/↓, TITLE, FAMILY, GRID/LIST and grid size.
+- LIST must stay dense; preview is decorative background, not large thumbnail.
+- ShaderMaterial mutable state is local to scene instances.
+- full-canvas shader surface rule remains enforced.
+- RATE remains centered/opaque/in-app.
+- no fake Spout/NDI.
 
 ## Next host validation
 
-1. LIST: preview stays visible on left of each row.
-2. TRASH: only Trash contents shown; test restore/purge and exit to normal Gallery.
-3. 037/040: continuous parameter scrub + interaction, no old/black-frame flash.
-4. 038: direct charge drag, empty-space no-op.
-5. 041–045: frozen frame, 20–30 s idle, interaction/recovery, parameter extremes.
-6. RATE with written WHY/NOTES.
-7. Close normally; inspect telemetry first afterwards.
+1. Sync exact final HEAD and wait exact CI.
+2. Verify LIST density/background preview at several window sizes.
+3. Open e.g. 037 -> 038 -> 039 using NEXT, then PREV; PROGRAM must not change unless TAKE LIVE is pressed.
+4. Stress 041 by dragging central nodes and changing tension/elasticity/damping; terminal must remain free of triangulation errors.
+5. On startup, allow automatic review checkpoint to publish; next AI inspects `telemetry/runtime` and confirms real `note` strings appear in `creative_preference_snapshot`.
+6. Continue normal written RATE feedback; never require chat duplication.
 
 ## Mandatory completion
 
-After material changes: code -> durable docs/state -> exact final remote HEAD -> exact-head CI -> report SHA/result -> canonical PowerShell when host testing is useful -> telemetry-first after host test.
+Material change -> code/push -> durable docs/state -> exact final remote HEAD -> exact-head CI -> report SHA/result -> canonical PowerShell when host test is useful -> telemetry-first after test.
