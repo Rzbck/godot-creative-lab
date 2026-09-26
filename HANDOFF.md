@@ -18,78 +18,118 @@ Last material refresh: 2026-09-26.
 
 PROGRAM persists across Gallery/Settings/other PREVIEW. `TAKE LIVE` explicitly replaces PROGRAM. Physical PROGRAM touch/mouse is supported. Linked PREVIEW/PROGRAM share one state/timeline. Per-sketch params persist. Gallery uses real thumbnails and only the hovered preview animates. PROGRAM is artwork-only. Telemetry stays async/non-blocking. Local Trash never deletes Git source.
 
-Top runtime: `res://app/main/main_runtime_window_memory.gd`.
-Source catalogue: **001–040** before local curation.
+Top runtime: `res://app/main/main_runtime_gallery_host_fixes.gd`, which extends the validated `main_runtime_window_memory.gd` chain.
+Source catalogue: **001–045** before local curation.
 
-## Latest host feedback — current priority
+## Host-validation status
 
-On the 036–040 host test:
+Important: the user has **not yet retested** the latest 037/038/040 fixes, Gallery fixes, or new 041–045 batch. Current status is repository/CI validated, host validation required. Do not turn CI success into an aesthetic or Windows-runtime verdict.
 
-- **037 DENDRITE BLOOM** showed coarse pixel/cell stair-stepping and flashed stale/black frames on interaction and parameter scrubbing.
-- **038 ELECTRIC LACE** received the first clear positive signal (`vraiment sympa`), but its pointer control was too indirect; visible charges should be directly draggable.
-- **040 SCHLIEREN VEIL** showed the same stale-frame glitch on click and parameter changes.
-- RATE needs written feedback explaining why visual/interaction/aliveness/etc. are low/high.
-- Gallery needs Finder/Explorer-style browsing: deterministic sort, GRID/LIST and adjustable thumbnail/card size.
+Latest direct host feedback before this batch:
 
-Do not erase the 038 concept while improving interaction.
+- 037 DENDRITE BLOOM: coarse cell stair-stepping and stale/black-frame flashes on interaction/parameter scrub.
+- 038 ELECTRIC LACE: positive concept signal (`vraiment sympa`) but interaction was too indirect.
+- 040 SCHLIEREN VEIL: stale-frame glitch on click/parameter changes.
+- RATE needed free-text explanations.
+- Gallery needed deterministic sort, GRID/LIST, adjustable card size, visual list previews, and a real Trash view.
 
-## Stateful shader root cause and permanent fix
+## Stateful shader contract
 
-The Gallery keeps a real hidden sketch instance for each thumbnail and mirrors saved parameter changes into it. Shader scenes previously used shared mutable `ShaderMaterial` subresources. Gallery thumbnail, active PREVIEW and PROGRAM could therefore share uniforms/textures; a hidden thumbnail could overwrite an active `u_state` with an old texture.
+Gallery keeps real hidden sketch instances for thumbnails. PREVIEW, PROGRAM and thumbnail may instantiate the same PackedScene simultaneously. Mutable shader state must therefore never be shared.
 
-Implementation reference: `e20e1751ed2dae70899f56fcf5217b3d84e75910`, CI #299 fully green before docs.
+Permanent rules:
 
-Permanent rules now implemented:
+- every sketch ShaderMaterial uses `resource_local_to_scene = true`;
+- CI rejects future runtime scenes that omit it;
+- stateful CPU→GPU textures should be committed atomically; 037, 040, 044 and 045 use double buffering;
+- hidden coarse state is allowed, but final PROGRAM must reconstruct a high-resolution material/geometry rather than expose enlarged cells.
 
-- every sketch `ShaderMaterial` sets `resource_local_to_scene = true`;
-- repository CI fails future runtime `.tscn` files whose ShaderMaterial omits that isolation;
-- PREVIEW / PROGRAM / Gallery thumbnail must never share mutable shader uniforms/state textures;
-- 037 and 040 additionally use two `ImageTexture` buffers: update the inactive texture, then switch the sampler to the completed texture;
-- state-changing pointer input marks the render state dirty immediately;
-- 037/040 final shaders smooth/reconstruct the hidden coarse field with weighted multi-tap samples before gradients/material lighting, reducing visible solver stair-stepping without exploding live-sync payload size.
+037/040 also use weighted reconstruction before final material/gradient shading. 038 now uses real charge hit-testing, direct drag, empty-space no-op and release inertia.
 
-## 038 direct manipulation
+## Gallery host-feedback layer
 
-ELECTRIC LACE now:
+`main_runtime_gallery_host_fixes.gd` is deliberately thin and sits above the already validated runtime chain.
 
-- grabs only when the pointer lands within a visible charge hit radius;
-- follows the pointer directly while held;
-- does nothing on empty-space click;
-- keeps a small inertial velocity on release;
-- shows only a subtle active grab ring.
+### LIST
+
+LIST is visual, not text-only:
+
+- each row keeps a real live/frozen preview on the left (~260 px);
+- index/title/engine/tags/description remain on the right;
+- the existing SubViewport is reused, so changing GRID/LIST does not restart simulations.
+
+### TRASH
+
+TRASH is now an exclusive browser mode:
+
+- opening TRASH hides normal Gallery scroll/search/browser controls;
+- only locally removed/restorable items are shown;
+- opening a normal tag/MORE exits Trash mode;
+- restore/purge semantics remain local and never delete Git source.
 
 ## REVIEW revision 4
 
-Compact sidebar remains `REVIEW <avg> RATE TRASH`. RATE remains opaque, centered and in-app.
+RATE stays opaque, centered and in-app. It contains six numeric axes plus `WHY / NOTES` text (max 2000 chars). Notes persist in `user://creative_lab_reviews.cfg`, are included in `creative_preference_snapshot`, and rating/note edits schedule an async telemetry checkpoint ~0.8 s later. `SAVE REVIEW` persists explicitly; modal close also saves pending text.
 
-New written feedback:
+## New batch 041–045
 
-- `WHY / NOTES` multi-line field;
-- stored beside numeric axes in `user://creative_lab_reviews.cfg`;
-- max 2000 characters;
-- included in `creative_preference_snapshot`;
-- `SAVE REVIEW` persists explicitly; closing modal also saves pending text;
-- rating/note edits schedule a remote telemetry checkpoint about 0.8 s after the last edit, so useful review evidence no longer depends on application shutdown.
+### 041 TENSION ORGAN
 
-## Gallery browser revision 2
+- physical 17×10 membrane / constraint mesh;
+- structural + diagonal springs, rest tension, damping;
+- stochastic target events drive force through the material rather than direct clock wobble;
+- direct node grab/drag with residual release velocity;
+- stress-dependent filled facets + fine tension threads;
+- 6 systemic controls.
 
-Tags/search remain metadata filters, but browsing is no longer dictated by group order.
+### 042 MYCELIUM RELAY
 
-- default flat view: **INDEX ↑** (`001 -> 040`);
-- sort options: INDEX ↓, TITLE A–Z, FAMILY;
-- FAMILY restores semantic tag-group sections;
-- GRID / LIST modes;
-- adjustable card/preview size in GRID;
-- state persisted in `user://creative_lab_gallery_view.cfg`;
-- sorting/reflow reparents existing card/SubViewport nodes instead of recreating simulations.
+- branching agent ecology up to 72 active tips;
+- autonomous nutrient basins plus persistent user-painted nutrient trails;
+- chemotaxis, energy, branching and path memory;
+- interaction paints future conditions instead of dragging an object;
+- persistent hyphal graph/trails with growing tips;
+- 6 systemic controls.
 
-Adaptive tag rail remains bounded; do not restore a permanent wall of every tag.
+### 043 SLIT MEMORY
 
-## Window / telemetry revision 4
+- ten coupled state channels with a real 180-frame history buffer;
+- final image is built from temporal slices of actual history;
+- pointer creates persistent time folds that compress/repeat/bend local history lookup;
+- underlying system keeps running; no fake shader-time slitscan;
+- dense antialiased temporal filament rendering;
+- 6 controls.
 
-Startup still never toggles visibility of the main Godot Window. Saved mode/screen/geometry is applied in `_enter_tree()`. Logical Maximize remains borderless WINDOWED usable-screen geometry with a 2 px bottom guard. F11 stays separate artwork presentation.
+### 044 EXCITABLE GLASS
 
-The latest host final `session_close_request` publication was again empty. Last non-empty intermediate telemetry recovered 031–035 ratings:
+- hidden 96×54 excitation/refractory/age medium;
+- autonomous pacemakers create state-driven wave fronts;
+- quiet click seeds excitation; active click quenches it;
+- double-buffered state texture;
+- full-resolution multi-tap glass reconstruction with relief, caustics and micro grain;
+- 7 controls.
+
+### 045 RIFT VOLUME
+
+- full-resolution SDF raymarch: three toroidal masses + folded connecting membrane;
+- CPU-driven damped anchor motion, no shader TIME;
+- hidden persistent scar/erosion field with diffusion and memory;
+- touch scars/erodes the volume and kicks nearby masses;
+- finite-difference normals, AO, mineral/specular/rim material;
+- 7 controls.
+
+All 041–045 have `creative_seed`, implemented `creative_signature`, `visual_finish` metadata and live-sync state.
+
+## Validation
+
+Implementation/UID batch before docs: `c43be4300105e8677db22dd7c291a59d80fbc9f5`.
+CI #307 is fully green: repository policy, temporal audit, adaptive draw self-test, Godot 4.7.1 import, main-scene smoke and tracked cleanliness.
+
+This is not the final completion SHA: after durable docs/signature history, resolve final HEAD and require exact-head CI again.
+
+## Telemetry evidence
+
+Latest remote final close before this batch was empty. Last useful intermediate snapshot recovered:
 
 - 031 FOLD CHAMBER avg 2.0
 - 032 LUMEN SWARM avg 1.5
@@ -97,63 +137,41 @@ The latest host final `session_close_request` publication was again empty. Last 
 - 034 PHOSPHOR SAND avg ~2.17
 - 035 DUNE CHOIR avg 1.0
 
-New 036–040 ratings are not remotely recoverable yet. Never invent them.
+036–045 have no trustworthy new numeric host verdict yet. Never invent one.
 
-Shutdown revision 4 now uses one final path:
+## Creative quality contract
 
-`session_close_flush -> flush -> FileAccess.close() -> release handle -> hidden final publisher(reason=session_close_request) -> quit`
+Read `knowledge/cross-domain/VISUAL_FINISH_GATE.md` and `TEMPORAL_MOTION_QUALITY.md`.
 
-This removes the previous auto-publisher vs dedicated-final-publisher race. Review checkpoints provide a second path for feedback durability.
-
-## Creative evidence / quality bar
-
-Earlier recovered ratings:
-
-- 026 VOID TENSION = all 1
-- 027 GLASS TIDE = visual 2, all others 1
-- 028 LUMEN MAZE = all 1
-- 029 FIBER FELT = all 1
-- 030 REACTOR SKIN = all 1
-
-026–035 are strong evidence that technical diversity is not artistic quality. Preserve the adaptive draw as a collision generator, not an art director.
-
-Read `knowledge/cross-domain/VISUAL_FINISH_GATE.md`. Required pipeline:
+Required pipeline:
 
 `adaptive draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
 
-For 036+ CI requires `visual_finish` metadata: composition, material model, final render, >=3 detail scales and stateful interaction. Frozen frame, material logic and multiple useful scales matter. Hidden coarse state is allowed; enlarged coarse solver pixels are not finished artwork.
-
-## Temporal-quality contract
-
-Preferred:
-
-`time -> force/state/memory/event -> coupled system -> render`
-
-Reject cheap direct clock wobble, visible phase wrap, global reset, respawn wall and synchronized restart. FARADAY QUASI remains the canonical warning that physically periodic state can still create a visible rendering cut.
+Technical diversity is not artistic quality. Frozen frame, material logic, composition, multiple useful scales and meaningful state interaction matter. Reject generic `time -> sin/cos -> visible wobble`, phase-wrap seams, global resets, respawn walls, coarse solver enlargement and superficial pointer overlays.
 
 ## Historical non-regressions
 
 - 001 remains technical foundation/reference.
-- 005 internal path remains `005_pressure_lattice`, visible artwork **REGISTER TYPE**; never restore Pressure Lattice.
-- generalized glyph-contour treatment across 006–010 was rejected; never make contours the house representation.
-- do not stop PROGRAM on navigation.
-- do not create independent linked timelines.
-- `ShaderSurface` must remain full-canvas via shared sizing component.
-- ShaderMaterial mutable state must remain local per scene instance.
-- do not restore transparent/off-centre native RATE popup.
-- do not toggle main-window visibility during startup.
-- do not fake Spout/NDI.
+- 005 source stays `005_pressure_lattice`, visible artwork **REGISTER TYPE**; never restore Pressure Lattice.
+- generalized glyph contours are not the house style.
+- navigation never stops PROGRAM.
+- linked outputs never have independent timelines.
+- ShaderSurface remains full-canvas through the shared sizing component.
+- ShaderMaterial mutable state stays local per scene instance.
+- RATE stays opaque/centered/in-app.
+- never toggle main-window visibility during startup.
+- never fake Spout/NDI.
 
 ## Required next host validation
 
-1. Sync exact final HEAD and require its exact CI before launch.
-2. 037: scrub several parameters and click/drag repeatedly; no black/stale-frame flash, reduced block stair-stepping.
-3. 040: same stress test; no old-frame flash.
-4. 038: direct charge drag must feel immediate; empty-space click grabs nothing.
-5. RATE: enter a WHY / NOTES comment, save it, then continue testing long enough for checkpoint publication.
-6. Gallery: default 001→040, INDEX ↓, TITLE, FAMILY, GRID/LIST, size slider; restart and verify browser state persists.
-7. Close normally.
-8. Next AI inspects `telemetry/runtime` first and requires a fresh non-empty review checkpoint/final session before trusting new scores.
+1. Sync exact final HEAD and require exact-head CI before launch.
+2. Gallery LIST: verify real visual preview remains on the left of every row.
+3. Gallery TRASH: opening it must hide normal cards; test restore/purge and exiting via normal filters.
+4. Re-test 037/040 under click/drag + continuous parameter scrub: no stale/black flashes; 037 stair-stepping substantially reduced.
+5. Re-test 038 direct charge grab; empty-space click must grab nothing.
+6. Test 041–045 first as frozen frames, then 20–30 s idle, then interaction/recovery and parameter extremes.
+7. RATE with numeric axes + WHY/NOTES.
+8. Close normally; next AI inspects `telemetry/runtime` first.
 
 ## Mandatory completion protocol
 

@@ -8,121 +8,126 @@ Last refreshed: 2026-09-26.
 - draft PR: #7
 - base: `feat/gallery-project-workflow-20260923`
 - never merge/change `main` without explicit user approval
-- resolve final remote HEAD after all docs commits, then require CI on that exact SHA
+- resolve final remote HEAD after all docs, then require CI on that exact SHA
 
-## Stable product behavior
+## Current runtime / catalogue
+
+Main scene: `res://app/main/main_runtime.tscn`.
+Top runtime: `res://app/main/main_runtime_gallery_host_fixes.gd` -> `main_runtime_window_memory.gd` -> existing validated chain.
+Source catalogue: **001–045** before local curation.
 
 Preserve real Gallery thumbnails/hover animation, parameter persistence, PREVIEW/PROGRAM separation, persistent PROGRAM across navigation, TAKE LIVE, physical output input, linked state sync, artwork-only PROGRAM output and async telemetry.
 
-Current top runtime: `app/main/main_runtime_window_memory.gd`.
-Source catalogue: **001–040** before local curation.
+## Host status
 
-## Latest host feedback — 2026-09-26
+The user has **not yet performed a new host test** after the latest 037/038/040 fixes or after 041–045 were added. Treat current work as repo/CI validated only.
 
-The user tested 036–040 and reported:
+Prior direct feedback driving this pass:
 
-- **037 DENDRITE BLOOM:** obvious pixel stair-stepping and stale/black-frame flashes whenever interacting or changing parameters.
-- **038 ELECTRIC LACE:** positive concept signal (`vraiment sympa`), but interaction was too weak/indirect; charges should be grabbed directly by clicking on them.
-- **040 SCHLIEREN VEIL:** same stale-frame / old-frame glitch on click and parameter changes as 037.
-- RATE needs a free-text explanation field so low/high axis scores have a reason.
-- Gallery needs file-browser controls: deterministic sort, GRID/LIST modes and adjustable card size.
+- 037: coarse cells + stale/black-frame flashes during interaction/parameter scrub.
+- 038: concept liked, but charges needed direct manipulation.
+- 040: same stale-frame glitch.
+- RATE needed free-text explanations.
+- Gallery needed file-browser sort/view/size, visual LIST rows and a real Trash view.
 
-The attached 037 host capture visibly showed coarse cell boundaries, so the complaint is grounded in the rendered output rather than only subjective description.
+## Gallery host fixes
 
-## Telemetry recovered from this test
+A thin top layer `main_runtime_gallery_host_fixes.gd` isolates the new UX fixes from the lower runtime.
 
-Telemetry-first was performed.
+### LIST
 
-- final `session_close_request` publication was empty again;
-- the last non-empty intermediate checkpoint recovered numeric ratings for 031–035:
-  - 031 FOLD CHAMBER: avg **2.0**;
-  - 032 LUMEN SWARM: avg **1.5**;
-  - 033 OBSIDIAN CATHEDRAL: avg **1.0**;
-  - 034 PHOSPHOR SAND: avg **~2.17**;
-  - 035 DUNE CHOIR: avg **1.0**.
-- new 036–040 scores were not present in the recoverable remote checkpoint. Do **not** invent them.
+The previous revision explicitly hid the card TextureRect. Current LIST builds a second card presentation that reuses the same SubViewport texture:
 
-## Root cause — stale shader frames
+- preview left (~260 px wide);
+- index/title/engine/tags/description right;
+- row height ~132 px;
+- GRID/LIST toggling does not recreate sketches.
 
-The key architectural bug was shared mutable `ShaderMaterial` resources.
+### TRASH
 
-The Gallery keeps a hidden real sketch instance for each thumbnail. Parameter persistence also mirrors parameter changes into that hidden instance. Shader scenes used a non-local `ShaderMaterial`, so Gallery thumbnail, active PREVIEW and PROGRAM instances could share uniforms/textures. A hidden thumbnail could therefore overwrite `u_state` on the active artwork with an old texture.
+The previous Trash button only opened a drawer while normal Gallery cards remained visible behind it. Current Trash is exclusive:
 
-Implementation commit `e20e1751ed2dae70899f56fcf5217b3d84e75910` fixes this globally:
+- normal `gallery_scroll`, search row and browser controls hide while Trash is open;
+- only local Trash rows remain visible;
+- normal tags/MORE exit Trash mode;
+- restore/purge still never mutate Git source.
 
-- all current sketch `ShaderMaterial` subresources now set `resource_local_to_scene = true`;
-- repository CI rejects any future runtime sketch ShaderMaterial missing this flag;
-- 037 and 040 use double-buffered `ImageTexture` uploads and atomically switch the shader sampler after updating the inactive texture;
-- interaction marks state dirty and publishes the next complete state without waiting for an unrelated later simulation tick;
-- 037 and 040 shaders reconstruct coarse hidden state with weighted multi-tap sampling before lighting/gradients, reducing visible cell stair-stepping without multiplying live-sync state size.
+## Stateful shader fixes retained
 
-CI #299 passed the implementation commit fully: repository policy, Godot 4.7.1 import, main-scene smoke and tracked cleanliness.
+Shared mutable ShaderMaterial was the architectural stale-frame root cause. Permanent contract:
 
-## 038 ELECTRIC LACE interaction revision
+- `resource_local_to_scene = true` on sketch ShaderMaterials;
+- CI enforces it;
+- PREVIEW/PROGRAM/thumbnail may share immutable Shader resources, never mutable uniform/texture state;
+- 037/040 use double-buffer state textures and weighted state reconstruction;
+- 044/045 were built with local materials and double-buffered state textures from the start.
 
-038 keeps the visual/technical concept. Interaction changed only:
+038 keeps its positive concept but now uses direct visible-charge hit test/drag and release inertia; empty-space click grabs nothing.
 
-- click must land within a real charge hit radius;
-- drag directly positions that charge instead of weakly moving a target spring;
-- empty-space clicks no longer grab an arbitrary nearest charge;
-- release keeps a small inertial velocity;
-- a subtle grab ring appears only while manipulating the charge.
+## New 041–045 batch
 
-## REVIEW revision 4
+### 041 TENSION ORGAN
 
-RATE remains an opaque centered in-app modal but now includes **WHY / NOTES**.
+Physical soft-body membrane: 17×10 constraint mesh, structural/diagonal springs, stochastic autonomous forcing through the material, direct node grab, residual release energy, stress-dependent facet material.
 
-- free-text note stored in `user://creative_lab_reviews.cfg` beside the six numeric axes;
-- note included in `creative_preference_snapshot` telemetry;
-- `SAVE REVIEW` persists explicitly; closing the modal also saves pending text;
-- note capped at 2000 characters;
-- ratings/notes schedule a telemetry checkpoint ~0.8 s after the last edit, so feedback reaches the remote branch without depending on app shutdown.
+### 042 MYCELIUM RELAY
 
-## Gallery browser revision 2
+Branching agent ecology: chemotaxis, energy, moving nutrients and persistent trails. Dragging paints a nutrient path into the world; agents discover it later instead of following a cursor immediately.
 
-Gallery keeps semantic tags/search but adds file-browser behavior:
+### 043 SLIT MEMORY
 
-- default flat sort: **INDEX ↑**;
-- other sorts: INDEX ↓, TITLE A–Z, FAMILY;
-- FAMILY restores semantic grouped sections;
-- GRID / LIST presentation toggle;
-- adjustable grid card/preview size;
-- browser state persists to `user://creative_lab_gallery_view.cfg`;
-- sorting/reflow reparents existing cards and keeps their real SubViewport instances alive instead of recreating simulations.
+Real temporal slicing: ten coupled channels and a 180-frame live history. User interaction writes persistent time folds into the history lookup, bending/compressing/repeating time while the source dynamics continue.
 
-## Window / telemetry revision 4
+### 044 EXCITABLE GLASS
 
-Startup still never toggles main-window visibility. Revision 4 changes shutdown:
+Hidden 96×54 excitable/refractory medium. Autonomous pacemakers drive waves. Quiet touch seeds excitation; active touch quenches it. Full-res multi-tap glass shader reconstructs relief/caustics/micro detail.
 
-- close writes non-autopublished `session_close_flush` telemetry;
-- flushes and explicitly calls `FileAccess.close()`;
-- releases the handle;
-- then starts the single hidden final publisher with reason `session_close_request`;
-- this removes the previous automatic-close-publisher vs dedicated-final-publisher race.
+### 045 RIFT VOLUME
 
-Host validation must prove the final remote session is non-empty.
+Full-res SDF raymarch with three toroidal masses and a folded membrane. Damped CPU anchors move without shader TIME. Touch writes a persistent scar field that erodes geometry and kicks nearby masses. AO/normals/mineral lighting finish the surface.
 
-## Creative quality / temporal rules
+All five include live-sync state, `creative_signature` and `visual_finish` metadata.
 
-`knowledge/cross-domain/VISUAL_FINISH_GATE.md` remains mandatory from 036 onward.
+## Code validation before docs
 
-- technical diversity is not visual quality;
-- frozen frame must already work as an image;
+Code/UID HEAD: `c43be4300105e8677db22dd7c291a59d80fbc9f5`.
+CI #307 fully green:
+
+- Repository policy: success
+- temporal audit: success
+- adaptive draw self-test: success
+- Godot 4.7.1 import: success
+- main-scene smoke: success
+- tracked cleanliness: success
+
+First CI #305 had only one failure: Godot generated `.uid` files for the new scripts/shaders. Those UIDs were then versioned; no runtime/script/shader error was reported.
+
+## REVIEW / telemetry
+
+RATE revision 4 includes six numeric axes + `WHY / NOTES`, persisted locally and included in `creative_preference_snapshot`. Rating/note changes schedule a remote checkpoint ~0.8 s later.
+
+Last useful remote ratings remain 031–035: 2.0, 1.5, 1.0, ~2.17, 1.0. The latest final close before this batch was empty. There is no trustworthy new numeric verdict for 036–045 yet.
+
+## Creative rules
+
+`VISUAL_FINISH_GATE.md` and `TEMPORAL_MOTION_QUALITY.md` remain mandatory.
+
+- technical distance alone is not quality;
+- frozen frame must work;
+- interaction should alter state/topology/material/history;
 - several useful detail scales;
-- hidden low-res solver may drive state, never be exposed directly as enlarged final art;
-- no generic `time -> sin/cos -> visible wobble`;
-- no visible phase wrap/reset/respawn wall;
-- interaction enters state/material/topology, not a generic pointer overlay.
+- no coarse solver exposed as final artwork;
+- no generic clock wobble, visible phase wrap, global reset or respawn wall.
 
 ## Next host validation
 
-1. Sync exact final HEAD and wait exact-head CI before launch.
-2. Open 037; drag/click and scrub several parameters continuously. No black/stale-frame flashes; cell stair-stepping should be substantially reduced.
-3. Open 040; repeat click/drag and parameter scrubbing. No old-frame flash/glitch.
-4. Open 038; click directly on charges, drag them, release; empty-space click should not grab one.
-5. Open RATE; write a WHY / NOTES comment, save, wait briefly, then continue testing.
-6. Gallery: verify default 001→040 ordering, INDEX ↓, TITLE, FAMILY, GRID/LIST and size slider; restart and confirm browser state persists.
-7. Close normally. Next AI inspects `telemetry/runtime` first and requires a fresh non-empty review checkpoint/final session before trusting 036–040 ratings.
+1. LIST: preview stays visible on left of each row.
+2. TRASH: only Trash contents shown; test restore/purge and exit to normal Gallery.
+3. 037/040: continuous parameter scrub + interaction, no old/black-frame flash.
+4. 038: direct charge drag, empty-space no-op.
+5. 041–045: frozen frame, 20–30 s idle, interaction/recovery, parameter extremes.
+6. RATE with written WHY/NOTES.
+7. Close normally; inspect telemetry first afterwards.
 
 ## Mandatory completion
 

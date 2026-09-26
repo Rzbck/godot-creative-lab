@@ -14,153 +14,123 @@ DC//LAB separates:
 
 Navigation is not transport: PROGRAM continues while the workstation browses or edits another PREVIEW. `TAKE LIVE` explicitly replaces PROGRAM.
 
-## Main runtime
+## Main runtime chain
 
 Entry scene: `res://app/main/main_runtime.tscn`.
-Top layer: `res://app/main/main_runtime_window_memory.gd`.
-
-Important chain:
+Top layer: `res://app/main/main_runtime_gallery_host_fixes.gd`.
 
 ```text
-main_runtime_window_memory.gd
-    -> main_runtime_gallery_compact_review.gd
-        -> main_runtime_gallery_feedback_trash.gd
-            -> main_runtime_gallery_adaptive_filters.gd
-                -> main_runtime_gallery_organizer.gd
-                    -> main_runtime_program_output.gd
-                        -> main_runtime_gallery_persistence.gd
-                            -> main_runtime_live_output.gd
-                                -> lower output/window/telemetry layers
+main_runtime_gallery_host_fixes.gd
+    -> main_runtime_window_memory.gd
+        -> main_runtime_gallery_compact_review.gd
+            -> main_runtime_gallery_feedback_trash.gd
+                -> main_runtime_gallery_adaptive_filters.gd
+                    -> main_runtime_gallery_organizer.gd
+                        -> main_runtime_program_output.gd
+                            -> main_runtime_gallery_persistence.gd
+                                -> main_runtime_live_output.gd
+                                    -> lower output/window/telemetry layers
 ```
 
-Always inspect the actual `extends` chain before host edits.
+The host-fix layer is intentionally thin: it overrides only Gallery LIST/TRASH presentation proven wrong in host feedback and leaves the validated lower runtime behavior intact.
 
-## Workstation window / shutdown revision 4
+## Workstation window / shutdown
 
 State persists in `user://creative_lab_window_state.cfg`.
 
-Current rules:
-
-- never toggle main `Window.visible` during startup; Godot 4.7.1 rejects this;
+- never toggle main `Window.visible` during startup;
 - apply saved screen/mode/position/size in `_enter_tree()`;
-- logical Maximize is borderless **WINDOWED** usable-screen geometry with a 2 px bottom guard;
+- logical Maximize is borderless WINDOWED usable-screen geometry with a 2 px bottom guard;
 - F11 remains separate artwork presentation;
-- shutdown telemetry writes `session_close_flush`, flushes and explicitly closes the telemetry `FileAccess`, then starts one hidden final publisher with reason `session_close_request`.
+- close telemetry uses one ordered path: write/flush -> explicit FileAccess close -> release -> hidden final publisher -> quit.
 
-The explicit close order removes the prior race between an automatic close publisher and the dedicated final publisher. Host validation must still prove a fresh non-empty final publication.
+Review checkpoints provide a second asynchronous durability path for feedback.
 
 ## Gallery architecture
 
-Sketches are data-driven from `sketches/*/definition.json`. Source catalogue: **001–040** before local curation.
+Sketches are data-driven from `sketches/*/definition.json`. Source catalogue: **001–045** before local curation.
 
-### Thumbnail/runtime model
-
-- each card owns a real sketch instance in a SubViewport;
-- idle thumbnails freeze; only hovered preview animates;
-- persisted parameters can be mirrored into the hidden thumbnail instance;
-- active PREVIEW and PROGRAM can instantiate the same PackedScene at the same time.
-
-This means mutable resources inside a sketch **must not be shared between scene instances**.
+Each card owns a real sketch instance in a SubViewport. Idle thumbnails freeze; only hovered previews animate. Persisted parameters can be mirrored into hidden thumbnail instances. Active PREVIEW and PROGRAM can instantiate the same PackedScene simultaneously.
 
 ### ShaderMaterial isolation contract
 
-A host stale-frame bug proved that shared ShaderMaterial resources are unsafe: a hidden Gallery thumbnail could overwrite uniforms or state textures used by PREVIEW/PROGRAM.
-
-Permanent contract:
+Mutable resources inside a sketch must not be shared between instances.
 
 - every runtime sketch `ShaderMaterial` subresource sets `resource_local_to_scene = true`;
-- repository CI enforces this for every `sketches/**/runtime/*.tscn`;
-- PREVIEW, PROGRAM and Gallery thumbnail may share immutable Shader resources, but never the mutable ShaderMaterial uniform state;
-- stateful CPU→GPU textures should be committed atomically. 037/040 use two ImageTexture buffers: update inactive -> switch shader sampler.
+- repository CI enforces this;
+- PREVIEW, PROGRAM and Gallery thumbnail may share immutable Shader code but never mutable ShaderMaterial uniforms/textures;
+- stateful CPU→GPU textures should be atomically committed. 037, 040, 044 and 045 use two ImageTexture buffers.
 
-### Browser presentation revision 2
+### Browser presentation
 
 Filtering metadata and browsing presentation are separate concerns.
 
-- search still indexes title/index/engine/description/all tags;
-- adaptive quick-tag rail stays bounded, with rare tags in the drawer;
-- default browsing is flat `INDEX ↑`, giving deterministic 001→040 order;
-- alternative sorts: INDEX ↓, TITLE A–Z, FAMILY;
-- FAMILY restores semantic first-tag sections;
-- GRID and LIST modes are available;
+- search indexes title/index/engine/description/tags;
+- adaptive quick tags stay bounded;
+- default browsing is flat `INDEX ↑`;
+- INDEX ↓, TITLE A–Z and FAMILY sorts remain available;
+- FAMILY restores semantic first-tag groups;
+- GRID and LIST reuse the same cards/SubViewports rather than recreating simulations;
 - GRID card/preview size is adjustable;
-- browser state persists in `user://creative_lab_gallery_view.cfg`;
-- sort/reflow reparents existing cards/SubViewports rather than recreating sketch instances.
+- browser state persists in `user://creative_lab_gallery_view.cfg`.
 
-Local Trash remains reversible and never deletes Git source.
+### LIST host fix
 
-## Review / preference feedback revision 4
+LIST must remain visual. The top runtime creates a second presentation for every card using the same SubViewport texture:
 
-Compact row remains:
+- ~260 px preview on the left;
+- index/title/engine/tags/description on the right;
+- compact ~132 px row;
+- switching modes only changes presentation visibility/layout.
 
-`REVIEW <avg> RATE TRASH`
+### TRASH host fix
 
-RATE is an opaque centered in-app modal with six 1–5 axes:
+TRASH is an exclusive local curation view, not a filter layered over normal cards.
 
-- visual
-- interaction
-- originality
-- aliveness
-- controls
-- performance
+- opening Trash hides normal Gallery scroll/search/browser controls;
+- only the curation drawer rows remain visible;
+- normal tag/MORE actions exit Trash mode;
+- restore/purge never delete versioned source.
 
-It also contains free text **WHY / NOTES**.
+## Review / preference feedback
 
-Reviews persist in `user://creative_lab_reviews.cfg`. Written notes are stored beside numeric ratings and included in `creative_preference_snapshot`. `SAVE REVIEW` persists explicitly; modal close saves pending note text.
+RATE is opaque, centered and in-app. Six 1–5 axes remain: visual, interaction, originality, aliveness, controls, performance. `WHY / NOTES` adds free text. Reviews persist in `user://creative_lab_reviews.cfg` and are included in `creative_preference_snapshot`.
 
-Ratings/notes schedule a telemetry checkpoint roughly 0.8 s after the last change, so preference evidence does not rely on successful application shutdown.
+Ratings/notes schedule a telemetry checkpoint ~0.8 s after changes so useful preference evidence does not depend on application shutdown.
 
-## Current stateful render fixes
+## Current creative systems 041–045
 
-### 037 DENDRITE BLOOM
+### 041 TENSION ORGAN — constraint mesh
 
-- hidden 96×54 phase/nutrient/age state remains compact for live sync;
-- two ImageTextures alternate for complete GPU state commits;
-- final shader reconstructs the hidden field using weighted multi-tap sampling before normals/material shading;
-- this reduces visible grid stair-stepping without multiplying synchronized solver state.
+17×10 physical membrane, structural + diagonal springs, damped state, event-driven autonomous force and direct node manipulation. Rendering uses filled stress facets plus fine structural threads.
 
-### 038 ELECTRIC LACE
+### 042 MYCELIUM RELAY — agent ecology
 
-- vector field-line system remains the artwork;
-- visible charges are directly grabbable only inside a real hit radius;
-- empty-space click does nothing;
-- drag directly moves the charge, release preserves small inertia.
+Branching tips, energy, chemotaxis, autonomous nutrient basins and persistent grown trails. User gestures paint nutrients into the future state rather than directly positioning the organism.
 
-### 040 SCHLIEREN VEIL
+### 043 SLIT MEMORY — temporal slicing
 
-- hidden 80×45 density/heat/velocity field remains compact;
-- double-buffered ImageTexture commit prevents sampling a texture while it is being updated;
-- multi-tap reconstruction occurs before density-gradient schlieren optics.
+Ten coupled channels produce a real history buffer. Final geometry samples that history horizontally. Persistent interaction staples modify local history lookup, creating temporal compression/repetition/folds while source dynamics continue.
+
+### 044 EXCITABLE GLASS — excitable medium
+
+Hidden excitation/refractory grid with autonomous pacemakers. Interaction seeds quiet areas or quenches active material. A full-resolution multi-tap glass shader reconstructs relief/front caustics/micro grain from hidden state.
+
+### 045 RIFT VOLUME — SDF raymarch
+
+Three event-driven toroidal masses plus a folded membrane are raymarched full resolution. A hidden persistent scar field erodes the SDF. Interaction adds scars and force. Shader uses finite-difference normals, AO and mineral/specular/rim shading; no shader TIME.
 
 ## Visual Finish Gate
 
 Technical diversity is not a quality guarantee. Read `knowledge/cross-domain/VISUAL_FINISH_GATE.md`.
 
-Required creative pipeline:
+Required pipeline:
 
 `adaptive draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
 
-Since sketch 036, repository CI requires `definition.json.visual_finish` with:
+Since 036, CI requires `visual_finish` metadata with composition, material model, final render, >=3 detail scales and stateful interaction. This is a process contract, not a beauty score.
 
-- `composition`
-- `material_model`
-- `final_render`
-- at least three `detail_scales`
-- `interaction_stateful=true`
-
-This is a process contract, not an automated beauty score.
-
-## Full-canvas render contract
-
-Logical artwork coordinates normally remain 1280×720. Physical PREVIEW/PROGRAM surfaces adapt to actual viewport size.
-
-A node named `ShaderSurface` must use:
-
-`res://sketches/_shared/full_canvas_surface.gd`
-
-CI rejects fixed 1280×720 ShaderSurface offsets.
-
-Low-resolution simulation grids are hidden state only. Final visible output must reconstruct appropriate high-resolution geometry/material/detail; do not expose enlarged coarse solver pixels as finished art.
+Low-resolution simulation grids are hidden state only. Final visible output must reconstruct suitable high-resolution material/geometry/detail.
 
 ## Temporal-quality contract
 
@@ -168,13 +138,7 @@ Preferred:
 
 `time -> force/state/memory/event -> coupled system -> render`
 
-Rejected by default:
-
-`time -> sin/cos -> visible position/scale/alpha/warp`
-
-Also reject visible phase wraps, global resets, respawn walls and synchronized restarts. Physical periodic forcing is allowed only when visible representation stays continuous.
-
-`scripts/ci/audit_temporal_motion.py` audits the corpus. For 026+, direct clock trig requires `TEMPORAL_INTENT:`.
+Reject direct clock wobble, visible phase wraps, global resets, respawn walls and synchronized restarts. Physical periodic forcing is allowed only when visible representation stays continuous.
 
 ## Adaptive creative draw
 
@@ -184,54 +148,24 @@ Files:
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 - `scripts/creative/draw_recipe.py`
 
-The engine selects distant carriers/representations/operators/temporal models/interactions/constraints/render paths and penalizes recent repetition. Explicit REVIEW data is bounded probability evidence only. It is a collision generator, not an art director.
+The engine selects technically distant mechanisms and penalizes recent repetition. REVIEW is bounded probability evidence only. The draw engine generates collisions; it is not an art director.
 
-## Preference evidence
+## Validation / host status
 
-Recovered evidence strongly rejects 026–035 overall. Latest non-empty intermediate telemetry also recovered:
+Code/UID batch `c43be4300105e8677db22dd7c291a59d80fbc9f5` passed CI #307 completely before final docs.
 
-- 031 avg 2.0
-- 032 avg 1.5
-- 033 avg 1.0
-- 034 avg ~2.17
-- 035 avg 1.0
-
-New 036–040 scores were not available remotely because the final close publication was empty. Never infer them from qualitative comments. 038 did receive explicit positive qualitative feedback; preserve that signal without turning it into a clone rule.
-
-## Performance representation
-
-- dense fields: simulate at appropriate cadence and render via suitable texture/material representation;
-- expensive neighbour/contact work belongs in simulation, not duplicated in `_draw()`;
-- hidden state resolution should balance dynamics/live-sync cost while the final representation restores visual resolution;
-- vector geometry is preferred when it preserves useful line/facet detail;
-- MultiMesh/GPU paths remain available for large populations;
-- high FPS never compensates for weak art direction.
-
-## Telemetry
-
-Local runtime telemetry: `res://.telemetry_runtime/`.
-Sanitized remote telemetry:
-
-```text
-branch: telemetry/runtime
-latest.jsonl
-sessions/
-```
-
-Publishing must never block the UI. Review checkpoints are asynchronous. After any host test, inspect matching telemetry before asking for logs or drawing conclusions.
+The user has not yet host-tested this latest build. Therefore LIST/TRASH behavior and 041–045 aesthetics/interactions remain host-validation-required despite green CI.
 
 ## PREVIEW / PROGRAM synchronization
 
-When linked, editor PREVIEW is simulation authority and PROGRAM follows synchronized state. On navigation/detach, final state syncs and PROGRAM continues autonomously. Never create unrelated linked timelines.
-
-PROGRAM touch/mouse maps through the same logical design space as PREVIEW.
+When linked, editor PREVIEW is simulation authority and PROGRAM follows synchronized state. On navigation/detach, final state syncs and PROGRAM continues autonomously. Never create unrelated linked timelines. PROGRAM touch/mouse maps through the same logical design space as PREVIEW.
 
 ## Historical non-regressions
 
 - 005 source path stays `005_pressure_lattice`, visible artwork stays **REGISTER TYPE**.
 - generalized glyph-contour treatment is not a house style.
 - do not restore a permanent full tag wall.
-- ShaderMaterial mutable state remains local to each scene instance.
+- ShaderMaterial mutable state remains local per scene instance.
 - RATE remains opaque/centered/in-app.
 - no main-window visibility toggles at startup.
-- Spout/NDI remain future adapters and must never be represented as installed/working when they are not.
+- Spout/NDI remain future adapters and must never be represented as working when they are not.
