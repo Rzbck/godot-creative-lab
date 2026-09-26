@@ -12,94 +12,116 @@ Commence par résoudre le HEAD réel de `feat/creative-sketches-002-004-20260924
 6. `docs/ARCHITECTURE.md`
 7. `docs/SKETCH_CONTRACT.md`
 
-Après un test hôte, inspecte `telemetry/runtime` avant de demander logs/captures et vérifie que la session correspond au HEAD testé.
+Après tout test hôte, inspecte `telemetry/runtime` **avant** de demander logs/captures. Ne jamais inventer un rating absent de la télémétrie.
 
-## Priorité hôte
+## Dernier retour hôte
 
-Le précédent lancement sur `672385c8...` a exposé une erreur Godot 4.7.1 : `Can't change visibility of main window` dans `_enter_tree()` de `main_runtime_window_memory.gd`. Revision 3 ne touche plus à `Window.visible`; elle applique mode/screen/rect directement dans `_enter_tree()` avant le premier frame de scène.
+Le user a testé 036–040.
 
-Le custom Maximize reste un borderless WINDOWED work-area rectangle avec garde basse de 2 px, jamais le fullscreen natif. F11 reste la présentation artwork.
+- 037 DENDRITE BLOOM : rendu cellulaire/pixelisé + flashes noir/ancienne frame dès interaction ou changement de paramètre.
+- 038 ELECTRIC LACE : premier signal positif clair (`vraiment sympa`) mais interaction souris trop faible; il veut attraper les charges directement.
+- 040 SCHLIEREN VEIL : même glitch stale-frame pendant clic et scrub paramètres.
+- il veut écrire un commentaire libre dans RATE pour expliquer pourquoi un axe est bas/haut.
+- il veut une Gallery type Finder/Explorer : tri fiable, GRID/LIST et taille de cartes réglable.
 
-La fermeture telemetry ferme maintenant le `FileAccess` avant de lancer le publisher final pour éviter la course qui avait produit des `latest.jsonl` vides. À valider sur Windows.
+## Correctif implémenté
 
-## Retours créatifs les plus récents
+Commit code de référence : `e20e1751ed2dae70899f56fcf5217b3d84e75910`, CI #299 complètement verte avant les commits docs.
 
-Le snapshot intermédiaire de la session `003706451ab202f2` récupère enfin les notes 026–030 :
+### Isolation ShaderMaterial — règle permanente
 
-- 026 VOID TENSION = 1.0 partout ;
-- 027 GLASS TIDE = visual 2, tous les autres axes 1, moyenne ~1.17 ;
-- 028 LUMEN MAZE = 1.0 partout ;
-- 029 FIBER FELT = 1.0 partout ;
-- 030 REACTOR SKIN = 1.0 partout.
+Cause racine probable du stale-frame : Gallery conserve une vraie instance cachée de chaque sketch et synchronise ses paramètres. Les scènes shader partageaient leur `ShaderMaterial`; la vignette pouvait donc réécrire les uniforms/textures de l'instance active.
 
-Le user a également qualifié 031–035 de « pas fameux » sans snapshot numérique correspondant. Traite 026–035 comme un échec de direction visuelle globale, pas comme une réussite du système adaptatif.
+Maintenant :
 
-Le user demande : image magnifique, forte même immobile, détaillée à grande résolution, matière/lumière crédibles, plusieurs échelles de détail, interaction qui modifie l'état au lieu d'ajouter un effet souris, et aucune coupure/loop visible.
+- tous les `ShaderMaterial` de sketch existants ont `resource_local_to_scene = true`;
+- `scripts/ci/validate_repository.py` échoue si un futur runtime `.tscn` oublie cette isolation;
+- PREVIEW / Gallery thumbnail / PROGRAM ne doivent jamais partager des uniforms stateful.
 
-## Batch actuel 036–040
+### 037 / 040
 
-La Gallery source doit compter **40 sketches** avant curation locale.
+- deux `ImageTexture` alternées : écriture sur texture inactive puis switch du sampler;
+- interaction marque l'état GPU dirty et pousse une frame complète;
+- reconstruction shader multi-tap du solveur caché pour réduire les gros escaliers de cellules;
+- ne pas augmenter brutalement la grille CPU : l'état doit rester raisonnable pour le live-sync.
 
-- **036 POLAR STRESS** — photoélasticité / biréfringence ; 4 charges persistantes pilotent un shader optique plein écran.
-- **037 DENDRITE BLOOM** — croissance cristalline anisotrope + nutriment ; solveur 96×54 caché, matériau final full-res facetté.
-- **038 ELECTRIC LACE** — lignes de champ électrostatique vectorielles antialiasées recalculées autour de 5 charges mobiles.
-- **039 SOAP CONSTELLATION** — 8 cellules de mousse pression/surface-tension + film mince iridescent full-res.
-- **040 SCHLIEREN VEIL** — champ densité/chaleur/vitesse 80×45 caché, rendu full-res basé gradients de densité type schlieren.
+### 038
 
-Tous ont `creative_signature` + `visual_finish` et 8–9 paramètres.
+- clic uniquement sur une charge dans un vrai hit radius;
+- charge suit directement le pointeur pendant drag;
+- clic vide ne saisit rien;
+- petite inertie au lâcher;
+- anneau de prise discret seulement pendant manipulation.
 
-## Visual Finish Gate
+## REVIEW revision 4
 
-Lire `knowledge/cross-domain/VISUAL_FINISH_GATE.md`.
+RATE modal contient maintenant **WHY / NOTES** :
 
-Depuis 036, `scripts/ci/validate_repository.py` exige dans `definition.json` :
+- texte persistant dans `user://creative_lab_reviews.cfg`;
+- texte inclus dans `creative_preference_snapshot`;
+- bouton SAVE REVIEW + sauvegarde à fermeture du modal;
+- max 2000 caractères;
+- checkpoint telemetry publié ~0.8 s après la dernière note/commentaire afin de ne plus dépendre de la fermeture de l'app.
 
-- `visual_finish.composition` ;
-- `material_model` ;
-- `final_render` ;
-- au moins 3 `detail_scales` ;
-- `interaction_stateful=true`.
+## Gallery browser revision 2
 
-La CI ne juge pas la beauté ; elle interdit seulement de sauter silencieusement l'étape de finition.
+- default **INDEX ↑**, vue plate donc 001→040 réellement ordonnée;
+- INDEX ↓, TITLE A–Z, FAMILY;
+- FAMILY restaure les groupes tags;
+- GRID / LIST;
+- slider de taille des cartes en GRID;
+- état persistant `user://creative_lab_gallery_view.cfg`;
+- tri/reflow réutilise les cartes/SubViewports existants, ne redémarre pas les simulations.
 
-## Qualité temporelle
+## Telemetry / window revision 4
 
-Toujours préférer :
+Le dernier `session_close_request` distant était encore vide. La dernière publication intermédiaire non vide a permis de récupérer 031–035 :
 
-`time -> état/force/mémoire/événement -> système couplé -> rendu`
+- 031 avg 2.0
+- 032 avg 1.5
+- 033 avg 1.0
+- 034 avg ~2.17
+- 035 avg 1.0
 
-Pas de `sin(time)` décoratif, phase wrap visible, reset, respawn wall ou restart synchronisé. FARADAY QUASI reste le cas canonique d'une phase physique valide dont le rendu avait malgré tout créé une coupure.
+Les nouvelles notes 036–040 ne sont **pas** disponibles côté serveur : ne pas les inventer.
 
-## Tirage créatif
+Revision 4 shutdown : `session_close_flush` (non auto-publié) -> `flush()` -> `FileAccess.close()` explicite -> release handle -> un seul publisher final caché avec reason `session_close_request`.
 
-Le moteur adaptatif reste un générateur de collisions, jamais un art director. Pipeline obligatoire :
+## Creative contract
 
-`draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
+Catalogue source : **001–040**.
 
-Les ratings biaisent modestement les tirages ; exploration indépendante conservée.
+Le user a rejeté 026–035 globalement; la diversité technique ne suffit pas. 038 est un signal positif à préserver, pas à transformer arbitrairement.
+
+Lire `knowledge/cross-domain/VISUAL_FINISH_GATE.md` et `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`.
+
+Toujours :
+
+`adaptive draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
+
+Pas de clock wobble générique, phase wrap visible, reset/respawn wall, coarse solver agrandi comme artwork final, ni interaction curseur superficielle.
 
 ## Non-régressions
 
-- 005 reste visuellement **REGISTER TYPE**, jamais Pressure Lattice.
-- ne restaure pas le contour-glyph généralisé comme représentation maison.
-- ne restaure pas le mur permanent de tags.
-- `ShaderSurface` plein-canvas obligatoire via `sketches/_shared/full_canvas_surface.gd`.
-- navigation ne stoppe pas PROGRAM ; TAKE LIVE, touch et live-sync restent stables.
-- RATE modal reste in-app opaque/centré.
-- ne restaure pas `root_window.visible=false/true` sur la fenêtre principale.
+- 005 visible reste **REGISTER TYPE**, jamais Pressure Lattice.
+- pas de contour-glyph généralisé comme house style.
+- pas de mur permanent de tags.
+- `ShaderSurface` plein canvas obligatoire.
+- ShaderMaterial de sketch toujours local à la scène.
+- navigation ne stoppe pas PROGRAM; TAKE LIVE/touch/live-sync stables.
+- RATE reste modal in-app opaque centré.
+- pas de `root_window.visible=false/true` sur la fenêtre principale.
 - pas de faux Spout/NDI.
 
-## Prochaine opération
+## Prochaine opération hôte
 
-Test hôte prioritaire :
+1. résoudre HEAD final + CI exacte;
+2. tester 037 en scrub paramètres + clic/drag : aucun flash noir/ancienne frame;
+3. tester 040 pareil;
+4. tester le grab direct de 038;
+5. écrire une note WHY dans RATE, SAVE REVIEW, attendre brièvement;
+6. vérifier tri 001→040, autres tris, GRID/LIST, taille et persistance après restart;
+7. fermer normalement;
+8. telemetry-first : confirmer un checkpoint review non vide et une fermeture non vide.
 
-1. lancement sans erreur `Can't change visibility of main window` ;
-2. Maximize/Restore stable, fermeture/réouverture cohérente ;
-3. confirmer 40 cartes source moins curation locale ;
-4. FARADAY : vérifier absence de cut idle + click/drag ;
-5. regarder 036–040 d'abord immobiles, puis 20–30 s idle, puis interaction ;
-6. noter 036–040 sur les six axes ;
-7. fermer normalement sans Ctrl+C ;
-8. telemetry-first : exiger un `latest.jsonl` non vide et un nouveau `creative_preference_snapshot`.
-
-Après toute modification matérielle : terminer commits/docs, résoudre HEAD final, attendre CI du SHA exact, donner short SHA + CI et PowerShell canonique de `OPERATIONS.md` si test Windows pertinent.
+Après toute modification matérielle : code/push -> docs -> résoudre HEAD final -> attendre CI du SHA exact -> rapporter short SHA + CI -> fournir PowerShell canonique si host test pertinent.
