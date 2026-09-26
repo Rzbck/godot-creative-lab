@@ -14,7 +14,7 @@
     "main_scene": "res://app/main/main_runtime.tscn",
     "top_runtime_script": "res://app/main/main_runtime_gallery_host_fixes.gd",
     "top_runtime_parent": "res://app/main/main_runtime_window_memory.gd",
-    "expected_gallery_source_count": 50,
+    "expected_gallery_source_count": 55,
     "program_persists_across_navigation": true,
     "take_live_supported": true,
     "touch_program_input": true,
@@ -60,7 +60,7 @@
     "preference_snapshot_event": "creative_preference_snapshot",
     "startup_republish_existing_reviews": true,
     "ratings_are_bounded_evidence_not_clone_instruction": true,
-    "latest_axis_averages": {
+    "historical_axis_averages_before_046_050": {
       "visual": 2.0555555556,
       "interaction": 1.7222222222,
       "originality": 1.9166666667,
@@ -73,7 +73,12 @@
       "012_chemical_blocks": {"average": 3.3333333333},
       "038_electric_lace": {"average": 2.6666666667, "visual": 4, "originality": 4}
     },
-    "latest_written_reviews": {
+    "confirmed_feedback_at_051_generation_boundary": {
+      "046_ink_shear": {"visual": 4, "interaction": 2, "originality": 4, "aliveness": 2, "controls": 2, "performance": 1},
+      "user_summary": "046-050 are already better; consume the notes and advance to the next series",
+      "missing_exact_047_050_values_must_not_be_invented": true
+    },
+    "durable_written_reviews": {
       "041_tension_organ": "oui plutot basic pour ce genre de chos eon ressent ma la physique et en plsu si on tire trop ca cree des bug visuel mal gere",
       "042_mycelium_relay": "opk cest pas mal mais c amanque dinteractione tpareil les parametre on comprend pas on a limpresion que ca fait rien , en gros les parametre cest bine aussi quand onncre eune rell different en faite",
       "043_slit_memory": "on comrpend rien ce nest pa sinteractif temps reel on ressent rine quon on clique et ces tmoche",
@@ -86,13 +91,14 @@
     "latest": "latest.jsonl",
     "sessions_directory": "sessions/",
     "telemetry_first_after_host_test": true,
-    "current_verified_session": "67a6e7499c4524cf",
-    "current_verified_runtime_head": "ceecb6be59a9",
+    "latest_observed_review_checkpoint_head": "c8681daea3d1566c95b522658ad348a8d07415b4",
+    "latest_observed_session": "6b82f797db3cfd8d",
+    "session_blob_was_too_large_for_complete_connector_reconstruction": true,
+    "do_not_invent_unread_values": true,
     "written_note_transport_verified": true,
     "verified_note_location": "creative_preference_snapshot.reviews.<sketch>.note",
     "safe_free_text_fields": ["note"],
     "safe_note_max_chars": 2000,
-    "sanitized_zero_byte_publish_rejected": true,
     "review_checkpoint_enabled": true,
     "review_checkpoint_delay_seconds": 0.8,
     "startup_republish_verified": true
@@ -124,7 +130,8 @@
     "visible_phase_wrap_reset_respawn_wall_rejected": true,
     "controls_must_create_visible_regime_changes": true,
     "interaction_must_be_immediate_and_stateful": true,
-    "weakest_axes_current": ["controls", "aliveness", "interaction"]
+    "performance_is_a_first_class_acceptance_axis": true,
+    "weakest_axes_prior_to_046_050": ["controls", "aliveness", "interaction"]
   },
   "adaptive_creative_draw": {
     "space": "knowledge/cross-domain/creative_draw_space.json",
@@ -134,32 +141,34 @@
     "written_notes_inform_repairs_and_durable_rules": true,
     "draw_is_collision_generator_not_quality_gate": true,
     "latest_implemented_batch": [
-      "046_ink_shear",
-      "047_moire_aperture",
-      "048_active_nematic",
-      "049_temper_skin",
-      "050_ferro_trace"
+      "051_capillary_bridge",
+      "052_fiber_memory",
+      "053_avalanche_bed",
+      "054_hinge_choir",
+      "055_snap_lattice"
     ],
     "latest_batch_feedback_targets": [
-      "stronger_parameter_regime_changes",
-      "higher_aliveness_without_clock_wobble",
-      "direct_stateful_interaction",
-      "no_visible_coarse_pixels",
-      "comprehensible_sources_and_material_causality"
+      "lower runtime cost than 046",
+      "stronger physical material causality",
+      "direct stateful interaction",
+      "parameters that create visible regime changes",
+      "no visible coarse pixels",
+      "working reset",
+      "autonomous life without generic clock wobble"
     ],
     "latest_batch_host_state": "NOT_YET_HOST_RATED"
   },
-  "batch_046_050": {
-    "046_ink_shear": "persistent vector ink filaments + user-written eddies",
-    "047_moire_aperture": "full-resolution analytic interference + directly draggable apertures",
-    "048_active_nematic": "hidden coupled director solver + 880 visible MultiMesh filaments",
-    "049_temper_skin": "state-dependent heat/quench metal + conduction + oxide memory",
-    "050_ferro_trace": "1100 MultiMesh iron filings + directly draggable magnetic poles + hysteresis"
+  "batch_051_055": {
+    "051_capillary_bridge": "84 droplets + persistent pointer-written wet zones + capillary clustering",
+    "052_fiber_memory": "42x13 woven fiber field + direct combing + persistent directional memory + neighbor twist",
+    "053_avalanche_bed": "96-column continuous granular ridge + pour/excavate interaction + repose/cohesion/compaction regimes",
+    "054_hinge_choir": "8x8 coupled mechanical levers + direct manipulation + propagating stored angular energy",
+    "055_snap_lattice": "16x9 large bistable folded facets + isolated-to-cascade snap-through dynamics"
   },
   "validation": {
     "workflow": ".github/workflows/ci.yml",
-    "implementation_head_before_docs": "96471494f10c8c292ab8b0c0c04ea6dcf2828034",
-    "implementation_ci_run": 340,
+    "implementation_head_before_docs": "25cb01539d0b4b767140dab79ee9215e739d1a44",
+    "implementation_ci_run": 348,
     "implementation_ci_passed": true,
     "implementation_ci_jobs": {
       "repository_policy": "success",
@@ -169,6 +178,8 @@
       "main_scene_smoke": "success",
       "tracked_cleanliness": "success"
     },
+    "earlier_failed_ci_run": 346,
+    "earlier_failure_reason": "052 and 054 required TEMPORAL_INTENT documentation for secondary direct-clock modulation",
     "final_exact_head_ci_required_after_docs": true
   },
   "constraints": {
