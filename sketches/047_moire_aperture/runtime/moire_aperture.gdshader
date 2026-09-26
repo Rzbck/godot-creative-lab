@@ -2,7 +2,6 @@ shader_type canvas_item;
 render_mode unshaded;
 
 const float ASPECT = 1.7777778;
-const float PI = 3.14159265359;
 
 uniform vec2 u_anchor0 = vec2(0.28, 0.36);
 uniform vec2 u_anchor1 = vec2(0.72, 0.32);
