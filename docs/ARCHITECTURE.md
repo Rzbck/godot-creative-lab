@@ -19,7 +19,7 @@ Navigation is not transport: PROGRAM continues while the workstation browses or 
 Entry scene: `res://app/main/main_runtime.tscn`.
 Top layer: `res://app/main/main_runtime_window_memory.gd`.
 
-Important chain begins:
+Important chain:
 
 ```text
 main_runtime_window_memory.gd
@@ -35,40 +35,63 @@ main_runtime_window_memory.gd
 
 Always inspect the actual `extends` chain before host edits.
 
-## Workstation window memory revision 3
+## Workstation window / shutdown revision 4
 
 State persists in `user://creative_lab_window_state.cfg`.
 
-The host proved two separate Windows/Godot problems:
+Current rules:
 
-1. native maximize on a borderless monitor-sized client could collapse into fullscreen semantics;
-2. Godot 4.7.1 rejects changing visibility of the main Window from `_enter_tree()`.
+- never toggle main `Window.visible` during startup; Godot 4.7.1 rejects this;
+- apply saved screen/mode/position/size in `_enter_tree()`;
+- logical Maximize is borderless **WINDOWED** usable-screen geometry with a 2 px bottom guard;
+- F11 remains separate artwork presentation;
+- shutdown telemetry writes `session_close_flush`, flushes and explicitly closes the telemetry `FileAccess`, then starts one hidden final publisher with reason `session_close_request`.
 
-Current strategy:
-
-- saved screen/mode/position/size is applied in `_enter_tree()` without changing `Window.visible`;
-- logical Maximize is a borderless **WINDOWED** usable-screen rectangle with a 2 px bottom guard;
-- `_workstation_expanded` prevents that geometry from overwriting the normal restore rectangle;
-- F11 is separate artwork presentation state;
-- first-frame cleanliness and restore behavior require host validation, but CI has no runtime error in headless mode.
+The explicit close order removes the prior race between an automatic close publisher and the dedicated final publisher. Host validation must still prove a fresh non-empty final publication.
 
 ## Gallery architecture
 
-Sketches are data-driven from `sketches/*/definition.json`. Current source catalogue: **001–040**.
+Sketches are data-driven from `sketches/*/definition.json`. Source catalogue: **001–040** before local curation.
 
-Gallery behavior:
+### Thumbnail/runtime model
 
-- real SubViewport thumbnails;
-- idle thumbnails freeze; hovered card animates;
-- persisted sketch parameters restore;
-- search indexes metadata/all tags;
-- adaptive tag rail exposes only a bounded useful subset plus `MORE`;
-- local Trash is reversible and never deletes Git source;
-- review badges reflect persisted explicit ratings.
+- each card owns a real sketch instance in a SubViewport;
+- idle thumbnails freeze; only hovered preview animates;
+- persisted parameters can be mirrored into the hidden thumbnail instance;
+- active PREVIEW and PROGRAM can instantiate the same PackedScene at the same time.
 
-## Review / preference feedback
+This means mutable resources inside a sketch **must not be shared between scene instances**.
 
-Compact row:
+### ShaderMaterial isolation contract
+
+A host stale-frame bug proved that shared ShaderMaterial resources are unsafe: a hidden Gallery thumbnail could overwrite uniforms or state textures used by PREVIEW/PROGRAM.
+
+Permanent contract:
+
+- every runtime sketch `ShaderMaterial` subresource sets `resource_local_to_scene = true`;
+- repository CI enforces this for every `sketches/**/runtime/*.tscn`;
+- PREVIEW, PROGRAM and Gallery thumbnail may share immutable Shader resources, but never the mutable ShaderMaterial uniform state;
+- stateful CPU→GPU textures should be committed atomically. 037/040 use two ImageTexture buffers: update inactive -> switch shader sampler.
+
+### Browser presentation revision 2
+
+Filtering metadata and browsing presentation are separate concerns.
+
+- search still indexes title/index/engine/description/all tags;
+- adaptive quick-tag rail stays bounded, with rare tags in the drawer;
+- default browsing is flat `INDEX ↑`, giving deterministic 001→040 order;
+- alternative sorts: INDEX ↓, TITLE A–Z, FAMILY;
+- FAMILY restores semantic first-tag sections;
+- GRID and LIST modes are available;
+- GRID card/preview size is adjustable;
+- browser state persists in `user://creative_lab_gallery_view.cfg`;
+- sort/reflow reparents existing cards/SubViewports rather than recreating sketch instances.
+
+Local Trash remains reversible and never deletes Git source.
+
+## Review / preference feedback revision 4
+
+Compact row remains:
 
 `REVIEW <avg> RATE TRASH`
 
@@ -81,16 +104,37 @@ RATE is an opaque centered in-app modal with six 1–5 axes:
 - controls
 - performance
 
-Reviews persist in `user://creative_lab_reviews.cfg`.
-Telemetry publishes individual changes plus consolidated `creative_preference_snapshot`.
+It also contains free text **WHY / NOTES**.
 
-Recovered 21-review evidence strongly rejects 026–030; 031–035 are qualitatively weak according to the host. Ratings bias future exploration but never dictate it; 24% of adaptive draws remain preference-free.
+Reviews persist in `user://creative_lab_reviews.cfg`. Written notes are stored beside numeric ratings and included in `creative_preference_snapshot`. `SAVE REVIEW` persists explicitly; modal close saves pending note text.
+
+Ratings/notes schedule a telemetry checkpoint roughly 0.8 s after the last change, so preference evidence does not rely on successful application shutdown.
+
+## Current stateful render fixes
+
+### 037 DENDRITE BLOOM
+
+- hidden 96×54 phase/nutrient/age state remains compact for live sync;
+- two ImageTextures alternate for complete GPU state commits;
+- final shader reconstructs the hidden field using weighted multi-tap sampling before normals/material shading;
+- this reduces visible grid stair-stepping without multiplying synchronized solver state.
+
+### 038 ELECTRIC LACE
+
+- vector field-line system remains the artwork;
+- visible charges are directly grabbable only inside a real hit radius;
+- empty-space click does nothing;
+- drag directly moves the charge, release preserves small inertia.
+
+### 040 SCHLIEREN VEIL
+
+- hidden 80×45 density/heat/velocity field remains compact;
+- double-buffered ImageTexture commit prevents sampling a texture while it is being updated;
+- multi-tap reconstruction occurs before density-gradient schlieren optics.
 
 ## Visual Finish Gate
 
-Technical diversity is not a quality guarantee. Read:
-
-`knowledge/cross-domain/VISUAL_FINISH_GATE.md`
+Technical diversity is not a quality guarantee. Read `knowledge/cross-domain/VISUAL_FINISH_GATE.md`.
 
 Required creative pipeline:
 
@@ -104,21 +148,11 @@ Since sketch 036, repository CI requires `definition.json.visual_finish` with:
 - at least three `detail_scales`
 - `interaction_stateful=true`
 
-This is deliberately a process contract, not an automated beauty score.
-
-## Current batch 036–040
-
-- 036 POLAR STRESS — analytic photoelastic stress field / birefringent full-res material.
-- 037 DENDRITE BLOOM — hidden phase/nutrient crystal solver -> full-res faceted mineral material.
-- 038 ELECTRIC LACE — antialiased vector electrostatic field-line integration around stateful charges.
-- 039 SOAP CONSTELLATION — pressure-coupled foam cells -> full-res thin-film interference material.
-- 040 SCHLIEREN VEIL — hidden density/heat/velocity field -> full-res schlieren gradient optics.
-
-Each has 8–9 meaningful controls and stateful interaction. Implemented creative signatures are recorded in `knowledge/cross-domain/creative_draw_space.json`.
+This is a process contract, not an automated beauty score.
 
 ## Full-canvas render contract
 
-Logical artwork coordinates remain normally 1280×720. Physical PREVIEW/PROGRAM surfaces adapt to their actual viewport.
+Logical artwork coordinates normally remain 1280×720. Physical PREVIEW/PROGRAM surfaces adapt to actual viewport size.
 
 A node named `ShaderSurface` must use:
 
@@ -126,7 +160,7 @@ A node named `ShaderSurface` must use:
 
 CI rejects fixed 1280×720 ShaderSurface offsets.
 
-Low-resolution simulation grids are allowed as hidden state only. The final visible image must reconstruct appropriate high-resolution geometry/material/detail; do not expose enlarged nearest-neighbour solver pixels as finished art.
+Low-resolution simulation grids are hidden state only. Final visible output must reconstruct appropriate high-resolution geometry/material/detail; do not expose enlarged coarse solver pixels as finished art.
 
 ## Temporal-quality contract
 
@@ -138,7 +172,7 @@ Rejected by default:
 
 `time -> sin/cos -> visible position/scale/alpha/warp`
 
-Also reject visible phase wraps, global resets, respawn walls and synchronized restarts. Physical periodic forcing is allowed only when the visible representation stays continuous.
+Also reject visible phase wraps, global resets, respawn walls and synchronized restarts. Physical periodic forcing is allowed only when visible representation stays continuous.
 
 `scripts/ci/audit_temporal_motion.py` audits the corpus. For 026+, direct clock trig requires `TEMPORAL_INTENT:`.
 
@@ -150,19 +184,32 @@ Files:
 - `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
 - `scripts/creative/draw_recipe.py`
 
-The engine selects distant carriers/representations/operators/temporal models/interactions/constraints/render paths and penalizes recent repetition. Explicit REVIEW data is only bounded probability evidence. It is a collision generator, not an art director.
+The engine selects distant carriers/representations/operators/temporal models/interactions/constraints/render paths and penalizes recent repetition. Explicit REVIEW data is bounded probability evidence only. It is a collision generator, not an art director.
+
+## Preference evidence
+
+Recovered evidence strongly rejects 026–035 overall. Latest non-empty intermediate telemetry also recovered:
+
+- 031 avg 2.0
+- 032 avg 1.5
+- 033 avg 1.0
+- 034 avg ~2.17
+- 035 avg 1.0
+
+New 036–040 scores were not available remotely because the final close publication was empty. Never infer them from qualitative comments. 038 did receive explicit positive qualitative feedback; preserve that signal without turning it into a clone rule.
 
 ## Performance representation
 
-- dense fields: simulate at an appropriate cadence, render via texture/fullscreen material when suitable;
+- dense fields: simulate at appropriate cadence and render via suitable texture/material representation;
 - expensive neighbour/contact work belongs in simulation, not duplicated in `_draw()`;
-- vector geometry is preferred when it preserves useful line/facet resolution;
+- hidden state resolution should balance dynamics/live-sync cost while the final representation restores visual resolution;
+- vector geometry is preferred when it preserves useful line/facet detail;
 - MultiMesh/GPU paths remain available for large populations;
-- performance is part of visual quality, but high FPS alone never compensates for weak art direction.
+- high FPS never compensates for weak art direction.
 
 ## Telemetry
 
-Local runtime telemetry lives under `res://.telemetry_runtime/`.
+Local runtime telemetry: `res://.telemetry_runtime/`.
 Sanitized remote telemetry:
 
 ```text
@@ -171,13 +218,7 @@ latest.jsonl
 sessions/
 ```
 
-Publishing must never block the UI. Revision 3 close handling flushes and releases the active telemetry file before spawning the final hidden PowerShell publisher, fixing the previous empty-close race in principle. Host validation still required.
-
-After any host test, inspect matching telemetry before asking for logs or drawing conclusions.
-
-## FARADAY continuity rule
-
-FARADAY QUASI established an important failure case: a physically periodic state can still render badly if a wrapped phase is transformed with non-integer coefficients. Current 025 keeps forcing phase internal and visual modal phases continuous. Treat any visible seam/cut as a blocker.
+Publishing must never block the UI. Review checkpoints are asynchronous. After any host test, inspect matching telemetry before asking for logs or drawing conclusions.
 
 ## PREVIEW / PROGRAM synchronization
 
@@ -185,22 +226,12 @@ When linked, editor PREVIEW is simulation authority and PROGRAM follows synchron
 
 PROGRAM touch/mouse maps through the same logical design space as PREVIEW.
 
-## Knowledge references
+## Historical non-regressions
 
-For substantial work consult relevant sections of:
-
-- `TECHNIQUE_PALETTE.md`
-- `RANDOM_COLLISION_ENGINE.md`
-- `COLLISION_SOURCE_CATALOG.md`
-- `PHYSICAL_CHEMICAL_SYSTEMS_ATLAS.md`
-- `ORGANIC_COUPLING_AND_CONTROLS.md`
-- `REALTIME_PERFORMANCE_BUDGET.md`
-- `TEMPORAL_MOTION_QUALITY.md`
-- `ADAPTIVE_CREATIVE_DRAW.md`
-- `VISUAL_FINISH_GATE.md`
-
-References supply mechanisms and constraints, never surfaces to copy.
-
-## Optional future outputs
-
-Spout and NDI remain future adapters and must never be represented as already working.
+- 005 source path stays `005_pressure_lattice`, visible artwork stays **REGISTER TYPE**.
+- generalized glyph-contour treatment is not a house style.
+- do not restore a permanent full tag wall.
+- ShaderMaterial mutable state remains local to each scene instance.
+- RATE remains opaque/centered/in-app.
+- no main-window visibility toggles at startup.
+- Spout/NDI remain future adapters and must never be represented as installed/working when they are not.
