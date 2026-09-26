@@ -67,7 +67,7 @@ func _seed_filaments() -> void:
     for i: int in range(MAX_FILAMENTS):
         var lane := i % 3
         var phase := _hash01i(i * 41 + 7)
-        var base_y := [178.0, 362.0, 544.0][lane]
+        var base_y: float = float([178.0, 362.0, 544.0][lane])
         _positions[i] = Vector2(
             lerpf(58.0, 1190.0, phase),
             base_y + (_hash01i(i * 67 + 13) - 0.5) * 118.0
@@ -219,7 +219,7 @@ func _respawn_filament(i: int) -> void:
     _respawns[i] += 1
     var r := _respawns[i]
     var lane := (i + r) % 3
-    var base_y := [172.0, 356.0, 540.0][lane]
+    var base_y: float = float([172.0, 356.0, 540.0][lane])
     var from_left := _hash01i(i * 193 + r * 31) > 0.18
     var x := 46.0 if from_left else lerpf(110.0, 1160.0, _hash01i(i * 211 + r * 43))
     _positions[i] = Vector2(x, base_y + (_hash01i(i * 223 + r * 59) - 0.5) * 150.0)
