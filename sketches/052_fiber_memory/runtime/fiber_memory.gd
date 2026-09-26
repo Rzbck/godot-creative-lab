@@ -1,5 +1,7 @@
 extends "res://sketches/_shared/design_sketch_base.gd"
 
+# TEMPORAL_INTENT: low-amplitude clock terms only modulate autonomous current; persistent fiber state is driven by spring relaxation and user-written comb memory.
+
 const STRANDS: int = 42
 const POINTS: int = 13
 const SAFE := Rect2(64.0, 54.0, 1152.0, 612.0)
@@ -168,6 +170,7 @@ func _draw() -> void:
         draw_polyline(points, Color(0.0, 0.0, 0.0, 0.18), 4.2, true)
         draw_polyline(points, base, 1.2 + stiffness * 0.34, true)
 
+    # Sparse transverse stitches make the distortion readable as material, not hairlines.
     for p: int in range(1, POINTS - 1, 2):
         var stitch := PackedVector2Array()
         for s: int in range(0, STRANDS, 2):
