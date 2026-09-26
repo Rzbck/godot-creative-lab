@@ -183,6 +183,7 @@
       "main_scene_smoke": "success",
       "tracked_cleanliness": "success"
     },
+    "docs_bundle_commit_before_final_ci": "04672299404ecb56a51941afea7154c8655e0ed1",
     "final_exact_head_ci_required_after_docs": true
   },
   "constraints": {
