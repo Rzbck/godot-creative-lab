@@ -12,118 +12,116 @@ Avant toute conclusion, résous le HEAD réel de `feat/creative-sketches-002-004
 6. `docs/ARCHITECTURE.md`
 7. `docs/SKETCH_CONTRACT.md`
 
-Après tout test hôte, inspecte `telemetry/runtime` **avant** de demander logs/captures et avant de créer le batch suivant.
+Après tout test hôte, inspecte `telemetry/runtime` **avant** de demander logs/captures et avant de réparer ou créer un nouveau batch.
 
-## Priorité actuelle
+## Etat actuel
 
-Le dernier test hôte concernait HEAD `a55c65c6...`.
+Catalogue source : **001–050**.
 
-Retours directs :
-- LIST était beaucoup trop haut (132 px) : le user veut une vraie liste compacte, avec preview utilisée en background décoratif sur une partie de la ligne.
-- il veut NEXT/PREV directement dans l'écran sketch.
-- il a écrit de nombreux commentaires RATE et ne veut plus devoir les recopier dans le chat.
-- 041 TENSION ORGAN spammait `Invalid polygon data, triangulation failed` dans `_draw()`.
+Le batch **046–050** a été construit après lecture croisée des notes numériques + written reviews disponibles. Il est techniquement validé mais **pas encore accepté visuellement par le user**.
 
-## Patch implémenté
+Implementation HEAD avant docs : `96471494f10c8c292ab8b0c0c04ea6dcf2828034`.
+CI code **#340** : GREEN complet (policy, temporal audit, creative draw self-test, Godot import, main smoke, cleanliness).
 
-Références code avant docs :
-- `21d31984...` : host layer revision 2, LIST compact + PREV/NEXT + startup review republish.
-- `df9710ae...` : 041 cellules rendues en triangles explicites sûrs.
-- `0c360c358e4b08fc456ba158fd35d6f62e18a253` : sanitizer telemetry conserve désormais les written reviews.
-- CI code #312 : GREEN complet.
+Ne confonds jamais ce succès CI avec un succès artistique.
 
-### LIST revision 2
+## Evidence utilisateur désormais vérifiée
 
-- hauteur = 68 px;
-- preview réelle réutilisée à faible alpha comme fond sur la partie droite de la ligne;
-- pas de grosse vignette séparée;
-- index/titre/méta en overlay compact;
-- GRID inchangé;
-- TRASH reste exclusif.
+La pipeline written-review est maintenant réellement vérifiée. Session `67a6e7499c4524cf`, runtime `ceecb6be59a9` : les notes existent sous `creative_preference_snapshot.reviews.<sketch>.note` et le startup republish fonctionne.
 
-### PREV / NEXT
+Axes moyens visibles :
+- visual ~2.06
+- interaction ~1.72
+- originality ~1.92
+- aliveness ~1.64
+- controls ~1.56
+- performance ~2.42
 
-ProjectToolbar contient `‹ PREV` / `NEXT ›`.
-- ordre numérique global des sketches actuellement browsables;
-- trash local sauté;
-- pas de wrap;
-- boutons désactivés aux limites;
-- switching par `_open_sketch()` normal : PROGRAM ne doit jamais être remplacé par cette navigation.
+Donc les trois faiblesses dominantes à corriger sont : **controls, aliveness, interaction**.
 
-### 041
+Signaux positifs bornés :
+- 020 ECHO TISSUE ~4.17 : causalité/lisibilité/contrôle forts, mais ne pas le cloner;
+- 012 CHEMICAL BLOCKS ~3.33;
+- 038 ELECTRIC LACE ~2.67, visual 4 + originality 4 : sources compréhensibles, mais interaction/controls restaient faibles.
 
-Le quad dynamique à 4 points était parfois concave/inversé, donc RenderingServer ne pouvait pas le trianguler.
-Maintenant chaque cellule choisit sa diagonale la plus courte, dessine deux triangles explicites et ignore les triangles quasi nuls. La physique n'a pas changé.
+Written reviews utiles :
+- 041 : trop basic pour le sujet, physique peu ressentie, bugs visuels quand on tire trop;
+- 042 : plutôt pas mal mais manque d'interaction; paramètres semblent ne rien faire au lieu de créer un résultat réellement différent;
+- 043 : incompréhensible, pas interactif temps réel, clic sans sensation, rejet visuel;
+- 044 : trop pixelisé, pas de reset, paramètres faibles;
+- 045 : rejet visuel/semantic très fort, résultat incompréhensible.
 
-## Written RATE — règle de travail obligatoire
+Règle durable : **un paramètre est valide s'il change visiblement le régime/composition/comportement**, pas s'il fait seulement varier un “amount”. Une interaction doit être immédiatement lisible et laisser une conséquence stateful/différée.
 
-Le remote de l'ancienne version contient bien les checkpoints et les notes numériques, mais l'ancien sanitizer retirait la string `note`. Les événements `sketch_review_note_changed` ne conservaient donc que `note_length`.
+## Batch 046–050
 
-Le nouveau sanitizer :
-- autorise explicitement `note`, max 2000 chars;
-- nettoie les caractères de contrôle;
-- garde les identifiants/signatures créatives utiles;
-- refuse de publier un fichier sanitized vide.
+### 046 INK SHEAR
+- filaments d'encre vectoriels persistants;
+- le geste écrit des eddies persistants;
+- viscosité/vorticité/bleed/pigment/brush/memory doivent produire des changements réellement lisibles;
+- aucun coarse fluid grid visible.
 
-Les commentaires sont déjà stockés localement dans `user://creative_lab_reviews.cfg`. Host layer revision 2 planifie un checkpoint au startup. **Au prochain test, vérifie que les anciens commentaires apparaissent réellement dans `creative_preference_snapshot.reviews.<sketch>.note` sans re-saisie.**
+### 047 MOIRE APERTURE
+- champ analytique full-resolution;
+- apertures/anchors directement dragables;
+- density/angle/shear/lens doivent basculer vers des familles d'interférence distinctes;
+- pas de texture de solver grossière.
 
-À partir de maintenant, les written reviews sont une source de premier rang :
-- les lire avec les ratings numériques avant toute réparation ou nouvelle génération;
-- en extraire le pourquoi des faibles/bonnes notes;
-- corriger les sketches concernés quand le commentaire est actionnable;
-- faire évoluer les règles durables si le même retour se répète;
-- ne jamais demander au user de recoller dans le chat un commentaire déjà présent dans RATE/telemetry;
-- ne jamais inventer le contenu d'un commentaire absent du remote.
+### 048 ACTIVE NEMATIC
+- solver direction/flow discret caché;
+- rendu final = 880 filaments MultiMesh;
+- geste écrit orientation/spin;
+- alignment/activity/defect birth/flow memory doivent produire des régimes active-matter différents.
 
-## Evidence actuelle
+### 049 TEMPER SKIN
+- métal thermique avec conduction/cooling/oxide memory;
+- interaction dépend de l'état : zone froide chauffée, zone déjà chaude quench/refroidie;
+- paramètres = durée thermique, couplage et mémoire matériau, pas simple brightness.
 
-Dernier snapshot remote lisible :
-- 036 ~1.83
-- 037 ~2.33
-- 038 ~2.67, visual 4/originality 4 — meilleur signal récent, mais interaction/controls faibles
-- 039 ~2.17
-- 040 2.0
-- 043 1.0
-- 044 2.0
-- 045 1.0
+### 050 FERRO TRACE
+- 1100 limaille/filings MultiMesh;
+- 2–4 pôles directement déplaçables;
+- hystérésis d'orientation;
+- reprendre la lisibilité de sources de 038 sans reprendre son esthétique.
 
-041/042 ne doivent pas être inventés s'ils ne sont pas présents dans le snapshot suivant.
+`knowledge/cross-domain/creative_draw_space.json` contient maintenant 046–050 dans l'historique collision-avoidance.
 
-## Catalogue / creative contract
+## Host test prioritaire
 
-Catalogue source : **001–045**.
-Lire :
-- `knowledge/cross-domain/VISUAL_FINISH_GATE.md`
-- `knowledge/cross-domain/TEMPORAL_MOTION_QUALITY.md`
-- `knowledge/cross-domain/ADAPTIVE_CREATIVE_DRAW.md`
-- `knowledge/cross-domain/creative_draw_space.json`
+Quand le user teste :
 
-Toujours :
-`adaptive draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
+1. confirmer Gallery = 50;
+2. laisser chaque 046–050 vivre 20–30 s au default avant manipulation;
+3. interaction -> release -> vérifier réponse immédiate + mémoire/consequence;
+4. pousser tous les paramètres sur de grands écarts et relever ceux qui semblent inutiles;
+5. vérifier 046 eddies opposés et persistance;
+6. vérifier 047 regimes d'interférence très différents;
+7. vérifier 048 defects/flow visibles via filaments, jamais via pixels grossiers;
+8. vérifier 049 heat puis quench state-dependent + extremes conduction/cooling/oxide;
+9. vérifier 050 poles dragables + réorganisation/hystérésis des filings;
+10. RATE numeric + WHY/NOTES normalement, sans demander au user de recopier les notes dans le chat;
+11. fermeture normale, puis **telemetry-first** sur le tour suivant;
+12. n'attribuer FPS/ratings qu'après vérification que telemetry correspond au HEAD/session réellement testé.
 
-Pas de coarse solver agrandi, generic clock wobble, phase wrap/reset visible, pointer overlay superficiel, ou diversité technique prise pour une réussite artistique.
+## Contrats à préserver
 
-## Non-régressions
-
-- 005 reste visible **REGISTER TYPE**; ne jamais restaurer Pressure Lattice.
+- 005 visible = **REGISTER TYPE**; ne jamais restaurer Pressure Lattice.
 - pas de contour-glyph généralisé.
 - pas de mur permanent de tags.
-- ShaderSurface plein canvas obligatoire.
-- ShaderMaterial stateful toujours local à la scène.
-- navigation Gallery/PREV/NEXT ne stoppe pas PROGRAM.
-- TAKE LIVE, physical output input et linked-state sync restent stables.
-- RATE reste modal opaque/centré/in-app.
+- LIST reste compacte ~68 px, preview en background décoratif.
+- PREV/NEXT ne remplace jamais PROGRAM; TAKE LIVE reste explicite.
+- PROGRAM persiste à travers Gallery/Settings/navigation.
+- linked PREVIEW/PROGRAM = même timeline/state.
+- physical PROGRAM touch/mouse fonctionne.
+- ShaderSurface plein canvas.
+- ShaderMaterial mutable toujours local à la scène.
+- RATE opaque/centré/in-app.
 - pas de `Window.visible=false/true` au startup.
 - pas de faux Spout/NDI.
+- pas de generic direct-clock wobble comme aliveness.
+- pas de solver coarse exposé comme finition artistique.
+- written reviews = source de premier rang, mais ne jamais transformer un bon score en règle de clonage.
 
-## Prochaine validation hôte
+## Completion obligatoire
 
-1. sync HEAD final + attendre CI exacte;
-2. LIST compact / preview background;
-3. PREV/NEXT sur plusieurs sketches, vérifier PROGRAM inchangé;
-4. stress 041, vérifier zéro triangulation error;
-5. ne pas retaper les reviews : laisser le startup checkpoint partir;
-6. telemetry-first : confirmer que les vraies strings `note` sont présentes;
-7. utiliser ces commentaires avant le prochain batch créatif.
-
-Après toute modification matérielle : code/push -> docs/state -> résoudre HEAD final -> attendre CI exacte -> rapporter SHA/CI -> PowerShell canonique si test hôte pertinent -> telemetry-first après test.
+Après toute modification matérielle : code/push -> docs/state -> résoudre HEAD final -> attendre CI exacte -> inspecter tous les jobs -> rapporter SHA/CI -> PowerShell canonique si test hôte pertinent -> telemetry-first après test.
