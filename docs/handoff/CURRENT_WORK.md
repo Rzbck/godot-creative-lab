@@ -1,6 +1,6 @@
 # Current work — DC//LAB
 
-Last refreshed: 2026-09-25.
+Last refreshed: 2026-09-26.
 
 ## Active branch / PR
 
@@ -8,125 +8,122 @@ Last refreshed: 2026-09-25.
 - draft PR: #7
 - base: `feat/gallery-project-workflow-20260923`
 - never merge/change `main` without explicit user approval
-- final remote HEAD + exact-head CI are authoritative
+- resolve final remote HEAD after all docs commits, then require CI on that exact SHA
 
 ## Stable product behavior
 
-Preserve Gallery real previews/hover animation, adaptive search/filtering, parameter persistence, REVIEW/Trash, PREVIEW/PROGRAM separation, persistent PROGRAM across navigation, TAKE LIVE, physical output input, linked state sync, full-canvas output and async telemetry.
+Preserve real Gallery thumbnails/hover animation, parameter persistence, PREVIEW/PROGRAM separation, persistent PROGRAM across navigation, TAKE LIVE, physical output input, linked state sync, artwork-only PROGRAM output and async telemetry.
 
 Current top runtime: `app/main/main_runtime_window_memory.gd`.
-Source catalogue after this pass: **001–040**.
+Source catalogue: **001–040** before local curation.
 
-## Host evidence that drove this pass
+## Latest host feedback — 2026-09-26
 
-The latest host log on `672385c8...` showed `ERROR: Can't change visibility of main window` from `main_runtime_window_memory.gd:_enter_tree`. Main-window visibility toggling is rejected on Godot 4.7.1.
+The user tested 036–040 and reported:
 
-Intermediate telemetry session `003706451ab202f2` recovered ratings that had previously looked lost:
+- **037 DENDRITE BLOOM:** obvious pixel stair-stepping and stale/black-frame flashes whenever interacting or changing parameters.
+- **038 ELECTRIC LACE:** positive concept signal (`vraiment sympa`), but interaction was too weak/indirect; charges should be grabbed directly by clicking on them.
+- **040 SCHLIEREN VEIL:** same stale-frame / old-frame glitch on click and parameter changes as 037.
+- RATE needs a free-text explanation field so low/high axis scores have a reason.
+- Gallery needs file-browser controls: deterministic sort, GRID/LIST modes and adjustable card size.
 
-- 026 = all 1 (avg 1.0)
-- 027 = 2 visual, all other axes 1 (avg ~1.17)
-- 028 = all 1
-- 029 = all 1
-- 030 = all 1
+The attached 037 host capture visibly showed coarse cell boundaries, so the complaint is grounded in the rendered output rather than only subjective description.
 
-21-review axis averages: visual ~2.0, interaction ~1.857, originality ~1.857, aliveness ~1.619, controls ~1.762, performance ~2.571.
+## Telemetry recovered from this test
 
-031–035 have no trustworthy numeric snapshot; host direct verdict is “pas fameux”. Treat 026–035 as evidence that technical diversity and more rendering detail still do not automatically create strong artwork.
+Telemetry-first was performed.
 
-## New creative quality contract
+- final `session_close_request` publication was empty again;
+- the last non-empty intermediate checkpoint recovered numeric ratings for 031–035:
+  - 031 FOLD CHAMBER: avg **2.0**;
+  - 032 LUMEN SWARM: avg **1.5**;
+  - 033 OBSIDIAN CATHEDRAL: avg **1.0**;
+  - 034 PHOSPHOR SAND: avg **~2.17**;
+  - 035 DUNE CHOIR: avg **1.0**.
+- new 036–040 scores were not present in the recoverable remote checkpoint. Do **not** invent them.
 
-`knowledge/cross-domain/VISUAL_FINISH_GATE.md` is mandatory for substantial work.
+## Root cause — stale shader frames
 
-Pipeline:
+The key architectural bug was shared mutable `ShaderMaterial` resources.
 
-`draw -> prototype -> observe -> mutate -> art-direct -> visual-finish gate -> keep/reject`
+The Gallery keeps a hidden real sketch instance for each thumbnail. Parameter persistence also mirrors parameter changes into that hidden instance. Shader scenes used a non-local `ShaderMaterial`, so Gallery thumbnail, active PREVIEW and PROGRAM instances could share uniforms/textures. A hidden thumbnail could therefore overwrite `u_state` on the active artwork with an old texture.
 
-Since 036, CI requires each definition to declare `visual_finish` with composition, material model, final render, >=3 detail scales and stateful interaction. This is a process guard only; RATE/host judgment remains the aesthetic authority.
+Implementation commit `e20e1751ed2dae70899f56fcf5217b3d84e75910` fixes this globally:
 
-## Batch 036–040
+- all current sketch `ShaderMaterial` subresources now set `resource_local_to_scene = true`;
+- repository CI rejects any future runtime sketch ShaderMaterial missing this flag;
+- 037 and 040 use double-buffered `ImageTexture` uploads and atomically switch the shader sampler after updating the inactive texture;
+- interaction marks state dirty and publishes the next complete state without waiting for an unrelated later simulation tick;
+- 037 and 040 shaders reconstruct coarse hidden state with weighted multi-tap sampling before lighting/gradients, reducing visible cell stair-stepping without multiplying live-sync state size.
 
-### 036 POLAR STRESS
+CI #299 passed the implementation commit fully: repository policy, Godot 4.7.1 import, main-scene smoke and tracked cleanliness.
 
-- photoelastic/birefringent stressed glass;
-- four persistent stress anchors;
-- analytic principal stress field;
-- polarized spectral fringes, edge caustics, micro glass grain;
-- touch changes a real load;
-- full-resolution shader, 8 params.
+## 038 ELECTRIC LACE interaction revision
 
-### 037 DENDRITE BLOOM
+038 keeps the visual/technical concept. Interaction changed only:
 
-- anisotropic crystal phase growth + nutrient depletion/remelting;
-- hidden 96x54 neighbour-coupled solver;
-- full-resolution faceted mineral material and micrograin;
-- touch seeds local future growth;
-- 9 params.
+- click must land within a real charge hit radius;
+- drag directly positions that charge instead of weakly moving a target spring;
+- empty-space clicks no longer grab an arbitrary nearest charge;
+- release keeps a small inertial velocity;
+- a subtle grab ring appears only while manipulating the charge.
 
-### 038 ELECTRIC LACE
+## REVIEW revision 4
 
-- five stateful charges;
-- antialiased vector field-line integration/rebuild;
-- line halo + hairline core;
-- touch moves a charge, globally recomputing topology;
-- 8 params.
+RATE remains an opaque centered in-app modal but now includes **WHY / NOTES**.
 
-### 039 SOAP CONSTELLATION
+- free-text note stored in `user://creative_lab_reviews.cfg` beside the six numeric axes;
+- note included in `creative_preference_snapshot` telemetry;
+- `SAVE REVIEW` persists explicitly; closing the modal also saves pending text;
+- note capped at 2000 characters;
+- ratings/notes schedule a telemetry checkpoint ~0.8 s after the last edit, so feedback reaches the remote branch without depending on app shutdown.
 
-- eight pressure/radius/velocity soap cells;
-- pairwise surface-tension relaxation;
-- full-resolution thin-film interference/seams/pearly detail;
-- touch loads and moves a cell;
-- 9 params.
+## Gallery browser revision 2
 
-### 040 SCHLIEREN VEIL
+Gallery keeps semantic tags/search but adds file-browser behavior:
 
-- hidden 80x45 density/heat/velocity field;
-- advection, diffusion, buoyancy and vorticity;
-- reservoir-driven plumes rather than synchronized reset;
-- full-resolution density-gradient schlieren material;
-- touch injects heat/density/vorticity;
-- 9 params.
+- default flat sort: **INDEX ↑**;
+- other sorts: INDEX ↓, TITLE A–Z, FAMILY;
+- FAMILY restores semantic grouped sections;
+- GRID / LIST presentation toggle;
+- adjustable grid card/preview size;
+- browser state persists to `user://creative_lab_gallery_view.cfg`;
+- sorting/reflow reparents existing cards and keeps their real SubViewport instances alive instead of recreating simulations.
 
-First runtime CI #296 caught invalid CanvasItem `SCREEN_PIXEL_SIZE` use. Corrected 036/037/039/040 to use logical design aspect + `FRAGCOORD` microdetail. Runtime commit `bebe9fe8...` passed CI #297 fully.
+## Window / telemetry revision 4
 
-## Window-state revision 3
+Startup still never toggles main-window visibility. Revision 4 changes shutdown:
 
-`main_runtime_window_memory.gd` no longer touches `root_window.visible`.
+- close writes non-autopublished `session_close_flush` telemetry;
+- flushes and explicitly calls `FileAccess.close()`;
+- releases the handle;
+- then starts the single hidden final publisher with reason `session_close_request`;
+- this removes the previous automatic-close-publisher vs dedicated-final-publisher race.
 
-- state applied in `_enter_tree()` as mode/screen/geometry only;
-- custom Maximize remains borderless WINDOWED work-area geometry with 2 px bottom guard;
-- F11 remains independent artwork presentation;
-- saved state remains `user://creative_lab_window_state.cfg`.
+Host validation must prove the final remote session is non-empty.
 
-Needs Windows host validation.
+## Creative quality / temporal rules
 
-## Telemetry close revision
+`knowledge/cross-domain/VISUAL_FINISH_GATE.md` remains mandatory from 036 onward.
 
-Previous close publisher could race with an open telemetry handle; user also interrupted final publisher with Ctrl+C. Revision 3 flushes and releases the `FileAccess` handle before spawning hidden PowerShell publisher. Host validation must close normally and confirm a non-empty final session/latest.
-
-## FARADAY QUASI
-
-Current fix removes wrapped forcing phase from visible shader coordinates and removes direct click-local height bump. Test idle 30 s then click/hold/drag/release repeatedly. Any global seam/cut remains a blocker.
-
-## Temporal / performance rules
-
+- technical diversity is not visual quality;
+- frozen frame must already work as an image;
+- several useful detail scales;
+- hidden low-res solver may drive state, never be exposed directly as enlarged final art;
 - no generic `time -> sin/cos -> visible wobble`;
 - no visible phase wrap/reset/respawn wall;
-- low-res state is allowed only behind a higher-quality final representation;
-- `ShaderSurface` uses shared full-canvas sizing;
-- neighbour/contact work belongs in simulation cadence and is not duplicated in `_draw()`.
+- interaction enters state/material/topology, not a generic pointer overlay.
 
-## Next host test
+## Next host validation
 
-1. launch with no main-window visibility error;
-2. test Maximize/Restore + close/reopen window state;
-3. test FARADAY cut;
-4. confirm 40 source cards;
-5. judge 036–040 frozen frame, idle motion, interaction/recovery;
-6. RATE all five;
-7. close normally and let telemetry publisher finish;
-8. next AI inspects matching telemetry first.
+1. Sync exact final HEAD and wait exact-head CI before launch.
+2. Open 037; drag/click and scrub several parameters continuously. No black/stale-frame flashes; cell stair-stepping should be substantially reduced.
+3. Open 040; repeat click/drag and parameter scrubbing. No old-frame flash/glitch.
+4. Open 038; click directly on charges, drag them, release; empty-space click should not grab one.
+5. Open RATE; write a WHY / NOTES comment, save, wait briefly, then continue testing.
+6. Gallery: verify default 001→040 ordering, INDEX ↓, TITLE, FAMILY, GRID/LIST and size slider; restart and confirm browser state persists.
+7. Close normally. Next AI inspects `telemetry/runtime` first and requires a fresh non-empty review checkpoint/final session before trusting 036–040 ratings.
 
 ## Mandatory completion
 
-After material changes: code -> durable docs -> exact final remote HEAD -> exact-head CI -> report SHA/result -> canonical PowerShell if host test useful -> telemetry-first after host test.
+After material changes: code -> durable docs/state -> exact final remote HEAD -> exact-head CI -> report SHA/result -> canonical PowerShell when host testing is useful -> telemetry-first after host test.
